@@ -47,6 +47,8 @@
     - name: Update microk8s core addons repo
       become: true
       ansible.builtin.command: microk8s addons repo update core
+      register: update_result
+      changed_when: update_result.stdout is not search("Already up to date")
 
     - name: Enable microk8s addons
       ansible.builtin.command: microk8s enable {{ item }}
