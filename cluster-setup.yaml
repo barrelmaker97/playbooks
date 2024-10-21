@@ -95,7 +95,7 @@
     - name: Configure MetalLB
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('template', './definitions/configmap-metallb.yaml') | from_yaml }}"
+        template: ./definitions/configmap-metallb.yaml
 
     - name: Advertise Load Balanced IP
       kubernetes.core.k8s:
@@ -110,12 +110,12 @@
     - name: Load Balance Ingress Controller
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('template', './definitions/service-ingress.yaml') | from_yaml }}"
+        template: ./definitions/service-ingress.yaml
 
     - name: Create Ingress for Observability
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('template', './definitions/ingress-observability.yaml') | from_yaml }}"
+        template: ./definitions/ingress-observability.yaml
 
     - name: Install helm
       become: true
@@ -146,6 +146,6 @@
 
     - name: Create PVs
       kubernetes.core.k8s:
-        definition: "{{ lookup('template', '{{ item }}') | from_yaml }}"
+        template: "{{ item }}"
       with_fileglob:
         - ./definitions/persistent-volumes/*.yaml
