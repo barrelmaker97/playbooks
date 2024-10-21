@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: "{{ cluster_user }}"
+  namespace: "{{ cluster_user }}"
+spec:
+  hard:
+    requests.cpu: 5
+    requests.memory: 16Gi
+#   limits.cpu: 10
+#   limits.memory: 20Gi

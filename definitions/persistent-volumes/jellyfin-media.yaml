@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-media
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: jellyfin-media
+  nfs:
+    server: soteria.lan
+    path: /volume1/local_only/content/media

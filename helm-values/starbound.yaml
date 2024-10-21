@@ -1,0 +1,4 @@
+---
+serverPort: 30011  # Must be in the range 30000-32767
+storageClassName: starbound
+timezone: "America/Chicago"

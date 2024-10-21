@@ -1,0 +1,48 @@
+---
+storageClassName: niucraft
+serverPort: 30013  # Must be in the range 30000-32767
+dynmap: true
+metrics: true
+properties:
+  aikarFlags: true
+  enforceWhitelist: true
+  memory: "6G"
+  motd: "NIUCraft Server"
+  ops: "Barrelmaker97"
+  existingWhitelist: "SYNCHRONIZE"
+  existingOps: "SYNCHRONIZE"
+  paperChannel: "default"
+  serverName: "NIUCraft"
+  spigetResources: "81534,36618"
+  modrinthProjects: "dynmap:beta"
+  type: "PAPER"
+  version: "1.21.1"
+  viewDistance: "32"
+  whitelist: >-
+    BakerGang2022,
+    Barrelmaker97,
+    Lil_Doza,
+    LuckierDodge,
+    Solo22499,
+    Spronix,
+    ThePrimeus,
+    ninjahomie7
+
+resources:
+  requests:
+    memory: 7000Mi
+    cpu: 1000m
+  limits:
+    memory: 8000Mi
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+podSecurityContext:
+  fsGroup: 1000

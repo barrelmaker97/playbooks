@@ -1,0 +1,14 @@
+---
+all:
+  hosts:
+    hermes:
+      ansible_host: 192.168.15.50
+      ansible_user: barrelmaker
+      cluster_user: barrelmaker
+      cluster_vip: 192.168.15.60
+      cluster_port: 16443
+      local_domain: lan
+      metallb_ip_range: 192.168.15.60-192.168.15.69
+      microk8s_channel: 1.31/stable
+      upstream_dns: 192.168.15.1
+      cert_expiration_seconds: 604800  # 7 days

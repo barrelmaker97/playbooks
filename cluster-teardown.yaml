@@ -1,0 +1,26 @@
+---
+- hosts: hermes
+  tasks:
+    - name: Check if microk8s is installed
+      ansible.builtin.command: snap list microk8s
+      register: microk8s_installed
+      ignore_errors: true
+      changed_when: false
+
+    - name: Cluster teardown
+      when: microk8s_installed.rc == 0
+      block:
+        - name: Stop microk8s
+          ansible.builtin.command: microk8s stop
+
+        - name: Remove microk8s
+          become: true
+          community.general.snap:
+            name: microk8s
+            state: absent
+            options:
+              - purge
+
+        - name: Reboot
+          ansible.builtin.reboot:
+            reboot_timeout: 600

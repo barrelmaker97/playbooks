@@ -1,0 +1,18 @@
+---
+metrics: true
+serverPort: 30002  # Must be in the range 30000-32767
+storageClassName: factorio
+
+resources:
+  factorio:
+    requests:
+      memory: 1000Mi
+      cpu: 800m
+    limits:
+      memory: 2000Mi
+  metrics:
+    requests:
+      memory: 40Mi
+      cpu: 10m
+    limits:
+      memory: 80Mi
