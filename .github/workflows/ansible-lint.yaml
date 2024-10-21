@@ -10,5 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run ansible-lint
-        uses: ansible/ansible-lint@main
+      - name: Set up Python
+        uses: actions/setup-python@v5
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install pipx
+          pipx ensurepath
+          pipx install --include-deps ansible
+          pipx inject --include-apps ansible ansible-lint
+      - name: Lint
+        run: ansible-lint
