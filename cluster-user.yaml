@@ -44,7 +44,7 @@
     - name: Create User CSR Object
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('template', './definitions/csr-user.yaml') | from_yaml }}"
+        template: ./definitions/csr-user.yaml
       vars:
         user_csr_base64: "{{ lookup('file', '{{ csr_file }}') | b64encode }}"
 
@@ -83,22 +83,22 @@
     - name: Create User Namespace
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('template', './definitions/namespace-user.yaml') | from_yaml }}"
+        template: ./definitions/namespace-user.yaml
 
     - name: Create User Role Binding
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('template', './definitions/rolebinding-user.yaml') | from_yaml }}"
+        template: ./definitions/rolebinding-user.yaml
 
     - name: Create User Resource Quota
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('template', './definitions/resourcequota-user.yaml') | from_yaml }}"
+        template: ./definitions/resourcequota-user.yaml
 
     - name: Create User Limit Range
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('template', './definitions/limitrange-user.yaml') | from_yaml }}"
+        template: ./definitions/limitrange-user.yaml
 
     - name: Create User in Kubeconfig
       delegate_to: localhost

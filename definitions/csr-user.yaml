@@ -6,6 +6,6 @@ metadata:
 spec:
   request: "{{ user_csr_base64 }}"
   signerName: kubernetes.io/kube-apiserver-client
-  expirationSeconds: {{ cert_expiration_seconds }}
+  expirationSeconds: {{ cert_expiration_seconds | int }}
   usages:
     - client auth
