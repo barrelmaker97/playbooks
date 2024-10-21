@@ -1,5 +1,6 @@
 ---
-- hosts: hermes
+- name: Setup Cluster User
+  hosts: hermes
   vars:
     key_file: "{{ ansible_env.HOME }}/.kube/{{ cluster_user }}.key"
     csr_file: "{{ ansible_env.HOME }}/.kube/{{ cluster_user }}.csr"

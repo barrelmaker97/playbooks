@@ -1,5 +1,6 @@
 ---
-- hosts: hermes
+- name: Setup Cluster
+  hosts: hermes
   tasks:
     - name: Install python-kubernetes
       become: true

@@ -1,5 +1,6 @@
 ---
-- hosts: hermes
+- name: Deploy Applications
+  hosts: hermes
   tasks:
     - name: Add Helm Repos
       no_log: true

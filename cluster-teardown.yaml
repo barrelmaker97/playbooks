@@ -1,5 +1,6 @@
 ---
-- hosts: hermes
+- name: Teardown Cluster
+  hosts: hermes
   tasks:
     - name: Check if microk8s is installed
       ansible.builtin.command: snap list microk8s
