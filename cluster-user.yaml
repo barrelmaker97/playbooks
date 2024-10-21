@@ -63,6 +63,7 @@
       ansible.builtin.copy:
         content: "{{ user_cert.resources[0].status.certificate | b64decode }}"
         dest: "{{ crt_file }}"
+        mode: "0644"
 
     - name: Get Cluster Certificate
       kubernetes.core.k8s_info:
@@ -77,6 +78,7 @@
       ansible.builtin.copy:
         content: "{{ cluster_cert.resources[0]['data']['ca.crt'] }}"
         dest: "{{ cluster_crt_file }}"
+        mode: "0644"
 
     - name: Create User Namespace
       kubernetes.core.k8s:

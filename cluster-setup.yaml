@@ -90,10 +90,6 @@
       ansible.builtin.copy:
         content: "{{ kubeconfig.stdout }}"
         dest: "{{ ansible_env.HOME }}/.kube/config"
-
-    - name: Set kubeconfig file permissions
-      ansible.builtin.file:
-        path: "{{ ansible_env.HOME }}/.kube/config"
         mode: "0600"
 
     - name: Configure MetalLB
