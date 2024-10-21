@@ -112,7 +112,7 @@
       delegate_to: localhost
       ansible.builtin.command: >-
         kubectl config set-cluster microk8s-cluster
-        --server=https://{{ ansible_host }}:{{ cluster_port }}
+        --server=https://{{ inventory_hostname }}.{{ local_domain }}:{{ cluster_port }}
         --certificate-authority={{ cluster_crt_file }}
 
     - name: Create Context in Kubeconfig
