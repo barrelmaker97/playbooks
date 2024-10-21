@@ -1,0 +1,5 @@
+# vim: ft=yaml
+---
+warn_list:
+  - experimental
+  - no-changed-when
