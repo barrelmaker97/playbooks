@@ -1,0 +1,6 @@
+---
+kube_dir: "{{ ansible_env.HOME }}/.kube"
+key_file: "{{ kube_dir }}/{{ cluster_user }}.key"
+csr_file: "{{ kube_dir }}/{{ cluster_user }}.csr"
+crt_file: "{{ kube_dir }}/{{ cluster_user }}.crt"
+cluster_crt_file: "{{ kube_dir }}/cluster.crt"
