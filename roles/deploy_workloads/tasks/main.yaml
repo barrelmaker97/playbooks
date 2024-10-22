@@ -1,0 +1,31 @@
+---
+- name: Add Helm Repos
+  no_log: true
+  kubernetes.core.helm_repository:
+    name: "{{ item.key }}"
+    repo_url: "{{ item.value }}"
+  loop: "{{ helm_repos | dict2items }}"
+  vars:
+    helm_repos:
+      bitnami: https://charts.bitnami.com/bitnami
+      barrelmaker: https://charts.barrelmaker.dev
+
+- name: Deploy Helm Charts
+  kubernetes.core.helm:
+    name: "{{ item.key }}"
+    chart_ref: "{{ item.value }}"
+    release_namespace: default
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ lookup('file', 'files/{{ item.key }}.yaml') | from_yaml }}"
+  loop: "{{ helm_charts | dict2items }}"
+  vars:
+    helm_charts:
+      factorio: barrelmaker/factorio
+      # gmod: barrelmaker/gmod
+      jellyfin: barrelmaker/jellyfin
+      niucraft: barrelmaker/minecraft
+      # serge: barrelmaker/serge
+      valheim: barrelmaker/valheim
+      website: barrelmaker/website
+      ingress: barrelmaker/ingress
