@@ -250,6 +250,13 @@
     dest: "{{ setup_cluster_api_crt }}"
     mode: "0644"
 
+- name: Install kubectl locally
+  become: true
+  delegate_to: localhost
+  community.general.snap:
+    name: kubectl
+    classic: true
+
 - name: Create User in Kubeconfig
   delegate_to: localhost
   ansible.builtin.command: >-
