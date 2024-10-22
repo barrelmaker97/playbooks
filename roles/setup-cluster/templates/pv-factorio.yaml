@@ -12,7 +12,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: factorio
   local:
-    path: /home/barrelmaker/backup/factorio/factorio-data
+    path: "{{ local_storage_dir }}/factorio/factorio-data"
   nodeAffinity:
     required:
       nodeSelectorTerms:
