@@ -1,0 +1,5 @@
+---
+- name: Setup Cluster
+  hosts: hermes
+  roles:
+    - setup-cluster
