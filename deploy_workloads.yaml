@@ -1,5 +1,5 @@
 ---
-- name: Deploy Applications
+- name: Deploy Workloads
   hosts: hermes
   tasks:
     - name: Add Helm Repos
