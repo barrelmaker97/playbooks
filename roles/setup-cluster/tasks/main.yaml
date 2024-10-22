@@ -148,4 +148,4 @@
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_fileglob:
-    - ./definitions/persistent-volumes/*.yaml
+    - templates/pv-*.yaml
