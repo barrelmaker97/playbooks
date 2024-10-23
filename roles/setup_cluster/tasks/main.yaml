@@ -142,7 +142,7 @@
   register: cluster_dns_name
 
 - name: Wait for Certificate to Rotate
-  when: cluster_dns_name.changed
+  when: cluster_dns_name.changed # noqa: no-handler
   ansible.builtin.pause:
     minutes: 2
 
@@ -159,4 +159,4 @@
     - templates/pv-*.yaml
 
 - name: Create Cluster User
-  include_tasks: user.yaml
+  ansible.builtin.include_tasks: user.yaml
