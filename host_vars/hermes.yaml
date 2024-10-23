@@ -1,11 +1,10 @@
 ---
-ansible_user: barrelmaker
 cert_expiration_seconds: 604800  # 7 days
 cluster_port: 16443
 cluster_user: barrelmaker
 cluster_vip: 192.168.15.60
 local_domain: lan
+local_storage_dir: /home/barrelmaker/backup
 metallb_ip_range: 192.168.15.60-192.168.15.69
 microk8s_channel: 1.31/stable
 upstream_dns: 192.168.15.1
-local_storage_dir: /home/barrelmaker/backup

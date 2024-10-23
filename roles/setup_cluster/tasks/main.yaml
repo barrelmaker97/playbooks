@@ -126,12 +126,12 @@
 - name: Create Production Issuer
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('file', 'files/issuer-prod.yaml') | from_yaml }}"
+    template: issuer-prod.yaml
 
 - name: Create Staging Issuer
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('file', 'files/issuer-staging.yaml') | from_yaml }}"
+    template: issuer-staging.yaml
 
 - name: Add DNS Entry to Cluster Certificate
   ansible.builtin.lineinfile:
