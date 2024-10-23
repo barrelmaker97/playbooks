@@ -139,8 +139,10 @@
     regexp: '^DNS\.6'
     line: "DNS.6 = {{ inventory_hostname }}.{{ local_domain }}"
     insertafter: 'DNS\.5 = kubernetes\.default\.svc\.cluster\.local'
+  register: cluster_dns_name
 
 - name: Wait for Certificate to Rotate
+  when: cluster_dns_name.changed
   ansible.builtin.pause:
     minutes: 2
 
