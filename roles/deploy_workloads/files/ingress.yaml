@@ -1,0 +1,4 @@
+---
+baseDomain: barrelmaker.dev
+issuerName: letsencrypt-prod
+observability: true

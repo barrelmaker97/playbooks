@@ -1,12 +1,12 @@
 ---
 apiVersion: cert-manager.io/v1
-kind: Issuer
+kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
   namespace: default
 spec:
   acme:
-    email: nolancooper97@gmail.com
+    email: "{{ email_address }}"
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-prod-key
