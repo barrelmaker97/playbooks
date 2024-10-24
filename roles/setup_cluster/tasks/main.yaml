@@ -56,7 +56,6 @@
     - core/hostpath-storage
     - core/rbac
     - core/observability
-    - "core/metallb:{{ metallb_ip_range }}"
 
 - name: Install kubectl
   become: true
@@ -90,16 +89,6 @@
     dest: "{{ setup_cluster_kube_dir }}/config"
     mode: "0600"
 
-- name: Configure MetalLB
-  kubernetes.core.k8s:
-    state: present
-    template: configmap-metallb.yaml
-
-- name: Advertise Load Balanced IP
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
-
 - name: Install Helm
   become: true
   community.general.snap:
@@ -116,6 +105,39 @@
       jetstack: https://charts.jetstack.io
       ingress-nginx: https://kubernetes.github.io/ingress-nginx
       metrics-server: https://kubernetes-sigs.github.io/metrics-server
+      metallb: https://metallb.github.io/metallb
+
+- name: Create MetalLB Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: metallb-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Deploy MetalLB
+  kubernetes.core.helm:
+    name: metallb
+    chart_ref: metallb/metallb
+    chart_version: "{{ metallb_version }}"
+    release_namespace: metallb-system
+    update_repo_cache: true
+    wait: true
+
+- name: Create IP Address Pool
+  kubernetes.core.k8s:
+    state: present
+    template: ipaddresspool-metallb.yaml
+
+- name: Advertise Load Balanced IP
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
 
 - name: Create Ingress Nginx Namespace
   kubernetes.core.k8s:
