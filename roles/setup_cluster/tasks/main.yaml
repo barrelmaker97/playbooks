@@ -164,15 +164,15 @@
     state: present
     definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
 
-- name: Create Custom Headers ConfigMap for Observability
+- name: Create Custom Headers ConfigMap for Monitoring
   kubernetes.core.k8s:
     state: present
-    template: configmap-observability.yaml
+    template: configmap-monitoring.yaml
 
-- name: Create Ingress for Observability
+- name: Create Ingress for Monitoring
   kubernetes.core.k8s:
     state: present
-    template: ingress-observability.yaml
+    template: ingress-monitoring.yaml
 
 - name: Create Cert Manager Namespace
   kubernetes.core.k8s:

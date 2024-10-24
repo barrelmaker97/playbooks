@@ -2,10 +2,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: observability
-  namespace: observability
+  name: monitoring
+  namespace: monitoring
   annotations:
-    nginx.ingress.kubernetes.io/custom-headers: observability/observability-custom-headers
+    nginx.ingress.kubernetes.io/custom-headers: monitoring/monitoring-custom-headers
 spec:
   ingressClassName: nginx
   rules:
