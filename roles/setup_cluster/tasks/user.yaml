@@ -4,10 +4,10 @@
     state: present
     template: namespace-user.yaml
 
-- name: Create User Role Binding
+- name: Create User Cluster Role Binding
   kubernetes.core.k8s:
     state: present
-    template: rolebinding-user.yaml
+    template: clusterrolebinding-user.yaml
 
 - name: Create User Resource Quota
   kubernetes.core.k8s:

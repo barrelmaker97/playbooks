@@ -55,9 +55,7 @@
     - "core/dns:{{ upstream_dns }}"
     - core/hostpath-storage
     - core/rbac
-    - core/ingress
     - core/observability
-    - core/cert-manager
     - "core/metallb:{{ metallb_ip_range }}"
 
 - name: Install kubectl
@@ -102,26 +100,75 @@
     state: present
     definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
 
-- name: Configure Nginx Ingress Controller
+- name: Install Helm
+  become: true
+  community.general.snap:
+    name: helm
+    classic: true
+
+- name: Add Helm Repos
+  kubernetes.core.helm_repository:
+    name: "{{ item.key }}"
+    repo_url: "{{ item.value }}"
+  loop: "{{ helm_repos | dict2items }}"
+  vars:
+    helm_repos:
+      jetstack: https://charts.jetstack.io
+      ingress-nginx: https://kubernetes.github.io/ingress-nginx
+
+- name: Create Ingress Nginx Namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: ingress-nginx
+    state: present
+
+- name: Deploy Ingress Nginx Helm Chart
+  kubernetes.core.helm:
+    name: ingress-nginx
+    chart_ref: ingress-nginx/ingress-nginx
+    chart_version: "{{ ingress_nginx_version }}"
+    release_namespace: ingress-nginx
+    update_repo_cache: true
+    wait: true
+
+- name: Set Nginx Ingress Controller Custom Headers
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/configmap-custom-headers.yaml') | from_yaml }}"
+
+- name: Set Nginx Ingress Controller Config
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
 
-- name: Load Balance Ingress Controller
+- name: Create Custom Headers ConfigMap for Observability
   kubernetes.core.k8s:
     state: present
-    template: service-ingress.yaml
+    template: configmap-observability.yaml
 
 - name: Create Ingress for Observability
   kubernetes.core.k8s:
     state: present
     template: ingress-observability.yaml
 
-- name: Install helm
-  become: true
-  community.general.snap:
-    name: helm
-    classic: true
+- name: Create Cert Manager Namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: cert-manager
+    state: present
+
+- name: Deploy Cert Manager Helm Chart
+  kubernetes.core.helm:
+    name: cert-manager
+    chart_ref: jetstack/cert-manager
+    chart_version: "{{ cert_manager_version }}"
+    release_namespace: cert-manager
+    update_repo_cache: true
+    wait: true
+    set_values:
+      - value: crds.enabled=true
 
 - name: Create Production Issuer
   kubernetes.core.k8s:

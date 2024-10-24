@@ -1,4 +1,4 @@
 ---
 baseDomain: barrelmaker.dev
+ingressClass: nginx
 issuerName: letsencrypt-prod
-observability: true
