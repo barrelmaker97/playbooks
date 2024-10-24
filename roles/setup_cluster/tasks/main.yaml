@@ -100,7 +100,7 @@
     state: present
     definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
 
-- name: Install helm
+- name: Install Helm
   become: true
   community.general.snap:
     name: helm
