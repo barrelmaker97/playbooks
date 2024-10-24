@@ -202,6 +202,22 @@
     update_repo_cache: true
     wait: true
 
+- name: Create Monitoring Namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: monitoring
+    state: present
+
+- name: Deploy Kubernetes Prometheus Stack
+  kubernetes.core.helm:
+    name: kube-prometheus-stack
+    chart_ref: prometheus-community/kube-prometheus-stack
+    chart_version: "{{ kube_prometheus_stack_version }}"
+    release_namespace: monitoring
+    update_repo_cache: true
+    wait: true
+
 - name: Create Custom Headers ConfigMap for Monitoring
   kubernetes.core.k8s:
     state: present

@@ -16,7 +16,7 @@ spec:
             path: "/"
             backend:
               service:
-                name: kube-prom-stack-grafana
+                name: kube-prometheus-stack-grafana
                 port:
                   number: 80
     - host: prometheus.{{ inventory_hostname }}.{{ local_domain }}
@@ -26,7 +26,7 @@ spec:
             path: "/"
             backend:
               service:
-                name: kube-prom-stack-kube-prome-prometheus
+                name: kube-prometheus-stack-prometheus
                 port:
                   number: 9090
     - host: alertmanager.{{ inventory_hostname }}.{{ local_domain }}
@@ -36,6 +36,6 @@ spec:
             path: "/"
             backend:
               service:
-                name: kube-prom-stack-kube-prome-alertmanager
+                name: kube-prometheus-stack-alertmanager
                 port:
                   number: 9093
