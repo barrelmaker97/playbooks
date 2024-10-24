@@ -55,7 +55,6 @@
     - "core/dns:{{ upstream_dns }}"
     - core/hostpath-storage
     - core/rbac
-    - core/ingress
     - core/observability
     - "core/metallb:{{ metallb_ip_range }}"
 
@@ -101,21 +100,6 @@
     state: present
     definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
 
-- name: Configure Nginx Ingress Controller
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
-
-- name: Load Balance Ingress Controller
-  kubernetes.core.k8s:
-    state: present
-    template: service-ingress.yaml
-
-- name: Create Ingress for Observability
-  kubernetes.core.k8s:
-    state: present
-    template: ingress-observability.yaml
-
 - name: Install helm
   become: true
   community.general.snap:
@@ -130,6 +114,33 @@
   vars:
     helm_repos:
       jetstack: https://charts.jetstack.io
+      ingress-nginx: https://kubernetes.github.io/ingress-nginx
+
+- name: Create Ingress Nginx Namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: ingress-nginx
+    state: present
+
+- name: Deploy Ingress Nginx Helm Chart
+  kubernetes.core.helm:
+    name: ingress-nginx
+    chart_ref: ingress-nginx/ingress-nginx
+    chart_version: "{{ ingress_nginx_version }}"
+    release_namespace: ingress-nginx
+    update_repo_cache: true
+    wait: true
+
+- name: Configure Nginx Ingress Controller
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
+
+- name: Create Ingress for Observability
+  kubernetes.core.k8s:
+    state: present
+    template: ingress-observability.yaml
 
 - name: Create Cert Manager Namespace
   kubernetes.core.k8s:

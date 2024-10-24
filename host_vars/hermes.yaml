@@ -9,3 +9,4 @@ metallb_ip_range: 192.168.15.60-192.168.15.69
 microk8s_channel: 1.31/stable
 upstream_dns: 192.168.15.1
 cert_manager_version: "1.16.1"
+ingress_nginx_version: "4.11.3"
