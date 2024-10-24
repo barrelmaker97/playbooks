@@ -5,9 +5,11 @@ metadata:
   name: ingress-nginx-controller
   namespace: ingress-nginx
 data:
-  allow-snippet-annotations: "true"
+  add-headers: "ingress-nginx/custom-headers"
+  allow-snippet-annotations: "false"
   annotation-value-word-blocklist: "load_module,lua_package,_by_lua,location,root,proxy_pass,serviceaccount,{,}"
   enable-ocsp: "true"
+  global-allowed-response-headers: "Content-Security-Policy"
   hsts-max-age: "63072000"
   hsts-preload: "true"
   http-snippet: |
