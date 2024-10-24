@@ -55,7 +55,6 @@
     - "core/dns:{{ upstream_dns }}"
     - core/hostpath-storage
     - core/rbac
-    - core/observability
 
 - name: Install kubectl
   become: true
