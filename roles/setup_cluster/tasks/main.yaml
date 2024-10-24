@@ -115,6 +115,7 @@
     helm_repos:
       jetstack: https://charts.jetstack.io
       ingress-nginx: https://kubernetes.github.io/ingress-nginx
+      metrics-server: https://kubernetes-sigs.github.io/metrics-server
 
 - name: Create Ingress Nginx Namespace
   kubernetes.core.k8s:
@@ -123,7 +124,7 @@
     name: ingress-nginx
     state: present
 
-- name: Deploy Ingress Nginx Helm Chart
+- name: Deploy Ingress Nginx
   kubernetes.core.helm:
     name: ingress-nginx
     chart_ref: ingress-nginx/ingress-nginx
@@ -159,7 +160,7 @@
     name: cert-manager
     state: present
 
-- name: Deploy Cert Manager Helm Chart
+- name: Deploy Cert Manager
   kubernetes.core.helm:
     name: cert-manager
     chart_ref: jetstack/cert-manager
@@ -179,6 +180,15 @@
   kubernetes.core.k8s:
     state: present
     template: issuer-staging.yaml
+
+- name: Deploy Metrics Server
+  kubernetes.core.helm:
+    name: metrics-server
+    chart_ref: metrics-server/metrics-server
+    chart_version: "{{ metrics_server_version }}"
+    release_namespace: kube-system
+    update_repo_cache: true
+    wait: true
 
 - name: Add DNS Entry to Cluster Certificate
   ansible.builtin.lineinfile:
