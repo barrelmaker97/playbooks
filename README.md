@@ -1,6 +1,16 @@
 # playbooks
 Personal Ansible Playbook Library
 
+# Installing Ansible
+```bash
+sudo apt update
+sudo apt install pipx
+pipx ensurepath
+pipx install --include-deps ansible
+pipx inject ansible argcomplete kubernetes
+pipx inject --include-apps ansible ansible-lint
+```
+
 # License
 
 Copyright (c) 2024 Nolan Cooper
