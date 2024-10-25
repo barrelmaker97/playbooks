@@ -1,5 +1,7 @@
 ---
-storageClassName: niucraft
+persistence:
+  storageClassName: niucraft
+  size: 30Gi
 serverPort: 30013  # Must be in the range 30000-32767
 dynmap: true
 metrics: true
