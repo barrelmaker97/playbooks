@@ -56,6 +56,19 @@
     - core/hostpath-storage
     - core/rbac
 
+- name: Add DNS Entry to Cluster Certificate
+  ansible.builtin.lineinfile:
+    path: /var/snap/microk8s/current/certs/csr.conf.template
+    regexp: '^DNS\.6'
+    line: "DNS.6 = {{ inventory_hostname }}.{{ local_domain }}"
+    insertafter: 'DNS\.5 = kubernetes\.default\.svc\.cluster\.local'
+  register: cluster_dns_name
+
+- name: Wait for Certificate to Rotate
+  when: cluster_dns_name.changed # noqa: no-handler
+  ansible.builtin.pause:
+    minutes: 2
+
 - name: Install kubectl
   become: true
   community.general.snap:
@@ -87,6 +100,21 @@
     content: "{{ kubeconfig.stdout }}"
     dest: "{{ setup_cluster_kube_dir }}/config"
     mode: "0600"
+
+- name: Create Local Storage Directory
+  ansible.builtin.file:
+    path: "{{ local_storage_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create PVs
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_fileglob:
+    - templates/pv-*.yaml
+
+- name: Create Cluster User
+  ansible.builtin.include_tasks: user.yaml
 
 - name: Install Helm
   become: true
@@ -248,31 +276,3 @@
   kubernetes.core.k8s:
     state: present
     template: ingress-monitoring.yaml
-
-- name: Add DNS Entry to Cluster Certificate
-  ansible.builtin.lineinfile:
-    path: /var/snap/microk8s/current/certs/csr.conf.template
-    regexp: '^DNS\.6'
-    line: "DNS.6 = {{ inventory_hostname }}.{{ local_domain }}"
-    insertafter: 'DNS\.5 = kubernetes\.default\.svc\.cluster\.local'
-  register: cluster_dns_name
-
-- name: Wait for Certificate to Rotate
-  when: cluster_dns_name.changed # noqa: no-handler
-  ansible.builtin.pause:
-    minutes: 2
-
-- name: Create Local Storage Directory
-  ansible.builtin.file:
-    path: "{{ local_storage_dir }}"
-    state: directory
-    mode: "0755"
-
-- name: Create PVs
-  kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_fileglob:
-    - templates/pv-*.yaml
-
-- name: Create Cluster User
-  ansible.builtin.include_tasks: user.yaml
