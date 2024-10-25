@@ -100,29 +100,9 @@
     name: kubectl
     classic: true
 
-- name: Create User in Kubeconfig
+- name: Create Local Kubeconfig
   delegate_to: localhost
-  ansible.builtin.command: >-
-    kubectl config set-credentials {{ cluster_user }}
-    --client-key={{ setup_cluster_key }}
-    --client-certificate={{ setup_cluster_user_crt }}
-
-- name: Create Cluster in Kubeconfig
-  delegate_to: localhost
-  ansible.builtin.command: >-
-    kubectl config set-cluster microk8s-cluster
-    --server=https://{{ inventory_hostname }}.{{ local_domain }}:{{ cluster_port }}
-    --certificate-authority={{ setup_cluster_api_crt }}
-
-- name: Create Context in Kubeconfig
-  delegate_to: localhost
-  ansible.builtin.command: >-
-    kubectl config set-context {{ cluster_user }}
-    --cluster=microk8s-cluster
-    --user={{ cluster_user }}
-    --namespace={{ cluster_user }}
-
-- name: Use Context in Kubeconfig
-  delegate_to: localhost
-  ansible.builtin.command: >-
-    kubectl config use-context {{ cluster_user }}
+  ansible.builtin.template:
+    src: user-kubeconfig.yaml
+    dest: "{{ setup_cluster_kube_dir }}/config"
+    mode: "0600"
