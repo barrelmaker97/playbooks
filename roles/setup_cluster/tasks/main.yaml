@@ -94,6 +94,11 @@
     name: helm
     classic: true
 
+- name: Install Helm Diff
+  kubernetes.core.helm_plugin:
+    plugin_path: "https://github.com/databus23/helm-diff"
+    state: present
+
 - name: Add Helm Repos
   kubernetes.core.helm_repository:
     name: "{{ item.key }}"
@@ -209,6 +214,12 @@
     name: monitoring
     state: present
 
+- name: Get Node IPs
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Node
+  register: nodes
+
 - name: Deploy Kubernetes Prometheus Stack
   kubernetes.core.helm:
     name: kube-prometheus-stack
@@ -217,6 +228,16 @@
     release_namespace: monitoring
     update_repo_cache: true
     wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
+    values_file:
+      kubeScheduler:
+        endpoints: "{{ node_ips }}"
+      kubeControllerManager:
+        endpoints: "{{ node_ips }}"
+      kubeProxy:
+        endpoints: "{{ node_ips }}"
 
 - name: Create Custom Headers ConfigMap for Monitoring
   kubernetes.core.k8s:
