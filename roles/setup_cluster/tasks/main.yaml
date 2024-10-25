@@ -116,163 +116,166 @@
 - name: Create Cluster User
   ansible.builtin.include_tasks: user.yaml
 
-- name: Install Helm
-  become: true
-  community.general.snap:
-    name: helm
-    classic: true
+- name: Install Cluster Services
+  delegate_to: localhost
+  block:
+    - name: Install Helm
+      become: true
+      community.general.snap:
+        name: helm
+        classic: true
 
-- name: Install Helm Diff
-  kubernetes.core.helm_plugin:
-    plugin_path: "https://github.com/databus23/helm-diff"
-    state: present
+    - name: Install Helm Diff
+      kubernetes.core.helm_plugin:
+        plugin_path: "https://github.com/databus23/helm-diff"
+        state: present
 
-- name: Add Helm Repos
-  kubernetes.core.helm_repository:
-    name: "{{ item.key }}"
-    repo_url: "{{ item.value }}"
-  loop: "{{ helm_repos | dict2items }}"
-  vars:
-    helm_repos:
-      jetstack: https://charts.jetstack.io
-      ingress-nginx: https://kubernetes.github.io/ingress-nginx
-      metrics-server: https://kubernetes-sigs.github.io/metrics-server
-      metallb: https://metallb.github.io/metallb
-      prometheus-community: https://prometheus-community.github.io/helm-charts
+    - name: Add Helm Repos
+      kubernetes.core.helm_repository:
+        name: "{{ item.key }}"
+        repo_url: "{{ item.value }}"
+      loop: "{{ helm_repos | dict2items }}"
+      vars:
+        helm_repos:
+          jetstack: https://charts.jetstack.io
+          ingress-nginx: https://kubernetes.github.io/ingress-nginx
+          metrics-server: https://kubernetes-sigs.github.io/metrics-server
+          metallb: https://metallb.github.io/metallb
+          prometheus-community: https://prometheus-community.github.io/helm-charts
 
-- name: Create MetalLB Namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: metallb-system
-        labels:
-          pod-security.kubernetes.io/enforce: privileged
-          pod-security.kubernetes.io/audit: privileged
-          pod-security.kubernetes.io/warn: privileged
+    - name: Create MetalLB Namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: metallb-system
+            labels:
+              pod-security.kubernetes.io/enforce: privileged
+              pod-security.kubernetes.io/audit: privileged
+              pod-security.kubernetes.io/warn: privileged
 
-- name: Deploy MetalLB
-  kubernetes.core.helm:
-    name: metallb
-    chart_ref: metallb/metallb
-    chart_version: "{{ metallb_version }}"
-    release_namespace: metallb-system
-    update_repo_cache: true
-    wait: true
+    - name: Deploy MetalLB
+      kubernetes.core.helm:
+        name: metallb
+        chart_ref: metallb/metallb
+        chart_version: "{{ metallb_version }}"
+        release_namespace: metallb-system
+        update_repo_cache: true
+        wait: true
 
-- name: Create IP Address Pool
-  kubernetes.core.k8s:
-    state: present
-    template: ipaddresspool-metallb.yaml
+    - name: Create IP Address Pool
+      kubernetes.core.k8s:
+        state: present
+        template: ipaddresspool-metallb.yaml
 
-- name: Advertise Load Balanced IP
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
+    - name: Advertise Load Balanced IP
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
 
-- name: Create Ingress Nginx Namespace
-  kubernetes.core.k8s:
-    api_version: v1
-    kind: Namespace
-    name: ingress-nginx
-    state: present
+    - name: Create Ingress Nginx Namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: ingress-nginx
+        state: present
 
-- name: Deploy Ingress Nginx
-  kubernetes.core.helm:
-    name: ingress-nginx
-    chart_ref: ingress-nginx/ingress-nginx
-    chart_version: "{{ ingress_nginx_version }}"
-    release_namespace: ingress-nginx
-    update_repo_cache: true
-    wait: true
+    - name: Deploy Ingress Nginx
+      kubernetes.core.helm:
+        name: ingress-nginx
+        chart_ref: ingress-nginx/ingress-nginx
+        chart_version: "{{ ingress_nginx_version }}"
+        release_namespace: ingress-nginx
+        update_repo_cache: true
+        wait: true
 
-- name: Set Nginx Ingress Controller Custom Headers
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', 'files/configmap-custom-headers.yaml') | from_yaml }}"
+    - name: Set Nginx Ingress Controller Custom Headers
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', 'files/configmap-custom-headers.yaml') | from_yaml }}"
 
-- name: Set Nginx Ingress Controller Config
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
+    - name: Set Nginx Ingress Controller Config
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
 
-- name: Create Cert Manager Namespace
-  kubernetes.core.k8s:
-    api_version: v1
-    kind: Namespace
-    name: cert-manager
-    state: present
+    - name: Create Cert Manager Namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: cert-manager
+        state: present
 
-- name: Deploy Cert Manager
-  kubernetes.core.helm:
-    name: cert-manager
-    chart_ref: jetstack/cert-manager
-    chart_version: "{{ cert_manager_version }}"
-    release_namespace: cert-manager
-    update_repo_cache: true
-    wait: true
-    set_values:
-      - value: crds.enabled=true
+    - name: Deploy Cert Manager
+      kubernetes.core.helm:
+        name: cert-manager
+        chart_ref: jetstack/cert-manager
+        chart_version: "{{ cert_manager_version }}"
+        release_namespace: cert-manager
+        update_repo_cache: true
+        wait: true
+        set_values:
+          - value: crds.enabled=true
 
-- name: Create Production Issuer
-  kubernetes.core.k8s:
-    state: present
-    template: issuer-prod.yaml
+    - name: Create Production Issuer
+      kubernetes.core.k8s:
+        state: present
+        template: issuer-prod.yaml
 
-- name: Create Staging Issuer
-  kubernetes.core.k8s:
-    state: present
-    template: issuer-staging.yaml
+    - name: Create Staging Issuer
+      kubernetes.core.k8s:
+        state: present
+        template: issuer-staging.yaml
 
-- name: Deploy Metrics Server
-  kubernetes.core.helm:
-    name: metrics-server
-    chart_ref: metrics-server/metrics-server
-    chart_version: "{{ metrics_server_version }}"
-    release_namespace: kube-system
-    update_repo_cache: true
-    wait: true
+    - name: Deploy Metrics Server
+      kubernetes.core.helm:
+        name: metrics-server
+        chart_ref: metrics-server/metrics-server
+        chart_version: "{{ metrics_server_version }}"
+        release_namespace: kube-system
+        update_repo_cache: true
+        wait: true
 
-- name: Create Monitoring Namespace
-  kubernetes.core.k8s:
-    api_version: v1
-    kind: Namespace
-    name: monitoring
-    state: present
+    - name: Create Monitoring Namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: monitoring
+        state: present
 
-- name: Get Node IPs
-  kubernetes.core.k8s_info:
-    api_version: v1
-    kind: Node
-  register: nodes
+    - name: Get Node IPs
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Node
+      register: nodes
 
-- name: Deploy Kubernetes Prometheus Stack
-  kubernetes.core.helm:
-    name: kube-prometheus-stack
-    chart_ref: prometheus-community/kube-prometheus-stack
-    chart_version: "{{ kube_prometheus_stack_version }}"
-    release_namespace: monitoring
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
-    values_file:
-      kubeScheduler:
-        endpoints: "{{ node_ips }}"
-      kubeControllerManager:
-        endpoints: "{{ node_ips }}"
-      kubeProxy:
-        endpoints: "{{ node_ips }}"
+    - name: Deploy Kubernetes Prometheus Stack
+      kubernetes.core.helm:
+        name: kube-prometheus-stack
+        chart_ref: prometheus-community/kube-prometheus-stack
+        chart_version: "{{ kube_prometheus_stack_version }}"
+        release_namespace: monitoring
+        update_repo_cache: true
+        wait: true
+        release_values: "{{ values_file | from_yaml }}"
+      vars:
+        node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
+        values_file:
+          kubeScheduler:
+            endpoints: "{{ node_ips }}"
+          kubeControllerManager:
+            endpoints: "{{ node_ips }}"
+          kubeProxy:
+            endpoints: "{{ node_ips }}"
 
-- name: Create Custom Headers ConfigMap for Monitoring
-  kubernetes.core.k8s:
-    state: present
-    template: configmap-monitoring.yaml
+    - name: Create Custom Headers ConfigMap for Monitoring
+      kubernetes.core.k8s:
+        state: present
+        template: configmap-monitoring.yaml
 
-- name: Create Ingress for Monitoring
-  kubernetes.core.k8s:
-    state: present
-    template: ingress-monitoring.yaml
+    - name: Create Ingress for Monitoring
+      kubernetes.core.k8s:
+        state: present
+        template: ingress-monitoring.yaml
