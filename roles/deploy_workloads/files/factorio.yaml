@@ -1,7 +1,10 @@
 ---
-metrics: true
+persistence:
+  storageClassName: factorio
+  size: 2Gi
+
 serverPort: 30002  # Must be in the range 30000-32767
-storageClassName: factorio
+metrics: true
 
 resources:
   factorio:
