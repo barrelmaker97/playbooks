@@ -2,7 +2,11 @@
 - name: Create User Namespace
   kubernetes.core.k8s:
     state: present
-    template: namespace-user.yaml
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ cluster_user }}"
 
 - name: Create User Cluster Role Binding
   kubernetes.core.k8s:
