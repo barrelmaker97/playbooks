@@ -175,19 +175,13 @@
         state: present
         definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
 
-    - name: Create Ingress Nginx Namespace
-      kubernetes.core.k8s:
-        api_version: v1
-        kind: Namespace
-        name: ingress-nginx
-        state: present
-
     - name: Deploy Ingress Nginx
       kubernetes.core.helm:
         name: ingress-nginx
         chart_ref: ingress-nginx/ingress-nginx
         chart_version: "{{ ingress_nginx_version }}"
         release_namespace: ingress-nginx
+        create_namespace: true
         update_repo_cache: true
         wait: true
 
@@ -201,19 +195,13 @@
         state: present
         definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
 
-    - name: Create Cert Manager Namespace
-      kubernetes.core.k8s:
-        api_version: v1
-        kind: Namespace
-        name: cert-manager
-        state: present
-
     - name: Deploy Cert Manager
       kubernetes.core.helm:
         name: cert-manager
         chart_ref: jetstack/cert-manager
         chart_version: "{{ cert_manager_version }}"
         release_namespace: cert-manager
+        create_namespace: true
         update_repo_cache: true
         wait: true
         set_values:
@@ -238,25 +226,19 @@
         update_repo_cache: true
         wait: true
 
-    - name: Create Monitoring Namespace
-      kubernetes.core.k8s:
-        api_version: v1
-        kind: Namespace
-        name: monitoring
-        state: present
-
     - name: Get Node IPs
       kubernetes.core.k8s_info:
         api_version: v1
         kind: Node
       register: nodes
 
-    - name: Deploy Kubernetes Prometheus Stack
+    - name: Deploy Prometheus Stack
       kubernetes.core.helm:
         name: kube-prometheus-stack
         chart_ref: prometheus-community/kube-prometheus-stack
         chart_version: "{{ kube_prometheus_stack_version }}"
         release_namespace: monitoring
+        create_namespace: true
         update_repo_cache: true
         wait: true
         release_values: "{{ values_file | from_yaml }}"
