@@ -55,7 +55,6 @@
     - "core/dns:{{ upstream_dns }}"
     - core/hostpath-storage
     - core/rbac
-    - core/observability
 
 - name: Install kubectl
   become: true
@@ -95,6 +94,11 @@
     name: helm
     classic: true
 
+- name: Install Helm Diff
+  kubernetes.core.helm_plugin:
+    plugin_path: "https://github.com/databus23/helm-diff"
+    state: present
+
 - name: Add Helm Repos
   kubernetes.core.helm_repository:
     name: "{{ item.key }}"
@@ -106,6 +110,7 @@
       ingress-nginx: https://kubernetes.github.io/ingress-nginx
       metrics-server: https://kubernetes-sigs.github.io/metrics-server
       metallb: https://metallb.github.io/metallb
+      prometheus-community: https://prometheus-community.github.io/helm-charts
 
 - name: Create MetalLB Namespace
   kubernetes.core.k8s:
@@ -165,16 +170,6 @@
     state: present
     definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
 
-- name: Create Custom Headers ConfigMap for Observability
-  kubernetes.core.k8s:
-    state: present
-    template: configmap-observability.yaml
-
-- name: Create Ingress for Observability
-  kubernetes.core.k8s:
-    state: present
-    template: ingress-observability.yaml
-
 - name: Create Cert Manager Namespace
   kubernetes.core.k8s:
     api_version: v1
@@ -211,6 +206,48 @@
     release_namespace: kube-system
     update_repo_cache: true
     wait: true
+
+- name: Create Monitoring Namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: monitoring
+    state: present
+
+- name: Get Node IPs
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Node
+  register: nodes
+
+- name: Deploy Kubernetes Prometheus Stack
+  kubernetes.core.helm:
+    name: kube-prometheus-stack
+    chart_ref: prometheus-community/kube-prometheus-stack
+    chart_version: "{{ kube_prometheus_stack_version }}"
+    release_namespace: monitoring
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
+    values_file:
+      kubeScheduler:
+        endpoints: "{{ node_ips }}"
+      kubeControllerManager:
+        endpoints: "{{ node_ips }}"
+      kubeProxy:
+        endpoints: "{{ node_ips }}"
+
+- name: Create Custom Headers ConfigMap for Monitoring
+  kubernetes.core.k8s:
+    state: present
+    template: configmap-monitoring.yaml
+
+- name: Create Ingress for Monitoring
+  kubernetes.core.k8s:
+    state: present
+    template: ingress-monitoring.yaml
 
 - name: Add DNS Entry to Cluster Certificate
   ansible.builtin.lineinfile:
