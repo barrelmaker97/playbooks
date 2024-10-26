@@ -5,7 +5,7 @@ metadata:
   name: valheim
 spec:
   capacity:
-    storage: 3Gi
+    storage: 10Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
