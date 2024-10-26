@@ -1,5 +1,9 @@
 ---
-gitRepo: https://github.com/barrelmaker97/website.git
+contentDirectory: website  # Directory in the repo containing the site content.
+gitSyncRepo: https://github.com/barrelmaker97/website.git
+gitSyncRef: main
+gitSyncPeriodSeconds: 60
+
 resources:
   requests:
     cpu: 20m
