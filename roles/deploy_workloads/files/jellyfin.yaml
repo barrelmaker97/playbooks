@@ -1,7 +1,11 @@
 ---
-storageClassName:
-  config: jellyfin-config
-  media: jellyfin-media
+persistence:
+  config:
+    storageClassName: jellyfin-config
+    size: 1Gi
+  media:
+    storageClassName: jellyfin-media
+    size: 50Gi
 
 resources:
   requests:
