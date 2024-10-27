@@ -1,7 +1,4 @@
 ---
-image:
-  tag: 2.0.10
-
 persistence:
   storageClassName: factorio
   size: 2Gi
