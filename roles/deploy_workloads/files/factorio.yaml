@@ -4,18 +4,24 @@ persistence:
   size: 2Gi
 
 serverPort: 30002  # Must be in the range 30000-32767
-metrics: false
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 845
+  runAsGroup: 845
+  fsGroup: 845
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
 
 resources:
-  factorio:
-    requests:
-      memory: 1000Mi
-      cpu: 800m
-    limits:
-      memory: 2000Mi
-  metrics:
-    requests:
-      memory: 40Mi
-      cpu: 10m
-    limits:
-      memory: 80Mi
+  requests:
+    cpu: 800m
+    memory: 1000Mi
+  limits:
+    memory: 2000Mi
+
+metrics:
+  enabled: false
