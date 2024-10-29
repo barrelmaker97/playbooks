@@ -9,6 +9,12 @@ persistence:
   storageClassName: valheim
   size: 10Gi
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 111
+  runAsGroup: 1000
+  fsGroup: 1000
+
 resources:
   requests:
     memory: 3Gi
