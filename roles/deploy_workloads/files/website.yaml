@@ -1,8 +1,32 @@
 ---
-contentDirectory: website  # Directory in the repo containing the site content.
-gitSyncRepo: https://github.com/barrelmaker97/website.git
-gitSyncRef: main
-gitSyncPeriodSeconds: 60
+gitSync:
+  repo: https://github.com/barrelmaker97/website.git
+  ref: main
+  contentDirectory: website  # Directory in the repo containing the site content.
+  periodSeconds: 60
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  resources:
+    requests:
+      cpu: 20m
+      memory: 40Mi
+    limits:
+      memory: 80Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
 
 resources:
   requests:
