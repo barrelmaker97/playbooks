@@ -141,3 +141,16 @@
   kubernetes.core.k8s:
     state: present
     template: ingress-monitoring.yaml
+
+- name: Create Local Storage Directory
+  delegate_to: hermes
+  ansible.builtin.file:
+    path: "{{ local_storage_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create Local Persistent Volumes
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_fileglob:
+    - templates/pv-*.yaml

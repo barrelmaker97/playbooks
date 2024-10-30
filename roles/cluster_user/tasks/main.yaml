@@ -1,6 +1,12 @@
 ---
+- name: Get Kubeconfig File Location
+  ansible.builtin.shell: microk8s kubectl config view -v6 2>&1 | awk  '/Config loaded from file:/{print $NF}'
+  changed_when: false
+  register: kubeconfig_location
+
 - name: Create User Namespace
   kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_location.stdout }}"
     state: present
     definition:
       apiVersion: v1
@@ -10,16 +16,19 @@
 
 - name: Create User Cluster Role Binding
   kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_location.stdout }}"
     state: present
     template: clusterrolebinding-user.yaml
 
 - name: Create User Resource Quota
   kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_location.stdout }}"
     state: present
     template: resourcequota-user.yaml
 
 - name: Create User Limit Range
   kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_location.stdout }}"
     state: present
     template: limitrange-user.yaml
 
@@ -53,6 +62,7 @@
 
 - name: Delete Any Existing User CSR Objects
   kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_location.stdout }}"
     state: absent
     api_version: certificates.k8s.io/v1
     kind: CertificateSigningRequest
@@ -60,6 +70,7 @@
 
 - name: Create User CSR Object
   kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_location.stdout }}"
     state: present
     template: csr-user.yaml.j2
   vars:
@@ -71,6 +82,7 @@
 
 - name: Get User Certificate
   kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_location.stdout }}"
     api_version: certificates.k8s.io/v1
     kind: CertificateSigningRequest
     name: "{{ cluster_user }}"
@@ -85,6 +97,7 @@
 
 - name: Get Cluster Certificate
   kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_location.stdout }}"
     api_version: v1
     kind: ConfigMap
     name: kube-root-ca.crt
