@@ -1,16 +1,4 @@
 ---
-# TODO Find a better way to do this
-- name: Create Grafana External Endpoint
-  kubernetes.core.k8s:
-    state: present
-    template: endpoint-grafana.yaml
-
-# TODO Find a better way to do this
-- name: Create Kuma External Endpoint
-  kubernetes.core.k8s:
-    state: present
-    template: endpoint-kuma.yaml
-
 - name: Install helm locally
   become: true
   delegate_to: localhost
