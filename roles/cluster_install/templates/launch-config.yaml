@@ -1,0 +1,9 @@
+---
+version: 0.1.0
+addons:
+  - name: dns
+    args: [{{ upstream_dns }}]
+  - name: rbac
+  - name: hostpath-storage
+extraSANs:
+  - "{{ cluster_host }}.{{ local_domain }}"
