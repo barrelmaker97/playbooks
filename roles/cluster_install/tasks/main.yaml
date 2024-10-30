@@ -77,14 +77,14 @@
 
 - name: Create kubeconfig directory
   ansible.builtin.file:
-    path: "{{ setup_cluster_kube_dir }}"
+    path: "{{ cluster_install_kube_dir }}"
     state: directory
     mode: "0755"
 
 - name: Set owner of kubeconfig directory to {{ ansible_user }}
   become: true
   ansible.builtin.file:
-    path: "{{ setup_cluster_kube_dir }}"
+    path: "{{ cluster_install_kube_dir }}"
     state: directory
     owner: "{{ ansible_user }}"
     recurse: true
@@ -98,7 +98,7 @@
 - name: Save kubeconfig file
   ansible.builtin.copy:
     content: "{{ kubeconfig.stdout }}"
-    dest: "{{ setup_cluster_kube_dir }}/config"
+    dest: "{{ cluster_install_kube_dir }}/config"
     mode: "0600"
 
 - name: Create Local Storage Directory

@@ -1,6 +1,5 @@
 ---
-- name: Setup Cluster
+- name: Setup Cluster User
   hosts: hermes
   roles:
-    - setup_cluster
     - cluster_user
