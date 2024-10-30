@@ -1,5 +1,5 @@
 ---
 - name: Deploy Workloads
-  hosts: hermes
+  hosts: localhost
   roles:
     - deploy_workloads
