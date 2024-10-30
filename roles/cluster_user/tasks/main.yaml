@@ -30,18 +30,9 @@
 - name: Execute Tasks on Node
   delegate_to: hermes
   block:
-    - name: Get Kubeconfig File Location
-      ansible.builtin.shell: |
-        set -o pipefail
-        microk8s kubectl config view -v6 2>&1 | awk  '/Config loaded from file:/{print $NF}'
-      changed_when: false
-      register: kubeconfig_location
-      args:
-        executable: /bin/bash
-
     - name: Delete Any Existing User CSR Objects
       kubernetes.core.k8s:
-        kubeconfig: "{{ kubeconfig_location.stdout }}"
+        kubeconfig: "{{ cluster_user_config }}"
         state: absent
         api_version: certificates.k8s.io/v1
         kind: CertificateSigningRequest
@@ -49,7 +40,7 @@
 
     - name: Create User CSR Object
       kubernetes.core.k8s:
-        kubeconfig: "{{ kubeconfig_location.stdout }}"
+        kubeconfig: "{{ cluster_user_config }}"
         state: present
         template: csr-user.yaml.j2
       vars:
@@ -61,7 +52,7 @@
 
     - name: Get User Certificate
       kubernetes.core.k8s_info:
-        kubeconfig: "{{ kubeconfig_location.stdout }}"
+        kubeconfig: "{{ cluster_user_config }}"
         api_version: certificates.k8s.io/v1
         kind: CertificateSigningRequest
         name: "{{ cluster_user }}"
@@ -69,7 +60,7 @@
 
     - name: Get Cluster Certificate
       kubernetes.core.k8s_info:
-        kubeconfig: "{{ kubeconfig_location.stdout }}"
+        kubeconfig: "{{ cluster_user_config }}"
         api_version: v1
         kind: ConfigMap
         name: kube-root-ca.crt
