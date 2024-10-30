@@ -2,4 +2,4 @@
 - name: Deploy Workloads
   hosts: localhost
   roles:
-    - deploy_workloads
+    - cluster_workloads
