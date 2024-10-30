@@ -1,5 +1,5 @@
 ---
 - name: Setup Cluster User
-  hosts: hermes
+  hosts: localhost
   roles:
     - cluster_user
