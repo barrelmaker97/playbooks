@@ -41,30 +41,28 @@
     name: iptables-persistent
     state: present
 
-- name: Update microk8s core addons repo
+- name: Create microk8s launch config
+  ansible.builtin.template:
+    src: launch-config.yaml
+    dest: /tmp/launch-config.yaml
+    mode: "0644"
+
+- name: Apply microk8s launch config
   become: true
-  ansible.builtin.command: microk8s addons repo update core
-  register: update_result
-  changed_when: update_result.stdout is not search("Already up to date")
+  ansible.builtin.shell: |
+    set -o pipefail
+    snap set microk8s config="$(cat /tmp/launch-config.yaml)"
+  changed_when: true
+  args:
+    executable: /bin/bash
 
-- name: Enable microk8s addons
-  ansible.builtin.command: microk8s enable {{ item }}
-  register: addon_result
-  changed_when: addon_result.stdout is not search("is already enabled")
-  loop:
-    - "core/dns:{{ upstream_dns }}"
-    - core/hostpath-storage
-    - core/rbac
 
-- name: Add DNS Entry to Cluster Certificate
-  ansible.builtin.lineinfile:
-    path: /var/snap/microk8s/current/certs/csr.conf.template
-    regexp: '^DNS\.6'
-    line: "DNS.6 = {{ cluster_host }}.{{ local_domain }}"
-    insertafter: 'DNS\.5 = kubernetes\.default\.svc\.cluster\.local'
-  register: cluster_dns_name
-
-- name: Wait for Certificate to Rotate
-  when: cluster_dns_name.changed  # noqa: no-handler
-  ansible.builtin.pause:
-    minutes: 2
+- name: Wait for API certificate to be ready
+  community.crypto.x509_certificate_info:
+    path: /var/snap/microk8s/current/certs/server.crt
+  register: cluster_cert_info
+  until: "cluster_cert_info.subject_alt_name is contains(alt_name)"
+  retries: 12
+  delay: 10
+  vars:
+    alt_name: "DNS:{{ cluster_domain }}"
