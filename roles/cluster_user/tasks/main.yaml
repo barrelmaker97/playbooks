@@ -26,7 +26,7 @@
 - name: Create local kubeconfig directory
   delegate_to: localhost
   ansible.builtin.file:
-    path: "{{ setup_cluster_kube_dir }}"
+    path: "{{ cluster_user_kube_dir }}"
     state: directory
     mode: "0755"
 
@@ -34,7 +34,7 @@
   become: true
   delegate_to: localhost
   ansible.builtin.file:
-    path: "{{ setup_cluster_kube_dir }}"
+    path: "{{ cluster_user_kube_dir }}"
     state: directory
     owner: "{{ ansible_user }}"
     recurse: true
@@ -42,13 +42,13 @@
 - name: Generate User Private Key
   delegate_to: localhost
   community.crypto.openssl_privatekey:
-    path: "{{ setup_cluster_key }}"
+    path: "{{ cluster_user_key }}"
 
 - name: Generate User CSR
   delegate_to: localhost
   community.crypto.openssl_csr:
-    path: "{{ setup_cluster_csr }}"
-    privatekey_path: "{{ setup_cluster_key }}"
+    path: "{{ cluster_user_csr }}"
+    privatekey_path: "{{ cluster_user_key }}"
     common_name: "{{ cluster_user }}"
 
 - name: Delete Any Existing User CSR Objects
@@ -63,7 +63,7 @@
     state: present
     template: csr-user.yaml.j2
   vars:
-    user_csr_base64: "{{ lookup('file', '{{ setup_cluster_csr }}') | b64encode }}"
+    user_csr_base64: "{{ lookup('file', '{{ cluster_user_csr }}') | b64encode }}"
 
 - name: Approve User CSR
   ansible.builtin.command: kubectl certificate approve {{ cluster_user }}
@@ -79,7 +79,7 @@
   delegate_to: localhost
   ansible.builtin.copy:
     content: "{{ user_cert.resources[0].status.certificate | b64decode }}"
-    dest: "{{ setup_cluster_user_crt }}"
+    dest: "{{ cluster_user_crt }}"
     mode: "0644"
 
 - name: Get Cluster Certificate
@@ -94,7 +94,7 @@
   delegate_to: localhost
   ansible.builtin.copy:
     content: "{{ cluster_cert.resources[0]['data']['ca.crt'] }}"
-    dest: "{{ setup_cluster_api_crt }}"
+    dest: "{{ cluster_user_api_crt }}"
     mode: "0644"
 
 - name: Install kubectl locally
@@ -108,5 +108,5 @@
   delegate_to: localhost
   ansible.builtin.template:
     src: user-kubeconfig.yaml
-    dest: "{{ setup_cluster_kube_dir }}/config"
+    dest: "{{ cluster_user_kube_dir }}/config"
     mode: "0600"

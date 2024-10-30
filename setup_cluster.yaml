@@ -3,3 +3,4 @@
   hosts: hermes
   roles:
     - setup_cluster
+    - cluster_user
