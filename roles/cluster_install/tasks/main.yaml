@@ -65,6 +65,6 @@
   register: cluster_dns_name
 
 - name: Wait for Certificate to Rotate
-  when: cluster_dns_name.changed # noqa: no-handler
+  when: cluster_dns_name.changed  # noqa: no-handler
   ansible.builtin.pause:
     minutes: 2

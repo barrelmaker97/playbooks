@@ -1,17 +1,17 @@
 ---
 properties:
-# defaultMap: cs_office # Prop Hunt
-# gamemode: prop_hunt # Prop Hunt
-  defaultMap: gm_flatgrass # TTT
-  gamemode: terrortown # TTT
+  # defaultMap: cs_office  # Prop Hunt
+  # gamemode: prop_hunt  # Prop Hunt
+  defaultMap: gm_flatgrass  # TTT
+  gamemode: terrortown  # TTT
   installCSS: true
   installHL2: false
   installHLDM: false
   installTF2: false
   maxPlayers: 20
-# serverName: Prop-Hunt # Prop Hunt
-# workshopCollectionID: "2799438970" # Prop Hunt
-  serverName: TTT # TTT
+  # serverName: Prop-Hunt  # Prop Hunt
+  # workshopCollectionID: "2799438970"  # Prop Hunt
+  serverName: TTT  # TTT
   workshopCollectionID: "2747580017"  # TTT
 serverPort: 30008  # Must be in the range 30000-32767
 storageClassName: gmod  # directory needs to be owned by user/group 10000
