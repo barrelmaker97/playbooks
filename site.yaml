@@ -1,0 +1,5 @@
+---
+- import_playbook: cluster_install.yaml
+- import_playbook: cluster_user.yaml
+- import_playbook: cluster_services.yaml
+- import_playbook: cluster_workloads.yaml
