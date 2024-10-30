@@ -65,4 +65,4 @@
   retries: 12
   delay: 10
   vars:
-    alt_name: "DNS:{{ cluster_host }}.{{ local_domain }}"
+    alt_name: "DNS:{{ cluster_domain }}"
