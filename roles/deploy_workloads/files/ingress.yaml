@@ -1,4 +1,5 @@
 ---
 baseDomain: barrelmaker.dev
+externalName: soteria
 ingressClass: nginx
 issuerName: letsencrypt-prod
