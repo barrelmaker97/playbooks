@@ -3,12 +3,18 @@ Personal Ansible Playbook Library
 
 # Installing Ansible
 ```bash
-sudo apt update
-sudo apt install pipx
-pipx ensurepath
-pipx install --include-deps ansible
-pipx inject ansible argcomplete kubernetes
-pipx inject --include-apps ansible ansible-lint
+./install-ansible.sh
+```
+
+# Running Playbooks
+To run all playbooks, use site.yaml:
+```bash
+ansible-playbook site.yaml
+```
+
+Individual playbooks can be run in a similar manner:
+```bash
+ansible-playbook cluster_user.yaml
 ```
 
 # License
