@@ -4,34 +4,6 @@
   changed_when: false
   register: kubeconfig_location
 
-- name: Create User Namespace
-  kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig_location.stdout }}"
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: "{{ cluster_user }}"
-
-- name: Create User Cluster Role Binding
-  kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig_location.stdout }}"
-    state: present
-    template: clusterrolebinding-user.yaml
-
-- name: Create User Resource Quota
-  kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig_location.stdout }}"
-    state: present
-    template: resourcequota-user.yaml
-
-- name: Create User Limit Range
-  kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig_location.stdout }}"
-    state: present
-    template: limitrange-user.yaml
-
 - name: Create local kubeconfig directory
   delegate_to: localhost
   ansible.builtin.file:
@@ -124,3 +96,31 @@
     src: user-kubeconfig.yaml
     dest: "{{ cluster_user_kube_dir }}/config"
     mode: "0600"
+
+- name: Create User Namespace
+  delegate_to: localhost
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ cluster_user }}"
+
+- name: Create User Cluster Role Binding
+  delegate_to: localhost
+  kubernetes.core.k8s:
+    state: present
+    template: clusterrolebinding-user.yaml
+
+- name: Create User Resource Quota
+  delegate_to: localhost
+  kubernetes.core.k8s:
+    state: present
+    template: resourcequota-user.yaml
+
+- name: Create User Limit Range
+  delegate_to: localhost
+  kubernetes.core.k8s:
+    state: present
+    template: limitrange-user.yaml
