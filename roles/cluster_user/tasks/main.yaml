@@ -77,7 +77,7 @@
     user_csr_base64: "{{ lookup('file', '{{ cluster_user_csr }}') | b64encode }}"
 
 - name: Approve User CSR
-  ansible.builtin.command: kubectl certificate approve {{ cluster_user }}
+  ansible.builtin.command: microk8s kubectl certificate approve {{ cluster_user }}
   changed_when: true
 
 - name: Get User Certificate
