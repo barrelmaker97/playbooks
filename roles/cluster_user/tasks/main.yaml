@@ -31,9 +31,13 @@
   delegate_to: hermes
   block:
     - name: Get Kubeconfig File Location
-      ansible.builtin.shell: microk8s kubectl config view -v6 2>&1 | awk  '/Config loaded from file:/{print $NF}'
+      ansible.builtin.shell: |
+        set -o pipefail
+        microk8s kubectl config view -v6 2>&1 | awk  '/Config loaded from file:/{print $NF}'
       changed_when: false
       register: kubeconfig_location
+      args:
+        executable: /bin/bash
 
     - name: Delete Any Existing User CSR Objects
       kubernetes.core.k8s:
