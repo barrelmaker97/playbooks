@@ -1,5 +1,0 @@
----
-- name: Deploy Workloads
-  hosts: hermes
-  roles:
-    - deploy_workloads

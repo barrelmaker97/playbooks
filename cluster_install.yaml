@@ -1,0 +1,5 @@
+---
+- name: Install Cluster
+  hosts: hermes
+  roles:
+    - cluster_install

@@ -1,6 +1,0 @@
----
-setup_cluster_kube_dir: "{{ ansible_env.HOME }}/.kube"
-setup_cluster_key: "{{ setup_cluster_kube_dir }}/{{ cluster_user }}.key"
-setup_cluster_csr: "{{ setup_cluster_kube_dir }}/{{ cluster_user }}.csr"
-setup_cluster_user_crt: "{{ setup_cluster_kube_dir }}/{{ cluster_user }}.crt"
-setup_cluster_api_crt: "{{ setup_cluster_kube_dir }}/cluster.crt"

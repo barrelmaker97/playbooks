@@ -1,0 +1,114 @@
+---
+- name: Install python-kubernetes
+  become: true
+  ansible.builtin.apt:
+    name: python3-kubernetes
+    state: present
+
+- name: Install nfs-common
+  become: true
+  ansible.builtin.apt:
+    name: nfs-common
+    state: present
+
+- name: Install microk8s
+  become: true
+  community.general.snap:
+    name: microk8s
+    classic: true
+    channel: "{{ microk8s_channel }}"
+
+- name: Add user to microk8s group
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: microk8s
+    append: true
+
+- name: Wait for microk8s to be ready
+  ansible.builtin.command: microk8s status --wait-ready --timeout 1800
+  changed_when: false
+
+- name: Allow packet forwarding
+  become: true
+  ansible.builtin.iptables:
+    chain: FORWARD
+    policy: ACCEPT
+
+- name: Install iptables-persistent
+  become: true
+  ansible.builtin.apt:
+    name: iptables-persistent
+    state: present
+
+- name: Update microk8s core addons repo
+  become: true
+  ansible.builtin.command: microk8s addons repo update core
+  register: update_result
+  changed_when: update_result.stdout is not search("Already up to date")
+
+- name: Enable microk8s addons
+  ansible.builtin.command: microk8s enable {{ item }}
+  register: addon_result
+  changed_when: addon_result.stdout is not search("is already enabled")
+  loop:
+    - "core/dns:{{ upstream_dns }}"
+    - core/hostpath-storage
+    - core/rbac
+
+- name: Add DNS Entry to Cluster Certificate
+  ansible.builtin.lineinfile:
+    path: /var/snap/microk8s/current/certs/csr.conf.template
+    regexp: '^DNS\.6'
+    line: "DNS.6 = {{ cluster_host }}.{{ local_domain }}"
+    insertafter: 'DNS\.5 = kubernetes\.default\.svc\.cluster\.local'
+  register: cluster_dns_name
+
+- name: Wait for Certificate to Rotate
+  when: cluster_dns_name.changed # noqa: no-handler
+  ansible.builtin.pause:
+    minutes: 2
+
+- name: Install kubectl
+  become: true
+  community.general.snap:
+    name: kubectl
+    classic: true
+
+- name: Create kubeconfig directory
+  ansible.builtin.file:
+    path: "{{ cluster_install_kube_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Set owner of kubeconfig directory to {{ ansible_user }}
+  become: true
+  ansible.builtin.file:
+    path: "{{ cluster_install_kube_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    recurse: true
+
+- name: Generate kubeconfig file
+  ansible.builtin.command: microk8s config
+  register: kubeconfig
+  changed_when: false
+  no_log: true
+
+- name: Save kubeconfig file
+  ansible.builtin.copy:
+    content: "{{ kubeconfig.stdout }}"
+    dest: "{{ cluster_install_kube_dir }}/config"
+    mode: "0600"
+
+- name: Create Local Storage Directory
+  ansible.builtin.file:
+    path: "{{ local_storage_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create PVs
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_fileglob:
+    - templates/pv-*.yaml

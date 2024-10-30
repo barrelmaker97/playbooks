@@ -1,14 +1,11 @@
 ---
 - name: Install helm locally
   become: true
-  delegate_to: localhost
   community.general.snap:
     name: helm
     classic: true
 
 - name: Add Helm Repos
-  no_log: true
-  delegate_to: localhost
   kubernetes.core.helm_repository:
     name: "{{ item.key }}"
     repo_url: "{{ item.value }}"
@@ -19,7 +16,6 @@
       barrelmaker: https://charts.barrelmaker.dev
 
 - name: Deploy Helm Charts
-  delegate_to: localhost
   kubernetes.core.helm:
     name: "{{ item.key }}"
     chart_ref: "{{ item.value }}"

@@ -1,0 +1,5 @@
+---
+- name: Setup Cluster Services
+  hosts: localhost
+  roles:
+    - cluster_services
