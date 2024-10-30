@@ -1,5 +1,6 @@
 ---
 - name: Deploy Workloads
   hosts: localhost
+  gather_facts: false
   roles:
     - cluster_workloads

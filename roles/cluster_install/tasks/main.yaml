@@ -65,50 +65,6 @@
   register: cluster_dns_name
 
 - name: Wait for Certificate to Rotate
-  when: cluster_dns_name.changed # noqa: no-handler
+  when: cluster_dns_name.changed  # noqa: no-handler
   ansible.builtin.pause:
     minutes: 2
-
-- name: Install kubectl
-  become: true
-  community.general.snap:
-    name: kubectl
-    classic: true
-
-- name: Create kubeconfig directory
-  ansible.builtin.file:
-    path: "{{ cluster_install_kube_dir }}"
-    state: directory
-    mode: "0755"
-
-- name: Set owner of kubeconfig directory to {{ ansible_user }}
-  become: true
-  ansible.builtin.file:
-    path: "{{ cluster_install_kube_dir }}"
-    state: directory
-    owner: "{{ ansible_user }}"
-    recurse: true
-
-- name: Generate kubeconfig file
-  ansible.builtin.command: microk8s config
-  register: kubeconfig
-  changed_when: false
-  no_log: true
-
-- name: Save kubeconfig file
-  ansible.builtin.copy:
-    content: "{{ kubeconfig.stdout }}"
-    dest: "{{ cluster_install_kube_dir }}/config"
-    mode: "0600"
-
-- name: Create Local Storage Directory
-  ansible.builtin.file:
-    path: "{{ local_storage_dir }}"
-    state: directory
-    mode: "0755"
-
-- name: Create PVs
-  kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_fileglob:
-    - templates/pv-*.yaml

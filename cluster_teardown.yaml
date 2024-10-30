@@ -13,6 +13,7 @@
       block:
         - name: Stop microk8s
           ansible.builtin.command: microk8s stop
+          changed_when: true
 
         - name: Remove microk8s
           become: true

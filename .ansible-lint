@@ -2,4 +2,3 @@
 ---
 warn_list:
   - experimental
-  - no-changed-when
