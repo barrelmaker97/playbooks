@@ -67,6 +67,7 @@
 
 - name: Approve User CSR
   ansible.builtin.command: kubectl certificate approve {{ cluster_user }}
+  changed_when: true
 
 - name: Get User Certificate
   kubernetes.core.k8s_info:
