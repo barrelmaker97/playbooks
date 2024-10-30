@@ -4,9 +4,10 @@ cluster_user: barrelmaker
 email_address: nolancooper97@gmail.com
 cert_expiration_seconds: 604800  # 7 days
 cluster_domain: "{{ cluster_host }}.{{ local_domain }}"
-cluster_host: hermes
+cluster_host: poseidon
 cluster_port: 16443
 cluster_vip: 192.168.15.60
+node0_ip: 192.168.15.50
 local_domain: lan
 local_storage_dir: /home/barrelmaker/backup
 microk8s_channel: 1.31/stable
