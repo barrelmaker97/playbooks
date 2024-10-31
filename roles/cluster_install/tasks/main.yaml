@@ -56,7 +56,6 @@
   args:
     executable: /bin/bash
 
-
 - name: Wait for API certificate to be ready
   community.crypto.x509_certificate_info:
     path: /var/snap/microk8s/current/certs/server.crt
@@ -65,4 +64,4 @@
   retries: 12
   delay: 10
   vars:
-    alt_name: "DNS:{{ cluster_domain }}"
+    alt_name: "DNS:api.{{ cluster_domain }}"

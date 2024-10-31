@@ -1,2 +1,0 @@
----
-cluster_install_kube_dir: "{{ ansible_env.HOME }}/.kube"
