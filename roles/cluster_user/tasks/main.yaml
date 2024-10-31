@@ -19,6 +19,7 @@
   delegate_to: localhost
   community.crypto.openssl_privatekey:
     path: "{{ cluster_user_key }}"
+    size: 2048
 
 - name: Generate User CSR
   delegate_to: localhost
