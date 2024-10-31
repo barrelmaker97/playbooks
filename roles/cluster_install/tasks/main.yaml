@@ -56,7 +56,6 @@
   args:
     executable: /bin/bash
 
-
 - name: Wait for API certificate to be ready
   community.crypto.x509_certificate_info:
     path: /var/snap/microk8s/current/certs/server.crt
