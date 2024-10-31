@@ -1,6 +1,5 @@
 ---
-serverName: Valheim
-serverPort: 30005  # Must be in the range 30000-32767
+serverName: Barrelmaker
 worldName: Asgard
 public: true
 metrics: true
@@ -14,6 +13,10 @@ podSecurityContext:
   runAsUser: 111
   runAsGroup: 1000
   fsGroup: 1000
+
+service:
+  type: LoadBalancer
+  port: 2456
 
 resources:
   requests:

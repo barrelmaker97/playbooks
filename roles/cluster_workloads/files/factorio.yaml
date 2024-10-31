@@ -3,8 +3,6 @@ persistence:
   storageClassName: factorio
   size: 2Gi
 
-serverPort: 30002  # Must be in the range 30000-32767
-
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 845
@@ -15,6 +13,10 @@ securityContext:
   capabilities:
     drop:
       - ALL
+
+service:
+  type: LoadBalancer
+  port: 34197
 
 resources:
   requests:
