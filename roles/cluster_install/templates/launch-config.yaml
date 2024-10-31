@@ -6,4 +6,4 @@ addons:
   - name: rbac
   - name: hostpath-storage
 extraSANs:
-  - "{{ cluster_domain }}"
+  - "api.{{ cluster_domain }}"
