@@ -13,5 +13,17 @@ properties:
   # workshopCollectionID: "2799438970"  # Prop Hunt
   serverName: TTT  # TTT
   workshopCollectionID: "2747580017"  # TTT
-serverPort: 30008  # Must be in the range 30000-32767
-storageClassName: gmod  # directory needs to be owned by user/group 10000
+
+persistence:
+  size: 10Gi
+
+service:
+  type: LoadBalancer
+  port: 27015
+
+resources:
+  requests:
+    cpu: 2000m
+    memory: 4000Mi
+  limits:
+    memory: 8000Mi
