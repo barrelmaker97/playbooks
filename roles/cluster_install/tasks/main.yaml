@@ -64,4 +64,4 @@
   retries: 12
   delay: 10
   vars:
-    alt_name: "DNS:{{ cluster_domain }}"
+    alt_name: "DNS:api.{{ cluster_domain }}"
