@@ -15,7 +15,7 @@ securityContext:
       - ALL
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 34197
 
 resources:
