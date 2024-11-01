@@ -11,6 +11,8 @@
     plugin_path: "https://github.com/databus23/helm-diff"
 
 - name: Add Helm Repos
+  tags:
+    - longhorn
   kubernetes.core.helm_repository:
     name: "{{ item.key }}"
     repo_url: "{{ item.value }}"
@@ -155,3 +157,42 @@
     template: "{{ item }}"
   with_fileglob:
     - templates/pv-*.yaml
+
+- name: Deploy Longhorn
+  tags:
+    - longhorn
+  kubernetes.core.helm:
+    name: longhorn
+    chart_ref: longhorn/longhorn
+    chart_version: "{{ longhorn_version }}"
+    release_namespace: longhorn-system
+    create_namespace: true
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      csi:
+        attacherReplicaCount: 1
+        provisionerReplicaCount: 1
+        resizerReplicaCount: 1
+        snapshotterReplicaCount: 1
+        kubeletRootDir: /var/snap/microk8s/common/var/lib/kubelet
+      longhornUI:
+        replicas: 1
+      defaultSettings:
+        allowVolumeCreationWithDegradedAvailability: false
+        backupTarget: nfs://soteria.lan:/volume1/longhorn-backupstore
+        defaultDataPath: /dev/ubuntu-vg/longhorn-lv
+        replicaAutoBalance: least-effort
+        storageMinimalAvailablePercentage: 10
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        host: "longhorn.{{ cluster_domain }}"
+
+- name: Create Longhorn StorageClasses
+  tags:
+    - longhorn
+  debug:
+    msg: "TODO: Create Longhorn StorageClasses that fit your use case"
