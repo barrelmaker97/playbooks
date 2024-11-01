@@ -29,6 +29,7 @@
     common_name: "{{ cluster_user }}"
 
 - name: Execute Tasks on Node
+  become: true
   delegate_to: hermes
   block:
     - name: Delete Any Existing User CSR Objects
@@ -48,7 +49,6 @@
         user_csr_base64: "{{ lookup('file', '{{ cluster_user_csr }}') | b64encode }}"
 
     - name: Approve User CSR
-      become: true
       ansible.builtin.command: microk8s kubectl certificate approve {{ cluster_user }}
       changed_when: true
 
