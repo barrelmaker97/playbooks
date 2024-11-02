@@ -183,6 +183,8 @@
       defaultSettings:
         allowVolumeCreationWithDegradedAvailability: false
         backupTarget: nfs://soteria.lan:/volume1/longhorn-backupstore
+        defaultDataLocality: best-effort
+        defaultReplicaCount: 1
         replicaAutoBalance: least-effort
         storageMinimalAvailablePercentage: 10
       ingress:
