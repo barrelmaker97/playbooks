@@ -183,7 +183,6 @@
       defaultSettings:
         allowVolumeCreationWithDegradedAvailability: false
         backupTarget: nfs://soteria.lan:/volume1/longhorn-backupstore
-        defaultDataPath: /dev/ubuntu-vg/longhorn-lv
         replicaAutoBalance: least-effort
         storageMinimalAvailablePercentage: 10
       ingress:
