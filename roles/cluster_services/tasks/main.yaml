@@ -190,8 +190,20 @@
         ingressClassName: nginx
         host: "longhorn.{{ cluster_domain }}"
 
-- name: Create Longhorn StorageClasses
+- name: Create Longhorn Local Storage Class
   tags:
     - longhorn
-  debug:
-    msg: "TODO: Create Longhorn StorageClasses that fit your use case"
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: longhorn-local
+      provisioner: driver.longhorn.io
+      allowVolumeExpansion: true
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+      parameters:
+        dataLocality: strict-local
+        numberOfReplicas: "1"
