@@ -204,7 +204,7 @@
         name: longhorn-local
       provisioner: driver.longhorn.io
       allowVolumeExpansion: true
-      reclaimPolicy: Delete
+      reclaimPolicy: Retain
       volumeBindingMode: Immediate
       parameters:
         dataEngine: v1
