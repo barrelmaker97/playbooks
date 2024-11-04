@@ -207,5 +207,8 @@
       reclaimPolicy: Delete
       volumeBindingMode: Immediate
       parameters:
+        dataEngine: v1
         dataLocality: strict-local
         numberOfReplicas: "1"
+        disableRevisionCounter: "true"
+        fsType: ext4
