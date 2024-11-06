@@ -36,6 +36,6 @@
       jellyfin: barrelmaker/jellyfin
       niucraft: barrelmaker/minecraft
       # serge: barrelmaker/serge
-      valheim: barrelmaker/valheim
+      # valheim: barrelmaker/valheim
       website: barrelmaker/website
       ingress: barrelmaker/ingress
