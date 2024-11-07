@@ -4,6 +4,5 @@ addons:
   - name: dns
     args: [{{ upstream_dns }}]
   - name: rbac
-  - name: hostpath-storage
 extraSANs:
   - "api.{{ cluster_domain }}"
