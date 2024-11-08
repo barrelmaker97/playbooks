@@ -26,6 +26,51 @@
       prometheus-community: https://prometheus-community.github.io/helm-charts
       longhorn: https://charts.longhorn.io
 
+- name: Deploy Metrics Server
+  kubernetes.core.helm:
+    name: metrics-server
+    chart_ref: metrics-server/metrics-server
+    chart_version: "{{ metrics_server_version }}"
+    release_namespace: kube-system
+    update_repo_cache: true
+    wait: true
+
+- name: Get Node IPs
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Node
+  register: nodes
+
+- name: Deploy Prometheus Stack
+  kubernetes.core.helm:
+    name: kube-prometheus-stack
+    chart_ref: prometheus-community/kube-prometheus-stack
+    chart_version: "{{ kube_prometheus_stack_version }}"
+    release_namespace: monitoring
+    create_namespace: true
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
+    values_file:
+      kubeScheduler:
+        endpoints: "{{ node_ips }}"
+      kubeControllerManager:
+        endpoints: "{{ node_ips }}"
+      kubeProxy:
+        endpoints: "{{ node_ips }}"
+
+- name: Create Custom Headers ConfigMap for Monitoring
+  kubernetes.core.k8s:
+    state: present
+    template: configmap-monitoring.yaml
+
+- name: Create Ingress for Monitoring
+  kubernetes.core.k8s:
+    state: present
+    template: ingress-monitoring.yaml
+
 - name: Create MetalLB Namespace
   kubernetes.core.k8s:
     state: present
@@ -99,51 +144,6 @@
   kubernetes.core.k8s:
     state: present
     template: issuer-staging.yaml
-
-- name: Deploy Metrics Server
-  kubernetes.core.helm:
-    name: metrics-server
-    chart_ref: metrics-server/metrics-server
-    chart_version: "{{ metrics_server_version }}"
-    release_namespace: kube-system
-    update_repo_cache: true
-    wait: true
-
-- name: Get Node IPs
-  kubernetes.core.k8s_info:
-    api_version: v1
-    kind: Node
-  register: nodes
-
-- name: Deploy Prometheus Stack
-  kubernetes.core.helm:
-    name: kube-prometheus-stack
-    chart_ref: prometheus-community/kube-prometheus-stack
-    chart_version: "{{ kube_prometheus_stack_version }}"
-    release_namespace: monitoring
-    create_namespace: true
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
-    values_file:
-      kubeScheduler:
-        endpoints: "{{ node_ips }}"
-      kubeControllerManager:
-        endpoints: "{{ node_ips }}"
-      kubeProxy:
-        endpoints: "{{ node_ips }}"
-
-- name: Create Custom Headers ConfigMap for Monitoring
-  kubernetes.core.k8s:
-    state: present
-    template: configmap-monitoring.yaml
-
-- name: Create Ingress for Monitoring
-  kubernetes.core.k8s:
-    state: present
-    template: ingress-monitoring.yaml
 
 - name: Deploy Longhorn
   tags:
