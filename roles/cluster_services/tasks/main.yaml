@@ -218,6 +218,9 @@
         enabled: true
         ingressClassName: nginx
         host: "longhorn.{{ cluster_domain }}"
+      metrics:
+        serviceMonitor:
+          enabled: true
 
 - name: Create Longhorn Local Storage Class
   tags:
