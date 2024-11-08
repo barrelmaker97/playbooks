@@ -109,6 +109,14 @@
     release_namespace: metallb-system
     update_repo_cache: true
     wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      prometheus:
+        namespace: monitoring
+        rbacPrometheus: false
+        serviceMonitor:
+          enabled: true
 
 - name: Create IP Address Pool
   kubernetes.core.k8s:
