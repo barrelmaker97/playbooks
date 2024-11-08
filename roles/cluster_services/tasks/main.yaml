@@ -137,6 +137,14 @@
     create_namespace: true
     update_repo_cache: true
     wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      controller:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
 
 - name: Set Nginx Ingress Controller Custom Headers
   kubernetes.core.k8s:
