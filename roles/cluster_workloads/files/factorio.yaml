@@ -1,7 +1,7 @@
 ---
 persistence:
-  storageClassName: factorio
-  size: 2Gi
+  storageClassName: longhorn-local
+  size: 5Gi
 
 podSecurityContext:
   runAsNonRoot: true

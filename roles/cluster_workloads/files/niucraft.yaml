@@ -1,7 +1,7 @@
 ---
 persistence:
-  storageClassName: niucraft
-  size: 30Gi
+  storageClassName: longhorn-local
+  size: 40Gi
 
 dynmap: true
 metrics: true

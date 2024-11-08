@@ -5,7 +5,7 @@ public: true
 metrics: true
 
 persistence:
-  storageClassName: valheim
+  storageClassName: longhorn-local
   size: 10Gi
 
 podSecurityContext:

@@ -145,19 +145,6 @@
     state: present
     template: ingress-monitoring.yaml
 
-- name: Create Local Storage Directory
-  delegate_to: hermes
-  ansible.builtin.file:
-    path: "{{ local_storage_dir }}"
-    state: directory
-    mode: "0755"
-
-- name: Create Local Persistent Volumes
-  kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_fileglob:
-    - templates/pv-*.yaml
-
 - name: Deploy Longhorn
   tags:
     - longhorn
@@ -257,3 +244,9 @@
           full-backup-interval: "15"
         retain: 30
         task: backup
+
+- name: Create Jellyfin NFS Volumes
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_fileglob:
+    - templates/pv-*.yaml
