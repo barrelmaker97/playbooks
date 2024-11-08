@@ -54,7 +54,26 @@
   vars:
     node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
     values_file:
+      alertmanager:
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          hosts:
+            - "alertmanager.{{ cluster_domain }}"
+      grafana:
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            nginx.ingress.kubernetes.io/custom-headers: monitoring/monitoring-custom-headers
+          hosts:
+            - "grafana.{{ cluster_domain }}"
       prometheus:
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          hosts:
+            - "prometheus.{{ cluster_domain }}"
         prometheusSpec:
           serviceMonitorSelectorNilUsesHelmValues: false
       kubeScheduler:
@@ -68,11 +87,6 @@
   kubernetes.core.k8s:
     state: present
     template: configmap-monitoring.yaml
-
-- name: Create Ingress for Monitoring
-  kubernetes.core.k8s:
-    state: present
-    template: ingress-monitoring.yaml
 
 - name: Create MetalLB Namespace
   kubernetes.core.k8s:
