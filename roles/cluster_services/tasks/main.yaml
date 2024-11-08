@@ -54,6 +54,9 @@
   vars:
     node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
     values_file:
+      prometheus:
+        prometheusSpec:
+          serviceMonitorSelectorNilUsesHelmValues: false
       kubeScheduler:
         endpoints: "{{ node_ips }}"
       kubeControllerManager:
@@ -132,8 +135,15 @@
     create_namespace: true
     update_repo_cache: true
     wait: true
-    set_values:
-      - value: crds.enabled=true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      prometheus:
+        enabled: true
+        servicemonitor:
+          enabled: true
+      crds:
+        enabled: true
 
 - name: Create Production Issuer
   kubernetes.core.k8s:
