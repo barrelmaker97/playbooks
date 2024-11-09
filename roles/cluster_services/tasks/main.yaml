@@ -41,13 +41,33 @@
     kind: Node
   register: nodes
 
+- name: Create Monitoring Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+
+- name: Create Grafana Headers ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: grafana-headers
+        namespace: monitoring
+      data:
+        Content-Security-Policy: "frame-ancestors 'self'; default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://grafana.com data:; img-src 'self' https://grafana.com data:; style-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self';"
+
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
     name: kube-prometheus-stack
     chart_ref: prometheus-community/kube-prometheus-stack
     chart_version: "{{ kube_prometheus_stack_version }}"
     release_namespace: monitoring
-    create_namespace: true
     update_repo_cache: true
     wait: true
     release_values: "{{ values_file | from_yaml }}"
@@ -65,7 +85,7 @@
           enabled: true
           ingressClassName: nginx
           annotations:
-            nginx.ingress.kubernetes.io/custom-headers: monitoring/monitoring-custom-headers
+            nginx.ingress.kubernetes.io/custom-headers: monitoring/grafana-headers
           hosts:
             - "grafana.{{ cluster_domain }}"
       prometheus:
@@ -82,11 +102,6 @@
         endpoints: "{{ node_ips }}"
       kubeProxy:
         endpoints: "{{ node_ips }}"
-
-- name: Create Custom Headers ConfigMap for Monitoring
-  kubernetes.core.k8s:
-    state: present
-    template: configmap-monitoring.yaml
 
 - name: Create MetalLB Namespace
   kubernetes.core.k8s:
