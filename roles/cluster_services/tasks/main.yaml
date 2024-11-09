@@ -24,15 +24,6 @@
       metrics-server: https://kubernetes-sigs.github.io/metrics-server
       prometheus-community: https://prometheus-community.github.io/helm-charts
 
-- name: Deploy Metrics Server
-  kubernetes.core.helm:
-    name: metrics-server
-    chart_ref: metrics-server/metrics-server
-    chart_version: "{{ metrics_server_version }}"
-    release_namespace: kube-system
-    update_repo_cache: true
-    wait: true
-
 - name: Get Node IPs
   kubernetes.core.k8s_info:
     api_version: v1
@@ -157,6 +148,15 @@
         endpoints: "{{ node_ips }}"
       kubeProxy:
         endpoints: "{{ node_ips }}"
+
+- name: Deploy Metrics Server
+  kubernetes.core.helm:
+    name: metrics-server
+    chart_ref: metrics-server/metrics-server
+    chart_version: "{{ metrics_server_version }}"
+    release_namespace: kube-system
+    update_repo_cache: true
+    wait: true
 
 - name: Create MetalLB Namespace
   kubernetes.core.k8s:
