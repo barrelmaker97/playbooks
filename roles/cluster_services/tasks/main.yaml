@@ -11,8 +11,6 @@
     plugin_path: "https://github.com/databus23/helm-diff"
 
 - name: Add Helm Repos
-  tags:
-    - longhorn
   kubernetes.core.helm_repository:
     name: "{{ item.key }}"
     repo_url: "{{ item.value }}"
@@ -258,8 +256,6 @@
     template: issuer-staging.yaml
 
 - name: Deploy Longhorn
-  tags:
-    - longhorn
   kubernetes.core.helm:
     name: longhorn
     chart_ref: longhorn/longhorn
@@ -295,8 +291,6 @@
           enabled: true
 
 - name: Create Longhorn Local Storage Class
-  tags:
-    - longhorn
   kubernetes.core.k8s:
     state: present
     definition:
@@ -316,8 +310,6 @@
         fsType: ext4
 
 - name: Create Default Recurring Snapshot
-  tags:
-    - longhorn
   kubernetes.core.k8s:
     state: present
     definition:
@@ -338,8 +330,6 @@
         task: snapshot
 
 - name: Create Default Recurring Backup
-  tags:
-    - longhorn
   kubernetes.core.k8s:
     state: present
     definition:
