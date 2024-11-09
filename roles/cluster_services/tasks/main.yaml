@@ -60,7 +60,38 @@
         name: grafana-headers
         namespace: monitoring
       data:
-        Content-Security-Policy: "frame-ancestors 'self'; default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://grafana.com data:; img-src 'self' https://grafana.com data:; style-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self';"
+        Content-Security-Policy: >-
+          frame-ancestors 'self';
+          default-src 'none';
+          script-src 'self' 'unsafe-inline' 'unsafe-eval';
+          font-src 'self' https://fonts.gstatic.com;
+          connect-src 'self' https://grafana.com data:;
+          img-src 'self' https://grafana.com data:;
+          style-src 'self' 'unsafe-inline';
+          base-uri 'self';
+          form-action 'self';
+
+- name: Create Alertmanager Headers ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: alertmanager-headers
+        namespace: monitoring
+      data:
+        Content-Security-Policy: >-
+          default-src 'none';
+          form-action 'self';
+          img-src 'self' data:;
+          object-src 'none';
+          script-src 'self' 'unsafe-inline';
+          style-src 'self';
+          font-src 'self';
+          connect-src 'self';
+          base-uri 'self';
+          frame-ancestors 'none';
 
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
@@ -78,6 +109,8 @@
         ingress:
           enabled: true
           ingressClassName: nginx
+          annotations:
+            nginx.ingress.kubernetes.io/custom-headers: monitoring/alertmanager-headers
           hosts:
             - "alertmanager.{{ cluster_domain }}"
       grafana:
