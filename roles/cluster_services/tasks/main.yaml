@@ -50,6 +50,28 @@
       metadata:
         name: monitoring
 
+- name: Create Alertmanager Headers ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: alertmanager-headers
+        namespace: monitoring
+      data:
+        Content-Security-Policy: >-
+          default-src 'none';
+          form-action 'self';
+          img-src 'self' data:;
+          object-src 'none';
+          script-src 'self' 'unsafe-inline';
+          style-src 'self';
+          font-src 'self';
+          connect-src 'self';
+          base-uri 'self';
+          frame-ancestors 'none';
+
 - name: Create Grafana Headers ConfigMap
   kubernetes.core.k8s:
     state: present
@@ -71,14 +93,14 @@
           base-uri 'self';
           form-action 'self';
 
-- name: Create Alertmanager Headers ConfigMap
+- name: Create Prometheus Headers ConfigMap
   kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: v1
       kind: ConfigMap
       metadata:
-        name: alertmanager-headers
+        name: prometheus-headers
         namespace: monitoring
       data:
         Content-Security-Policy: >-
@@ -87,7 +109,7 @@
           img-src 'self' data:;
           object-src 'none';
           script-src 'self' 'unsafe-inline';
-          style-src 'self';
+          style-src 'self' 'unsafe-inline';
           font-src 'self';
           connect-src 'self';
           base-uri 'self';
@@ -125,6 +147,8 @@
         ingress:
           enabled: true
           ingressClassName: nginx
+          annotations:
+            nginx.ingress.kubernetes.io/custom-headers: monitoring/prometheus-headers
           hosts:
             - "prometheus.{{ cluster_domain }}"
         prometheusSpec:
