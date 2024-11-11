@@ -24,6 +24,105 @@
       metrics-server: https://kubernetes-sigs.github.io/metrics-server
       prometheus-community: https://prometheus-community.github.io/helm-charts
 
+- name: Check if Longhorn is installed
+  kubernetes.core.helm_info:
+    name: longhorn
+    release_namespace: longhorn-system
+  register: longhorn_info
+
+- name: Deploy Longhorn
+  when: '"status" not in longhorn_info'
+  kubernetes.core.helm:
+    name: longhorn
+    chart_ref: longhorn/longhorn
+    chart_version: "{{ longhorn_version }}"
+    release_namespace: longhorn-system
+    create_namespace: true
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      csi:
+        attacherReplicaCount: 1
+        provisionerReplicaCount: 1
+        resizerReplicaCount: 1
+        snapshotterReplicaCount: 1
+        kubeletRootDir: /var/snap/microk8s/common/var/lib/kubelet
+      longhornUI:
+        replicas: 1
+      defaultSettings:
+        allowVolumeCreationWithDegradedAvailability: false
+        backupTarget: nfs://soteria.lan:/volume1/longhorn-backupstore
+        defaultDataLocality: best-effort
+        defaultReplicaCount: 1
+        replicaAutoBalance: least-effort
+        storageMinimalAvailablePercentage: 10
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        host: "longhorn.{{ cluster_domain }}"
+
+- name: Create Longhorn Local Storage Class
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: longhorn-local
+      provisioner: driver.longhorn.io
+      allowVolumeExpansion: true
+      reclaimPolicy: Retain
+      volumeBindingMode: Immediate
+      parameters:
+        dataEngine: v1
+        dataLocality: strict-local
+        numberOfReplicas: "1"
+        disableRevisionCounter: "true"
+        fsType: ext4
+
+- name: Create Default Recurring Snapshot
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: longhorn.io/v1beta2
+      kind: RecurringJob
+      metadata:
+        name: default-snapshotter
+        namespace: longhorn-system
+      spec:
+        concurrency: 1
+        cron: 0 * * * ?
+        groups:
+          - default
+        labels: {}
+        name: default-snapshotter
+        parameters: {}
+        retain: 24
+        task: snapshot
+
+- name: Create Default Recurring Backup
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: longhorn.io/v1beta2
+      kind: RecurringJob
+      metadata:
+        name: default-backup
+        namespace: longhorn-system
+      spec:
+        concurrency: 1
+        cron: 0 3 * * ?
+        groups:
+          - default
+        labels: {}
+        name: default-backup
+        parameters:
+          full-backup-interval: "15"
+        retain: 30
+        task: backup
+
 - name: Get Node IPs
   kubernetes.core.k8s_info:
     api_version: v1
@@ -149,6 +248,22 @@
       kubeProxy:
         endpoints: "{{ node_ips }}"
 
+- name: Enable Longhorn Metrics
+  kubernetes.core.helm:
+    name: longhorn
+    chart_ref: longhorn/longhorn
+    chart_version: "{{ longhorn_version }}"
+    release_namespace: longhorn-system
+    wait: true
+    reset_values: false
+    reuse_values: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      metrics:
+        serviceMonitor:
+          enabled: true
+
 - name: Deploy Metrics Server
   kubernetes.core.helm:
     name: metrics-server
@@ -261,101 +376,6 @@
   kubernetes.core.k8s:
     state: present
     template: issuer-staging.yaml
-
-- name: Deploy Longhorn
-  kubernetes.core.helm:
-    name: longhorn
-    chart_ref: longhorn/longhorn
-    chart_version: "{{ longhorn_version }}"
-    release_namespace: longhorn-system
-    create_namespace: true
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    values_file:
-      csi:
-        attacherReplicaCount: 1
-        provisionerReplicaCount: 1
-        resizerReplicaCount: 1
-        snapshotterReplicaCount: 1
-        kubeletRootDir: /var/snap/microk8s/common/var/lib/kubelet
-      longhornUI:
-        replicas: 1
-      defaultSettings:
-        allowVolumeCreationWithDegradedAvailability: false
-        backupTarget: nfs://soteria.lan:/volume1/longhorn-backupstore
-        defaultDataLocality: best-effort
-        defaultReplicaCount: 1
-        replicaAutoBalance: least-effort
-        storageMinimalAvailablePercentage: 10
-      ingress:
-        enabled: true
-        ingressClassName: nginx
-        host: "longhorn.{{ cluster_domain }}"
-      metrics:
-        serviceMonitor:
-          enabled: true
-
-- name: Create Longhorn Local Storage Class
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: storage.k8s.io/v1
-      kind: StorageClass
-      metadata:
-        name: longhorn-local
-      provisioner: driver.longhorn.io
-      allowVolumeExpansion: true
-      reclaimPolicy: Retain
-      volumeBindingMode: Immediate
-      parameters:
-        dataEngine: v1
-        dataLocality: strict-local
-        numberOfReplicas: "1"
-        disableRevisionCounter: "true"
-        fsType: ext4
-
-- name: Create Default Recurring Snapshot
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: longhorn.io/v1beta2
-      kind: RecurringJob
-      metadata:
-        name: default-snapshotter
-        namespace: longhorn-system
-      spec:
-        concurrency: 1
-        cron: 0 * * * ?
-        groups:
-          - default
-        labels: {}
-        name: default-snapshotter
-        parameters: {}
-        retain: 24
-        task: snapshot
-
-- name: Create Default Recurring Backup
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: longhorn.io/v1beta2
-      kind: RecurringJob
-      metadata:
-        name: default-backup
-        namespace: longhorn-system
-      spec:
-        concurrency: 1
-        cron: 0 3 * * ?
-        groups:
-          - default
-        labels: {}
-        name: default-backup
-        parameters:
-          full-backup-interval: "15"
-        retain: 30
-        task: backup
 
 - name: Create Jellyfin NFS Volumes
   kubernetes.core.k8s:
