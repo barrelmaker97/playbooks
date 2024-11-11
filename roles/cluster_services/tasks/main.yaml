@@ -157,6 +157,13 @@
     release_namespace: kube-system
     update_repo_cache: true
     wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      metrics:
+        enabled: true
+      serviceMonitor:
+        enabled: true
 
 - name: Create MetalLB Namespace
   kubernetes.core.k8s:
