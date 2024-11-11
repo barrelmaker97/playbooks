@@ -53,7 +53,7 @@
         replicas: 1
       defaultSettings:
         allowVolumeCreationWithDegradedAvailability: false
-        backupTarget: nfs://soteria.lan:/volume1/longhorn-backupstore
+        backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
         defaultDataLocality: best-effort
         defaultReplicaCount: 1
         replicaAutoBalance: least-effort

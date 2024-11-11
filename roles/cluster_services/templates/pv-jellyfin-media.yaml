@@ -10,5 +10,5 @@ spec:
     - ReadWriteOnce
   storageClassName: jellyfin-media
   nfs:
-    server: soteria.lan
+    server: "{{ nas_domain }}"
     path: /volume1/local_only/content/media
