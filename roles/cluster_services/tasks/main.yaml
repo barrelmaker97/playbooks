@@ -216,6 +216,16 @@
     node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
     values_file:
       alertmanager:
+        alertmanagerSpec:
+          storage:
+            volumeClaimTemplate:
+              spec:
+                storageClassName: longhorn-local
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 10Gi
         ingress:
           enabled: true
           ingressClassName: nginx
@@ -241,6 +251,15 @@
             - "prometheus.{{ cluster_domain }}"
         prometheusSpec:
           serviceMonitorSelectorNilUsesHelmValues: false
+          storageSpec:
+            volumeClaimTemplate:
+              spec:
+                storageClassName: longhorn-local
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 10Gi
       kubeScheduler:
         endpoints: "{{ node_ips }}"
       kubeControllerManager:
