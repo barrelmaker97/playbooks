@@ -24,6 +24,3 @@ resources:
     memory: 1000Mi
   limits:
     memory: 2000Mi
-
-metrics:
-  enabled: false
