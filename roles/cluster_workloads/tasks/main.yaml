@@ -31,6 +31,7 @@
   loop: "{{ helm_charts | dict2items }}"
   vars:
     helm_charts:
+      ingress: barrelmaker/ingress
       factorio: barrelmaker/factorio
       # gmod: barrelmaker/gmod
       jellyfin: barrelmaker/jellyfin
@@ -38,4 +39,3 @@
       # serge: barrelmaker/serge
       # valheim: barrelmaker/valheim
       website: barrelmaker/website
-      ingress: barrelmaker/ingress
