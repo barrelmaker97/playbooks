@@ -6,7 +6,7 @@ metadata:
   namespace: ingress-nginx
 data:
   add-headers: "ingress-nginx/custom-headers"
-  allow-snippet-annotations: "false"
+  allow-snippet-annotations: "true"
   annotation-value-word-blocklist: "load_module,lua_package,_by_lua,location,root,proxy_pass,serviceaccount,{,}"
   enable-brotli: "true"
   enable-ocsp: "true"
