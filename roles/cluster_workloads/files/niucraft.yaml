@@ -3,8 +3,43 @@ persistence:
   storageClassName: longhorn-local
   size: 40Gi
 
-dynmap: true
-metrics: true
+dynmap:
+  enabled: true
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/server-snippet: |
+        add_header Content-Security-Policy "frame-ancestors 'self'; default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self'; base-uri 'self'; form-action 'self';" always;
+    hosts:
+      - host: niucraft.barrelmaker.dev
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: niucraft-dynmap-tls
+        hosts:
+          - niucraft.barrelmaker.dev
+
+metrics:
+  enabled: true
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/server-snippet: |
+        add_header Content-Security-Policy "frame-ancestors 'self'; default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; base-uri 'self'; form-action 'self';" always;
+    hosts:
+      - host: metrics.niucraft.barrelmaker.dev
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: niucraft-metrics-tls
+        hosts:
+          - metrics.niucraft.barrelmaker.dev
 
 properties:
   aikarFlags: true
