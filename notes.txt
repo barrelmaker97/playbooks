@@ -1,0 +1,1 @@
+talosctl gen config --with-secrets secrets.yaml --with-docs=false --with-examples=false --install-disk=/dev/nvme0n1 poseidon https://kube.poseidon.lan
