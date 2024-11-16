@@ -8,3 +8,12 @@ machine:
         dhcp: true
         vip:
           ip: 192.168.15.40
+  kubelet:
+    extraMounts:
+      - destination: /var/lib/longhorn
+        type: bind
+        source: /var/lib/longhorn
+        options:
+          - bind
+          - rshared
+          - rw
