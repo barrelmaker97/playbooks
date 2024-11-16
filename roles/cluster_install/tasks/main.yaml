@@ -1,4 +1,13 @@
 ---
+- name: Check if secrets exist
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/secrets.yaml"
+  register: secrets_file
+
+- name: Generate Secrets
+  when: not secrets_file.stat.exists
+  ansible.builtin.command: talosctl gen secrets --output-file "{{ ansible_env.HOME }}/secrets.yaml"
+
 - name: Get Talos Image ID
   ansible.builtin.uri:
     url: https://factory.talos.dev/schematics
