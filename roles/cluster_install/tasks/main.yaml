@@ -20,6 +20,16 @@
   debug:
     msg: "{{ factory_response.json.id }}"
 
+- name: Generate Config
+  ansible.builtin.command: talosctl gen config --with-secrets "{{ ansible_env.HOME }}/secrets.yaml" --with-docs=false --with-examples=false "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
+
+- name: Template Control Plane Patch
+  delegate_to: localhost
+  ansible.builtin.template:
+    src: controlplane-patch.yaml
+    dest: "{{ ansible_env.HOME }}/patch.yaml"
+    mode: "0644"
+
 - name: Download ISO
   ansible.builtin.get_url:
     url: "https://factory.talos.dev/image/{{ factory_response.json.id }}/v{{ talos_version }}/metal-amd64.iso"

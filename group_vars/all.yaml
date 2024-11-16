@@ -3,10 +3,12 @@ ansible_user: barrelmaker
 cluster_user: barrelmaker
 email_address: nolancooper97@gmail.com
 cert_expiration_seconds: 604800  # 7 days
-cluster_domain: "kube.{{ cluster_host }}.{{ local_domain }}"
+cluster_domain: "{{ cluster_host }}.{{ local_domain }}"
 cluster_host: poseidon
 cluster_port: 6443
 cluster_vip: 192.168.15.40
+install_disk: /dev/nvme0n1
+interface_name: enp2s0
 local_domain: lan
 talos_version: 1.8.3
 nas_host: soteria
