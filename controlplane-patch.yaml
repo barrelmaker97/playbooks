@@ -1,0 +1,10 @@
+machine:
+  install:
+    disk: /dev/nvme0n1
+    wipe: false
+  network:
+    interfaces:
+      - interface: enp2s0
+        dhcp: true
+        vip:
+          ip: 192.168.15.40
