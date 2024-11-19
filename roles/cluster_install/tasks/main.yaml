@@ -1,12 +1,18 @@
 ---
+- name: Create Talos config directory
+  ansible.builtin.file:
+    path: "{{ talos_config_dir }}"
+    state: directory
+    mode: '0700'
+
 - name: Check if secrets exist
   ansible.builtin.stat:
-    path: "{{ ansible_env.HOME }}/secrets.yaml"
+    path: "{{ talos_config_dir }}/secrets.yaml"
   register: secrets_file
 
 - name: Generate Secrets
   when: not secrets_file.stat.exists
-  ansible.builtin.command: talosctl gen secrets --output-file "{{ ansible_env.HOME }}/secrets.yaml"
+  ansible.builtin.command: talosctl gen secrets --output-file "{{ talos_config_dir }}/secrets.yaml"
 
 - name: Get Talos Image ID
   ansible.builtin.uri:
@@ -20,21 +26,23 @@
   debug:
     msg: "{{ factory_response.json.id }}"
 
-- name: Generate Machine Config
-  ansible.builtin.command: talosctl gen config --force --with-secrets "{{ ansible_env.HOME }}/secrets.yaml" --with-docs=false --with-examples=false "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
-
 - name: Template Machine Config Patch
   delegate_to: localhost
   ansible.builtin.template:
     src: controlplane-patch.yaml
-    dest: "{{ ansible_env.HOME }}/patch.yaml"
+    dest: "{{ talos_config_dir }}/patch.yaml"
     mode: "0644"
 
-- name: Patch Machine Config
-  ansible.builtin.command: talosctl machineconfig patch --patch "@{{ ansible_env.HOME }}/patch.yaml" --output "{{ ansible_env.HOME }}/machine.yaml" controlplane.yaml
+- name: Generate Machine Config
+  ansible.builtin.command: >
+    talosctl gen config --force
+    --with-docs=false
+    --with-examples=false
+    --with-secrets "{{ talos_config_dir }}/secrets.yaml"
+    --config-patch-control-plane "@{{ talos_config_dir }}/patch.yaml"
+    --output "{{ talos_config_dir }}"
+    "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
 
-- name: Download ISO
-  ansible.builtin.get_url:
-    url: "https://factory.talos.dev/image/{{ factory_response.json.id }}/v{{ talos_version }}/metal-amd64.iso"
-    mode: "0644"
-    dest: "{{ ansible_env.HOME }}/metal-amd64.iso"
+- name: Print ISO download link
+  ansible.builtin.debug:
+    msg: "https://factory.talos.dev/image/{{ factory_response.json.id }}/v{{ talos_version }}/metal-amd64.iso"
