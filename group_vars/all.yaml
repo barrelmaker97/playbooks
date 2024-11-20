@@ -1,6 +1,7 @@
 ---
 ansible_user: barrelmaker
 cluster_user: barrelmaker
+workload_namespace: barrelmaker
 email_address: nolancooper97@gmail.com
 cert_expiration_seconds: 604800  # 7 days
 cluster_domain: "{{ cluster_host }}.{{ local_domain }}"
