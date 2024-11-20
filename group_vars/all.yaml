@@ -12,6 +12,7 @@ interface_name: enp2s0
 local_domain: lan
 talos_version: 1.8.3
 talos_config_dir: /home/barrelmaker/talos
+ntp_server: 192.168.15.1
 nas_host: soteria
 nas_domain: "{{ nas_host }}.{{ local_domain }}"
 metallb_ip_range: 192.168.15.60-192.168.15.69

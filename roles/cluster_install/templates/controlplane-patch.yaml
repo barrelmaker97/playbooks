@@ -9,6 +9,11 @@ machine:
         dhcp: true
         vip:
           ip: {{ cluster_vip }}
+  time:
+      disabled: false
+      bootTimeout: 2m0s
+      servers:
+          - {{ ntp_server }}
   kubelet:
     extraMounts:
       - destination: /var/lib/longhorn
