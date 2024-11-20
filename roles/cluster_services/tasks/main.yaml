@@ -61,7 +61,6 @@
         provisionerReplicaCount: 1
         resizerReplicaCount: 1
         snapshotterReplicaCount: 1
-        kubeletRootDir: /var/snap/microk8s/common/var/lib/kubelet
       longhornUI:
         replicas: 1
       defaultSettings:
