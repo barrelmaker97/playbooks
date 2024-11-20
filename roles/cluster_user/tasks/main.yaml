@@ -96,31 +96,3 @@
     src: user-kubeconfig.yaml
     dest: "{{ cluster_user_kube_dir }}/config"
     mode: "0600"
-
-- name: Create User Namespace
-  delegate_to: localhost
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: "{{ cluster_user }}"
-
-- name: Create User Cluster Role Binding
-  delegate_to: localhost
-  kubernetes.core.k8s:
-    state: present
-    template: clusterrolebinding-user.yaml
-
-- name: Create User Resource Quota
-  delegate_to: localhost
-  kubernetes.core.k8s:
-    state: present
-    template: resourcequota-user.yaml
-
-- name: Create User Limit Range
-  delegate_to: localhost
-  kubernetes.core.k8s:
-    state: present
-    template: limitrange-user.yaml
