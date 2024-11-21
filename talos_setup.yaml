@@ -1,0 +1,5 @@
+---
+- name: Setup Talos
+  hosts: localhost
+  roles:
+    - talos_setup

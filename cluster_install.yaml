@@ -1,5 +1,0 @@
----
-- name: Install Cluster
-  hosts: localhost
-  roles:
-    - cluster_install
