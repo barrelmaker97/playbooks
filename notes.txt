@@ -5,15 +5,15 @@ IP Plan:
 	Node 3: 	192.168.15.43	node3-poseidon.lan
 
 First Node:
-  talosctl -n node1-poseidon.lan apply-config --insecure --file controlplane.yaml
+  talosctl -n node1-poseidon.lan apply-config --insecure --file node1-poseidon.yaml
   talosctl -n node1-poseidon.lan -e node1-poseidon.lan bootstrap
   talosctl -n node1-poseidon.lan -e node1-poseidon.lan patch mc --patch @nut-extension.yaml
   talosctl -n node1-poseidon.lan -e node1-poseidon.lan kubeconfig
 
 Second Node:
-  talosctl -n node2-poseidon.lan apply-config --insecure --file controlplane.yaml
+  talosctl -n node2-poseidon.lan apply-config --insecure --file node2-poseidon.yaml
   talosctl -n node2-poseidon.lan -e node2-poseidon.lan patch mc --patch @nut-extension.yaml
 
 Third Node:
-  talosctl -n node3-poseidon.lan apply-config --insecure --file controlplane.yaml
+  talosctl -n node3-poseidon.lan apply-config --insecure --file node3-poseidon.yaml
   talosctl -n node3-poseidon.lan -e node3-poseidon.lan patch mc --patch @nut-extension.yaml
