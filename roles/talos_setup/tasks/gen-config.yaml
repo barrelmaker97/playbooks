@@ -1,0 +1,23 @@
+- name: Template {{ item }} machine config patch
+  ansible.builtin.template:
+    src: controlplane-patch.yaml
+    dest: "{{ talos_config_dir }}/patch.yaml"
+    mode: "0644"
+  vars:
+    node_hostname: "{{ item }}"
+
+- name: Generate {{ item }} machine config
+  ansible.builtin.command: >
+    talosctl gen config --force
+    --with-docs=false
+    --with-examples=false
+    --with-secrets "{{ talos_config_dir }}/secrets.yaml"
+    --config-patch-control-plane "@{{ talos_config_dir }}/patch.yaml"
+    --output-types=controlplane
+    --output "{{ talos_config_dir }}/{{ item }}.yaml"
+    "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
+
+- name: Clean Up {{ item }} machine config patch
+  ansible.builtin.file:
+    path: "{{ talos_config_dir }}/patch.yaml"
+    state: absent

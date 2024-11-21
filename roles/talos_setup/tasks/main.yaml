@@ -22,30 +22,31 @@
     status_code: 201
   register: factory_response
 
-- name: Print ID
-  debug:
-    msg: "{{ factory_response.json.id }}"
+- name: Create control node machine configs
+  loop: "{{ node_names }}"
+  include_tasks: gen-config.yaml
 
-- name: Template Machine Config Patch
-  ansible.builtin.template:
-    src: controlplane-patch.yaml
-    dest: "{{ talos_config_dir }}/patch.yaml"
-    mode: "0644"
-
-- name: Generate Machine Config
+- name: Generate Talos config
   ansible.builtin.command: >
     talosctl gen config --force
-    --with-docs=false
-    --with-examples=false
     --with-secrets "{{ talos_config_dir }}/secrets.yaml"
-    --config-patch-control-plane "@{{ talos_config_dir }}/patch.yaml"
-    --output "{{ talos_config_dir }}"
+    --output-types=talosconfig
+    --output "{{ talos_config_dir }}/talosconfig"
     "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
 
-- name: Clean Up Machine Config Patch
-  ansible.builtin.file:
-    path: "{{ talos_config_dir }}/patch.yaml"
-    state: absent
+- name: Add nodes to Talos config
+  ansible.builtin.command: >
+    talosctl "--talosconfig={{ talos_config_dir }}/talosconfig"
+    config node "{{ node_names | product(['.' + local_domain]) | map('join') | join(' ') }}"
+
+- name: Add endpoints to Talos config
+  ansible.builtin.command: >
+    talosctl "--talosconfig={{ talos_config_dir }}/talosconfig"
+    config endpoint "{{ node_names | product(['.' + local_domain]) | map('join') | join(' ') }}"
+
+- name: Save Talos config
+  ansible.builtin.command: >
+    talosctl config merge "{{ talos_config_dir }}/talosconfig"
 
 - name: Template NUT config
   ansible.builtin.template:

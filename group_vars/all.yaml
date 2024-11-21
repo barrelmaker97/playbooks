@@ -2,11 +2,10 @@
 ansible_user: barrelmaker
 cluster_user: barrelmaker
 workload_namespace: barrelmaker
-email_address: nolancooper97@gmail.com
 cert_expiration_seconds: 604800  # 7 days
-cluster_domain: "{{ cluster_host }}.{{ local_domain }}"
 cluster_host: poseidon
 cluster_port: 6443
+cluster_domain: "{{ cluster_host }}.{{ local_domain }}"
 cluster_vip: 192.168.15.40
 install_disk: /dev/nvme0n1
 interface_name: enp86s0
@@ -16,13 +15,24 @@ talos_config_dir: /home/barrelmaker/talos
 ntp_server: 192.168.15.1
 nas_host: soteria
 nas_domain: "{{ nas_host }}.{{ local_domain }}"
+node_names:
+  - node1-poseidon
+  - node2-poseidon
+  - node3-poseidon
+
+# NUT connection
 nut_host: ups@192.168.15.30
 nut_user: remoteuser
 nut_password: hunter2
-metallb_ip_range: 192.168.15.60-192.168.15.69
+
+# Service versions
 cert_manager_version: "1.16.1"
 ingress_nginx_version: "4.11.3"
 metrics_server_version: "3.12.2"
 metallb_version: "0.14.8"
 kube_prometheus_stack_version: "65.4.0"
 longhorn_version: "1.7.2"
+
+# Service configuration
+email_address: nolancooper97@gmail.com
+metallb_ip_range: 192.168.15.60-192.168.15.69

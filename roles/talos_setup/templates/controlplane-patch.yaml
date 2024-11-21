@@ -4,6 +4,7 @@ machine:
     disk: {{ install_disk }}
     wipe: false
   network:
+    hostname: {{ node_hostname }}
     interfaces:
       - interface: {{ interface_name }}
         dhcp: true
