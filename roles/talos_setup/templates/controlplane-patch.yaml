@@ -1,3 +1,5 @@
+cluster:
+  allowSchedulingOnControlPlanes: true
 machine:
   certSANs:
     - {{ node_hostname }}.{{ local_domain }}
