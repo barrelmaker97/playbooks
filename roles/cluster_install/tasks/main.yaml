@@ -27,7 +27,6 @@
     msg: "{{ factory_response.json.id }}"
 
 - name: Template Machine Config Patch
-  delegate_to: localhost
   ansible.builtin.template:
     src: controlplane-patch.yaml
     dest: "{{ talos_config_dir }}/patch.yaml"
@@ -42,6 +41,17 @@
     --config-patch-control-plane "@{{ talos_config_dir }}/patch.yaml"
     --output "{{ talos_config_dir }}"
     "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
+
+- name: Clean Up Machine Config Patch
+  ansible.builtin.file:
+    path: "{{ talos_config_dir }}/patch.yaml"
+    state: absent
+
+- name: Template NUT config
+  ansible.builtin.template:
+    src: nut-extension.yaml
+    dest: "{{ talos_config_dir }}/nut-extension.yaml"
+    mode: "0644"
 
 - name: Print ISO download link
   ansible.builtin.debug:
