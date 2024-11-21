@@ -1,8 +1,8 @@
 IP Plan:
 	Kube API VIP: 	192.168.15.40	kube.poseidon.lan
-	Node 1: 		192.168.15.41	node1-poseidon.lan
-	Node 2: 		192.168.15.42	node2-poseidon.lan
-	Node 3: 		192.168.15.43	node3-poseidon.lan
+	Node 1: 	192.168.15.41
+	Node 2: 	192.168.15.42
+	Node 3: 	192.168.15.43
 
 Set Nodes/Endpoints in Config:
   talosctl --talosconfig=/home/barrelmaker/talos/talosconfig config node 192.168.15.41 192.168.15.42 192.168.15.43
