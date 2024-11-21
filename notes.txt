@@ -7,3 +7,4 @@ IP Plan:
 First Node (from directory where talos files were templated):
 	talosctl apply-config --insecure --nodes 192.168.15.41 --file controlplane.yaml
 	talosctl bootstrap --nodes 192.168.15.41 --endpoints 192.168.15.41 --talosconfig=./talosconfig
+	talosctl -n 192.168.15.41 -e 192.168.15.41 --talosconfig=./talosconfig patch mc --patch @nut-extension.yaml
