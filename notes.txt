@@ -4,7 +4,16 @@ IP Plan:
 	Node 2: 		192.168.15.42	node2-poseidon.lan
 	Node 3: 		192.168.15.43	node3-poseidon.lan
 
-First Node (from directory where talos files were templated):
-	talosctl apply-config --insecure --nodes 192.168.15.41 --file controlplane.yaml
-	talosctl bootstrap --nodes 192.168.15.41 --endpoints 192.168.15.41 --talosconfig=./talosconfig
-	talosctl -n 192.168.15.41 -e 192.168.15.41 --talosconfig=./talosconfig patch mc --patch @nut-extension.yaml
+First Node:
+  talosctl -n 192.168.15.41 apply-config --insecure --file controlplane.yaml
+  talosctl -n 192.168.15.41 -e 192.168.15.41 --talosconfig=/home/barrelmaker/talos/talosconfig bootstrap
+  talosctl -n 192.168.15.41 -e 192.168.15.41 --talosconfig=/home/barrelmaker/talos/talosconfig patch mc --patch @nut-extension.yaml
+  talosctl -n 192.168.15.41 -e 192.168.15.41 --talosconfig=/home/barrelmaker/talos/talosconfig kubeconfig
+
+Second Node:
+  talosctl -n 192.168.15.42 apply-config --insecure --file controlplane.yaml
+  talosctl -n 192.168.15.42 -e 192.168.15.42 --talosconfig=./talosconfig patch mc --patch @nut-extension.yaml
+
+Third Node:
+  talosctl -n 192.168.15.43 apply-config --insecure --file controlplane.yaml
+  talosctl -n 192.168.15.43 -e 192.168.15.43 --talosconfig=./talosconfig patch mc --patch @nut-extension.yaml
