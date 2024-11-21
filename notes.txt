@@ -4,14 +4,6 @@ IP Plan:
 	Node 2: 		192.168.15.42	node2-poseidon.lan
 	Node 3: 		192.168.15.43	node3-poseidon.lan
 
-curl -X POST --data-binary @customization.yaml https://factory.talos.dev/schematics
-
-factory.talos.dev/installer-secureboot/1ea6b5498851449cdc963bdb5d6489690d70e314e7edb9b2174ec1193d93a34c:v1.8.3
-
-talosctl gen secrets
-
-talosctl gen config --with-secrets secrets.yaml --with-docs=false --with-examples=false --install-disk=/dev/nvme0n1 poseidon https://kube.poseidon.lan
-
-Changes to Machine config:
-	Disk: /dev/nvme0n1
-	VIP: need to determine interface
+First Node (from directory where talos files were templated):
+	talosctl apply-config --insecure --nodes 192.168.15.41 --file controlplane.yaml
+	talosctl bootstrap --nodes 192.168.15.41 --endpoints 192.168.15.41 --talosconfig=./talosconfig
