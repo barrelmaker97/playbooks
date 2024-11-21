@@ -9,7 +9,7 @@ cluster_host: poseidon
 cluster_port: 6443
 cluster_vip: 192.168.15.40
 install_disk: /dev/nvme0n1
-interface_name: enp2s0
+interface_name: enp86s0
 local_domain: lan
 talos_version: 1.8.3
 talos_config_dir: /home/barrelmaker/talos
