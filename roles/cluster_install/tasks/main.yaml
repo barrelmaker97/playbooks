@@ -55,7 +55,7 @@
 
 - name: Print ISO download link
   ansible.builtin.debug:
-    msg: "https://factory.talos.dev/image/{{ factory_response.json.id }}/v{{ talos_version }}/metal-amd64-secureboot.iso"
+    msg: "https://factory.talos.dev/image/{{ factory_response.json.id }}/v{{ talos_version }}/metal-amd64.iso"
 
 - name: Wait for nodes bootup
   ansible.builtin.pause:
