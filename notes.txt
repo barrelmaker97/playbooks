@@ -6,7 +6,7 @@ IP Plan:
 
 curl -X POST --data-binary @customization.yaml https://factory.talos.dev/schematics
 
- factory.talos.dev/installer/1ea6b5498851449cdc963bdb5d6489690d70e314e7edb9b2174ec1193d93a34c:v1.8.3
+factory.talos.dev/installer-secureboot/1ea6b5498851449cdc963bdb5d6489690d70e314e7edb9b2174ec1193d93a34c:v1.8.3
 
 talosctl gen secrets
 
