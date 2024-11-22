@@ -290,6 +290,8 @@
     release_values: "{{ values_file | from_yaml }}"
   vars:
     values_file:
+      args:
+        - --kubelet-insecure-tls
       metrics:
         enabled: true
       serviceMonitor:
