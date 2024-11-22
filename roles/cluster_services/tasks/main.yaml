@@ -56,18 +56,11 @@
     release_values: "{{ values_file | from_yaml }}"
   vars:
     values_file:
-      csi:
-        attacherReplicaCount: 1
-        provisionerReplicaCount: 1
-        resizerReplicaCount: 1
-        snapshotterReplicaCount: 1
-      longhornUI:
-        replicas: 1
       defaultSettings:
         allowVolumeCreationWithDegradedAvailability: false
         backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
         defaultDataLocality: best-effort
-        defaultReplicaCount: 1
+        defaultReplicaCount: 2
         replicaAutoBalance: least-effort
         storageMinimalAvailablePercentage: 10
       ingress:
@@ -135,12 +128,6 @@
         retain: 30
         task: backup
 
-- name: Get Node IPs
-  kubernetes.core.k8s_info:
-    api_version: v1
-    kind: Node
-  register: nodes
-
 - name: Create Monitoring Namespace
   kubernetes.core.k8s:
     state: present
@@ -149,6 +136,10 @@
       kind: Namespace
       metadata:
         name: monitoring
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
 
 - name: Create Alertmanager Headers ConfigMap
   kubernetes.core.k8s:
@@ -225,7 +216,6 @@
     wait: true
     release_values: "{{ values_file | from_yaml }}"
   vars:
-    node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
     values_file:
       alertmanager:
         alertmanagerSpec:
@@ -272,12 +262,6 @@
                 resources:
                   requests:
                     storage: 10Gi
-      kubeScheduler:
-        endpoints: "{{ node_ips }}"
-      kubeControllerManager:
-        endpoints: "{{ node_ips }}"
-      kubeProxy:
-        endpoints: "{{ node_ips }}"
 
 - name: Enable Longhorn Metrics
   kubernetes.core.helm:
