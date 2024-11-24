@@ -217,6 +217,14 @@
     release_values: "{{ values_file | from_yaml }}"
   vars:
     values_file:
+      kubeScheduler:
+        service:
+          selector:
+            k8s-app: kube-scheduler
+      kubeControllerManager:
+        service:
+          selector:
+            k8s-app: kube-controller-manager
       alertmanager:
         alertmanagerSpec:
           storage:

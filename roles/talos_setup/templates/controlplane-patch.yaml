@@ -1,5 +1,15 @@
 cluster:
   allowSchedulingOnControlPlanes: true
+  controllerManager:
+    extraArgs:
+      bind-address: 0.0.0.0
+  proxy:
+    extraArgs:
+      metrics-bind-address: 0.0.0.0:10249
+  scheduler:
+    extraArgs:
+      bind-address: 0.0.0.0
+
 machine:
   certSANs:
     - {{ node_hostname }}.{{ local_domain }}
