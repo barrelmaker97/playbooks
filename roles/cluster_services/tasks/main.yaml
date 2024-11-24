@@ -56,6 +56,9 @@
     release_values: "{{ values_file | from_yaml }}"
   vars:
     values_file:
+      persistence:
+        defaultDataLocality: best-effort
+        defaultClassReplicaCount: 2
       defaultSettings:
         allowVolumeCreationWithDegradedAvailability: false
         backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
