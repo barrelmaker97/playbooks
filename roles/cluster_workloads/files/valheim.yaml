@@ -5,7 +5,7 @@ public: true
 metrics: true
 
 persistence:
-  storageClassName: longhorn-local
+  storageClassName: longhorn
   size: 10Gi
 
 podSecurityContext:

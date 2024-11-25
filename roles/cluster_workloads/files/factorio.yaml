@@ -1,6 +1,6 @@
 ---
 persistence:
-  storageClassName: longhorn-local
+  storageClassName: longhorn
   size: 5Gi
 
 podSecurityContext:
