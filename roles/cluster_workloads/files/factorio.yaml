@@ -1,4 +1,7 @@
 ---
+image:
+  tag: 2.0.20
+
 persistence:
   storageClassName: longhorn
   size: 5Gi
