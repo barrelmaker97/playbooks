@@ -1,22 +1,22 @@
 ---
 ansible_user: barrelmaker
-cluster_user: barrelmaker
-workload_namespace: barrelmaker
 cert_expiration_seconds: 604800  # 7 days
 cluster_host: poseidon
 cluster_port: 6443
+cluster_user: barrelmaker
 cluster_vip: 192.168.15.40
 install_disk: /dev/nvme0n1
 interface_name: enp86s0
 local_domain: lan
-talos_version: 1.8.3
-talos_config_dir: /home/barrelmaker/talos
-ntp_server: 192.168.15.1
 nas_host: soteria
 node_names:
   - node1-poseidon
   - node2-poseidon
   - node3-poseidon
+ntp_server: 192.168.15.1
+talos_config_dir: /home/barrelmaker/talos
+talos_version: 1.8.3
+workload_namespace: barrelmaker
 
 # NUT connection
 nut_host: ups@192.168.15.30
