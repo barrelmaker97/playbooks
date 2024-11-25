@@ -34,19 +34,29 @@
     --output "{{ talos_config_dir }}/talosconfig"
     "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
 
-- name: Add nodes to Talos config
-  ansible.builtin.command: >
-    talosctl "--talosconfig={{ talos_config_dir }}/talosconfig"
-    config node "{{ node_names | product(['.' + local_domain]) | map('join') | join(' ') }}"
-
-- name: Add endpoints to Talos config
-  ansible.builtin.command: >
-    talosctl "--talosconfig={{ talos_config_dir }}/talosconfig"
-    config endpoint "{{ node_names | product(['.' + local_domain]) | map('join') | join(' ') }}"
-
 - name: Save Talos config
   ansible.builtin.command: >
     talosctl config merge "{{ talos_config_dir }}/talosconfig"
+
+- name: Add nodes to Talos config
+  ansible.builtin.command:
+    argv: "{{ complete_command }}"
+  vars:
+    complete_command: "{{ prefix + (node_names | product(['.' + local_domain]) | map('join')) }}"
+    prefix:
+      - talosctl
+      - config
+      - node
+
+- name: Add endpoints to Talos config
+  ansible.builtin.command:
+    argv: "{{ complete_command }}"
+  vars:
+    complete_command: "{{ prefix + (node_names | product(['.' + local_domain]) | map('join')) }}"
+    prefix:
+      - talosctl
+      - config
+      - endpoint
 
 - name: Print ISO download link
   ansible.builtin.debug:
