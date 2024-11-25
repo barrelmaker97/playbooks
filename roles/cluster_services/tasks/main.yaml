@@ -121,7 +121,7 @@
         namespace: longhorn-system
       spec:
         concurrency: 1
-        cron: 0 3 * * ?
+        cron: 0 12 * * ?
         groups:
           - default
         labels: {}
