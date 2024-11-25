@@ -16,8 +16,3 @@
     --output-types=controlplane
     --output "{{ talos_config_dir }}/{{ item }}.yaml"
     "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
-
-- name: Clean Up {{ item }} machine config patch
-  ansible.builtin.file:
-    path: "{{ talos_config_dir }}/patch.yaml"
-    state: absent
