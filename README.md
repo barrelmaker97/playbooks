@@ -17,10 +17,12 @@ Individual playbooks can be run in a similar manner:
 ansible-playbook cluster_user.yaml
 ```
 # IP Plan
-Kube API VIP: 	192.168.15.40	kube.poseidon.lan
-Node 1: 	192.168.15.41	node1-poseidon.lan
-Node 2: 	192.168.15.42	node2-poseidon.lan
-Node 3: 	192.168.15.43	node3-poseidon.lan
+| Name       | Address       | Hostname           |
+|------------|---------------|--------------------|
+| Virtual IP | 192.168.15.40 | kube.poseidon.lan  |
+| Node 1     | 192.168.15.41 | node1-poseidon.lan |
+| Node 2     | 192.168.15.42 | node2-poseidon.lan |
+| Node 3     | 192.168.15.43 | node3-poseidon.lan |
 
 # Cluster Bootstrap
 ## Node 1
