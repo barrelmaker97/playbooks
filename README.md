@@ -29,20 +29,17 @@ ansible-playbook cluster_user.yaml
 ```bash
 talosctl -n node1-poseidon.lan apply-config --insecure --file node1-poseidon.yaml
 talosctl -n node1-poseidon.lan -e node1-poseidon.lan bootstrap
-talosctl -n node1-poseidon.lan -e node1-poseidon.lan patch mc --patch @nut-extension.yaml
 talosctl -n node1-poseidon.lan -e node1-poseidon.lan kubeconfig
 ```
 
 ## Node 2
 ```bash
 talosctl -n node2-poseidon.lan apply-config --insecure --file node2-poseidon.yaml
-talosctl -n node2-poseidon.lan -e node2-poseidon.lan patch mc --patch @nut-extension.yaml
 ```
 
 ## Node 3
 ```bash
 talosctl -n node3-poseidon.lan apply-config --insecure --file node3-poseidon.yaml
-talosctl -n node3-poseidon.lan -e node3-poseidon.lan patch mc --patch @nut-extension.yaml
 ```
 
 # License

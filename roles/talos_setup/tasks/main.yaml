@@ -48,12 +48,6 @@
   ansible.builtin.command: >
     talosctl config merge "{{ talos_config_dir }}/talosconfig"
 
-- name: Template NUT config
-  ansible.builtin.template:
-    src: nut-extension.yaml
-    dest: "{{ talos_config_dir }}/nut-extension.yaml"
-    mode: "0644"
-
 - name: Print ISO download link
   ansible.builtin.debug:
     msg: "https://factory.talos.dev/image/{{ factory_response.json.id }}/v{{ talos_version }}/metal-amd64.iso"
