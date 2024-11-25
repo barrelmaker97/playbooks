@@ -15,7 +15,7 @@ properties:
   workshopCollectionID: "2747580017"  # TTT
 
 persistence:
-  storageClassName: longhorn-local
+  storageClassName: longhorn
   size: 10Gi
 
 service:

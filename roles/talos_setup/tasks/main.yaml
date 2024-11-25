@@ -1,0 +1,80 @@
+---
+- name: Create Talos config directory
+  ansible.builtin.file:
+    path: "{{ talos_config_dir }}"
+    state: directory
+    mode: '0700'
+
+- name: Check if secrets exist
+  ansible.builtin.stat:
+    path: "{{ talos_config_dir }}/secrets.yaml"
+  register: secrets_file
+
+- name: Generate secrets
+  when: not secrets_file.stat.exists
+  changed_when: true
+  ansible.builtin.command: talosctl gen secrets --output-file "{{ talos_config_dir }}/secrets.yaml"
+
+- name: Zip secrets for easy backup
+  community.general.archive:
+    path: "{{ talos_config_dir }}/secrets.yaml"
+    dest: "{{ talos_config_dir }}/talos-secrets.zip"
+    format: zip
+    mode: '0644'
+
+- name: Get Talos Image ID
+  ansible.builtin.uri:
+    url: https://factory.talos.dev/schematics
+    method: POST
+    src: customization.yaml
+    status_code: 201
+  register: factory_response
+
+- name: Create control node machine configs
+  loop: "{{ node_names }}"
+  ansible.builtin.include_tasks: gen-config.yaml
+
+- name: Clean Up machine config patch
+  ansible.builtin.file:
+    path: "{{ talos_config_dir }}/patch.yaml"
+    state: absent
+
+- name: Generate Talos config
+  changed_when: true
+  ansible.builtin.command: >
+    talosctl gen config --force
+    --with-secrets "{{ talos_config_dir }}/secrets.yaml"
+    --output-types=talosconfig
+    --output "{{ talos_config_dir }}/talosconfig"
+    "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
+
+- name: Save Talos config
+  changed_when: true
+  ansible.builtin.command: >
+    talosctl config merge "{{ talos_config_dir }}/talosconfig"
+
+- name: Add nodes to Talos config
+  changed_when: true
+  ansible.builtin.command:
+    argv: "{{ complete_command }}"
+  vars:
+    complete_command: "{{ prefix + (node_names | product(['.' + local_domain]) | map('join')) }}"
+    prefix:
+      - talosctl
+      - config
+      - node
+
+- name: Add endpoints to Talos config
+  changed_when: true
+  ansible.builtin.command:
+    argv: "{{ complete_command }}"
+  vars:
+    complete_command: "{{ prefix + (node_names | product(['.' + local_domain]) | map('join')) }}"
+    prefix:
+      - talosctl
+      - config
+      - endpoint
+
+- name: Print ISO download link
+  ansible.builtin.debug:
+    msg: "https://factory.talos.dev/image/{{ factory_response.json.id }}/v{{ talos_version }}/metal-amd64.iso"

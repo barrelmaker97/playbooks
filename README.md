@@ -16,6 +16,31 @@ Individual playbooks can be run in a similar manner:
 ```bash
 ansible-playbook cluster_user.yaml
 ```
+# IP Plan
+| Name       | Address       | Hostname           |
+|------------|---------------|--------------------|
+| Virtual IP | 192.168.15.40 | kube.poseidon.lan  |
+| Node 1     | 192.168.15.41 | node1-poseidon.lan |
+| Node 2     | 192.168.15.42 | node2-poseidon.lan |
+| Node 3     | 192.168.15.43 | node3-poseidon.lan |
+
+# Cluster Bootstrap
+## Node 1
+```bash
+talosctl -n node1-poseidon.lan apply-config --insecure --file node1-poseidon.yaml
+talosctl -n node1-poseidon.lan -e node1-poseidon.lan bootstrap
+talosctl -n node1-poseidon.lan -e node1-poseidon.lan kubeconfig
+```
+
+## Node 2
+```bash
+talosctl -n node2-poseidon.lan apply-config --insecure --file node2-poseidon.yaml
+```
+
+## Node 3
+```bash
+talosctl -n node3-poseidon.lan apply-config --insecure --file node3-poseidon.yaml
+```
 
 # License
 

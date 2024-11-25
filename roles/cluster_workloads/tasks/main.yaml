@@ -24,7 +24,7 @@
   kubernetes.core.helm:
     name: "{{ item.key }}"
     chart_ref: "{{ item.value }}"
-    release_namespace: "{{ cluster_user }}"
+    release_namespace: "{{ workload_namespace }}"
     update_repo_cache: true
     wait: true
     release_values: "{{ lookup('file', 'files/{{ item.key }}.yaml') | from_yaml }}"

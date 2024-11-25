@@ -1,6 +1,6 @@
 ---
-- name: Install Cluster
-  import_playbook: cluster_install.yaml
+- name: Set Talos
+  import_playbook: talos_setup.yaml
 - name: Setup Cluster User
   import_playbook: cluster_user.yaml
 - name: Setup Cluster Services

@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: "{{ cluster_user }}"
-  namespace: "{{ cluster_user }}"
+  name: "{{ workload_namespace }}-default"
+  namespace: "{{ workload_namespace }}"
 spec:
   limits:
     - type: Container

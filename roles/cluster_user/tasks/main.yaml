@@ -1,6 +1,5 @@
 ---
 - name: Create local kubeconfig directory
-  delegate_to: localhost
   ansible.builtin.file:
     path: "{{ cluster_user_kube_dir }}"
     state: directory
@@ -8,7 +7,6 @@
 
 - name: Set owner of local kubeconfig directory to {{ ansible_user }}
   become: true
-  delegate_to: localhost
   ansible.builtin.file:
     path: "{{ cluster_user_kube_dir }}"
     state: directory
@@ -16,111 +14,97 @@
     recurse: true
 
 - name: Generate User Private Key
-  delegate_to: localhost
   community.crypto.openssl_privatekey:
     path: "{{ cluster_user_key }}"
     size: 2048
 
 - name: Generate User CSR
-  delegate_to: localhost
   community.crypto.openssl_csr:
     path: "{{ cluster_user_csr }}"
     privatekey_path: "{{ cluster_user_key }}"
     common_name: "{{ cluster_user }}"
 
-- name: Execute Tasks on Node
+- name: Get admin kubeconfig
+  changed_when: true
+  ansible.builtin.command: talosctl -e {{ cluster_vip }} -n {{ cluster_vip }} kubeconfig -f
+
+- name: Delete Any Existing User CSR Objects
+  kubernetes.core.k8s:
+    state: absent
+    api_version: certificates.k8s.io/v1
+    kind: CertificateSigningRequest
+    name: "{{ cluster_user }}"
+
+- name: Create User CSR Object
+  kubernetes.core.k8s:
+    state: present
+    template: csr-user.yaml.j2
+  vars:
+    user_csr_base64: "{{ lookup('file', '{{ cluster_user_csr }}') | b64encode }}"
+
+- name: Install kubectl locally
   become: true
-  delegate_to: hermes
-  block:
-    - name: Delete Any Existing User CSR Objects
-      kubernetes.core.k8s:
-        kubeconfig: "{{ cluster_user_config }}"
-        state: absent
-        api_version: certificates.k8s.io/v1
-        kind: CertificateSigningRequest
-        name: "{{ cluster_user }}"
+  community.general.snap:
+    name: kubectl
+    classic: true
 
-    - name: Create User CSR Object
-      kubernetes.core.k8s:
-        kubeconfig: "{{ cluster_user_config }}"
-        state: present
-        template: csr-user.yaml.j2
-      vars:
-        user_csr_base64: "{{ lookup('file', '{{ cluster_user_csr }}') | b64encode }}"
+- name: Approve User CSR
+  ansible.builtin.command: kubectl certificate approve {{ cluster_user }}
+  changed_when: true
 
-    - name: Approve User CSR
-      ansible.builtin.command: microk8s kubectl certificate approve {{ cluster_user }}
-      changed_when: true
+- name: Get User Certificate
+  kubernetes.core.k8s_info:
+    api_version: certificates.k8s.io/v1
+    kind: CertificateSigningRequest
+    name: "{{ cluster_user }}"
+  register: user_cert
 
-    - name: Get User Certificate
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ cluster_user_config }}"
-        api_version: certificates.k8s.io/v1
-        kind: CertificateSigningRequest
-        name: "{{ cluster_user }}"
-      register: user_cert
-
-    - name: Get Cluster Certificate
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ cluster_user_config }}"
-        api_version: v1
-        kind: ConfigMap
-        name: kube-root-ca.crt
-        namespace: kube-system
-      register: cluster_cert
+- name: Get Cluster Certificate
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    name: kube-root-ca.crt
+    namespace: kube-system
+  register: cluster_cert
 
 - name: Save User Certificate
-  delegate_to: localhost
   ansible.builtin.copy:
     content: "{{ user_cert.resources[0].status.certificate | b64decode }}"
     dest: "{{ cluster_user_crt }}"
     mode: "0644"
 
 - name: Save Cluster Certificate
-  delegate_to: localhost
   ansible.builtin.copy:
     content: "{{ cluster_cert.resources[0]['data']['ca.crt'] }}"
     dest: "{{ cluster_user_api_crt }}"
     mode: "0644"
 
-- name: Install kubectl locally
-  become: true
-  delegate_to: localhost
-  community.general.snap:
-    name: kubectl
-    classic: true
+- name: Create User Cluster Role Binding
+  kubernetes.core.k8s:
+    state: present
+    template: clusterrolebinding-user.yaml
 
-- name: Create Local Kubeconfig
-  delegate_to: localhost
+- name: Create User Kubeconfig
   ansible.builtin.template:
     src: user-kubeconfig.yaml
     dest: "{{ cluster_user_kube_dir }}/config"
     mode: "0600"
 
 - name: Create User Namespace
-  delegate_to: localhost
   kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: v1
       kind: Namespace
       metadata:
-        name: "{{ cluster_user }}"
-
-- name: Create User Cluster Role Binding
-  delegate_to: localhost
-  kubernetes.core.k8s:
-    state: present
-    template: clusterrolebinding-user.yaml
+        name: "{{ workload_namespace }}"
 
 - name: Create User Resource Quota
-  delegate_to: localhost
   kubernetes.core.k8s:
     state: present
     template: resourcequota-user.yaml
 
 - name: Create User Limit Range
-  delegate_to: localhost
   kubernetes.core.k8s:
     state: present
     template: limitrange-user.yaml

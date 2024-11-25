@@ -24,6 +24,19 @@
       metrics-server: https://kubernetes-sigs.github.io/metrics-server
       prometheus-community: https://prometheus-community.github.io/helm-charts
 
+- name: Create Longhorn Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: longhorn-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
 - name: Check if Longhorn is installed
   kubernetes.core.helm_info:
     name: longhorn
@@ -43,19 +56,14 @@
     release_values: "{{ values_file | from_yaml }}"
   vars:
     values_file:
-      csi:
-        attacherReplicaCount: 1
-        provisionerReplicaCount: 1
-        resizerReplicaCount: 1
-        snapshotterReplicaCount: 1
-        kubeletRootDir: /var/snap/microk8s/common/var/lib/kubelet
-      longhornUI:
-        replicas: 1
+      persistence:
+        defaultDataLocality: best-effort
+        defaultClassReplicaCount: 2
       defaultSettings:
         allowVolumeCreationWithDegradedAvailability: false
         backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
         defaultDataLocality: best-effort
-        defaultReplicaCount: 1
+        defaultReplicaCount: 2
         replicaAutoBalance: least-effort
         storageMinimalAvailablePercentage: 10
       ingress:
@@ -113,7 +121,7 @@
         namespace: longhorn-system
       spec:
         concurrency: 1
-        cron: 0 3 * * ?
+        cron: 0 12 * * ?
         groups:
           - default
         labels: {}
@@ -123,12 +131,6 @@
         retain: 30
         task: backup
 
-- name: Get Node IPs
-  kubernetes.core.k8s_info:
-    api_version: v1
-    kind: Node
-  register: nodes
-
 - name: Create Monitoring Namespace
   kubernetes.core.k8s:
     state: present
@@ -137,6 +139,10 @@
       kind: Namespace
       metadata:
         name: monitoring
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
 
 - name: Create Alertmanager Headers ConfigMap
   kubernetes.core.k8s:
@@ -213,14 +219,21 @@
     wait: true
     release_values: "{{ values_file | from_yaml }}"
   vars:
-    node_ips: "{{ nodes.resources[0].status.addresses | selectattr('type', '==', 'InternalIP') | map(attribute='address') }}"
     values_file:
+      kubeScheduler:
+        service:
+          selector:
+            k8s-app: kube-scheduler
+      kubeControllerManager:
+        service:
+          selector:
+            k8s-app: kube-controller-manager
       alertmanager:
         alertmanagerSpec:
           storage:
             volumeClaimTemplate:
               spec:
-                storageClassName: longhorn-local
+                storageClassName: longhorn
                 accessModes:
                   - ReadWriteOnce
                 resources:
@@ -254,18 +267,12 @@
           storageSpec:
             volumeClaimTemplate:
               spec:
-                storageClassName: longhorn-local
+                storageClassName: longhorn
                 accessModes:
                   - ReadWriteOnce
                 resources:
                   requests:
                     storage: 10Gi
-      kubeScheduler:
-        endpoints: "{{ node_ips }}"
-      kubeControllerManager:
-        endpoints: "{{ node_ips }}"
-      kubeProxy:
-        endpoints: "{{ node_ips }}"
 
 - name: Enable Longhorn Metrics
   kubernetes.core.helm:
@@ -294,6 +301,8 @@
     release_values: "{{ values_file | from_yaml }}"
   vars:
     values_file:
+      args:
+        - --kubelet-insecure-tls
       metrics:
         enabled: true
       serviceMonitor:
@@ -323,6 +332,8 @@
     release_values: "{{ values_file | from_yaml }}"
   vars:
     values_file:
+      speaker:
+        ignoreExcludeLB: true
       prometheus:
         namespace: monitoring
         rbacPrometheus: false
