@@ -10,10 +10,17 @@
     path: "{{ talos_config_dir }}/secrets.yaml"
   register: secrets_file
 
-- name: Generate Secrets
+- name: Generate secrets
   when: not secrets_file.stat.exists
   changed_when: true
   ansible.builtin.command: talosctl gen secrets --output-file "{{ talos_config_dir }}/secrets.yaml"
+
+- name: Zip secrets for easy backup
+  community.general.archive:
+    path: "{{ talos_config_dir }}/secrets.yaml"
+    dest: "{{ talos_config_dir }}/talos-secrets.zip"
+    format: zip
+    mode: '0644'
 
 - name: Get Talos Image ID
   ansible.builtin.uri:
