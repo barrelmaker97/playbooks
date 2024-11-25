@@ -25,6 +25,7 @@
     common_name: "{{ cluster_user }}"
 
 - name: Get admin kubeconfig
+  changed_when: true
   ansible.builtin.command: talosctl -e {{ cluster_vip }} -n {{ cluster_vip }} kubeconfig -f
 
 - name: Delete Any Existing User CSR Objects

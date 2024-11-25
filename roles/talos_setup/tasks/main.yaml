@@ -12,6 +12,7 @@
 
 - name: Generate Secrets
   when: not secrets_file.stat.exists
+  changed_when: true
   ansible.builtin.command: talosctl gen secrets --output-file "{{ talos_config_dir }}/secrets.yaml"
 
 - name: Get Talos Image ID
@@ -24,7 +25,7 @@
 
 - name: Create control node machine configs
   loop: "{{ node_names }}"
-  include_tasks: gen-config.yaml
+  ansible.builtin.include_tasks: gen-config.yaml
 
 - name: Clean Up machine config patch
   ansible.builtin.file:
@@ -32,6 +33,7 @@
     state: absent
 
 - name: Generate Talos config
+  changed_when: true
   ansible.builtin.command: >
     talosctl gen config --force
     --with-secrets "{{ talos_config_dir }}/secrets.yaml"
@@ -40,10 +42,12 @@
     "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
 
 - name: Save Talos config
+  changed_when: true
   ansible.builtin.command: >
     talosctl config merge "{{ talos_config_dir }}/talosconfig"
 
 - name: Add nodes to Talos config
+  changed_when: true
   ansible.builtin.command:
     argv: "{{ complete_command }}"
   vars:
@@ -54,6 +58,7 @@
       - node
 
 - name: Add endpoints to Talos config
+  changed_when: true
   ansible.builtin.command:
     argv: "{{ complete_command }}"
   vars:

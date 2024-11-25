@@ -1,4 +1,4 @@
-- name: Template {{ item }} machine config patch
+- name: Template machine config patch for {{ item }}
   ansible.builtin.template:
     src: controlplane-patch.yaml
     dest: "{{ talos_config_dir }}/patch.yaml"
@@ -6,7 +6,8 @@
   vars:
     node_hostname: "{{ item }}"
 
-- name: Generate {{ item }} machine config
+- name: Generate machine config for {{ item }}
+  changed_when: true
   ansible.builtin.command: >
     talosctl gen config --force
     --with-docs=false
