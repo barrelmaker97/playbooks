@@ -230,6 +230,8 @@
             k8s-app: kube-controller-manager
       alertmanager:
         alertmanagerSpec:
+          alertmanagerConfigMatcherStrategy:
+            type: None
           storage:
             volumeClaimTemplate:
               spec:
