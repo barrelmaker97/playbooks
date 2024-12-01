@@ -1,6 +1,6 @@
 ---
 ansible_user: barrelmaker
-cert_expiration_seconds: 604800  # 7 days
+cert_expiration_seconds: 2592000  # 30 days
 cluster_host: poseidon
 cluster_port: 6443
 cluster_user: barrelmaker
