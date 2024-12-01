@@ -230,6 +230,8 @@
             k8s-app: kube-controller-manager
       alertmanager:
         alertmanagerSpec:
+          alertmanagerConfigMatcherStrategy:
+            type: None
           storage:
             volumeClaimTemplate:
               spec:
@@ -273,6 +275,18 @@
                 resources:
                   requests:
                     storage: 10Gi
+
+- name: Create Alert Manager Config
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('file', 'files/alertmanagerconfig.yaml') | from_yaml }}"
+
+- name: Create Discord Webhook URL Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('community.sops.sops', 'files/secret-discord-webhook-url.sops.yaml') | from_yaml }}"
 
 - name: Enable Longhorn Metrics
   kubernetes.core.helm:
