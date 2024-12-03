@@ -1,6 +1,6 @@
 ---
 image:
-  tag: 2.0.21
+  tag: 2.0.23
 
 persistence:
   storageClassName: longhorn
