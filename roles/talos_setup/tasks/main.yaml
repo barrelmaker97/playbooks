@@ -17,7 +17,7 @@
   loop: "{{ node_names }}"
   ansible.builtin.include_tasks: gen-config.yaml
 
-- name: Clean Up machine config patch
+- name: Clean up machine config patch
   ansible.builtin.file:
     path: "{{ talos_config_dir }}/patch.yaml"
     state: absent
