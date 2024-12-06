@@ -9,11 +9,12 @@
 - name: Generate machine config for {{ item }}
   changed_when: true
   ansible.builtin.command: >
-    talosctl gen config --force
+    sops exec-file "{{ role_path }}/files/secrets.sops.yaml"
+    'talosctl gen config --force
     --with-docs=false
     --with-examples=false
-    --with-secrets "{{ talos_config_dir }}/secrets.yaml"
+    --with-secrets {}
     --config-patch-control-plane "@{{ talos_config_dir }}/patch.yaml"
     --output-types=controlplane
     --output "{{ talos_config_dir }}/{{ item }}.yaml"
-    "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"
+    "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"'

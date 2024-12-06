@@ -1,7 +1,7 @@
 ---
 creation_rules:
   - path_regex: .*\.sops\.ya?ml
-    encrypted_regex: '(^data|^stringData)'
+    encrypted_regex: '(^data|^stringData|^cluster|^secrets|^certs|^trustdinfo)'
     key_groups:
       - age:
         - age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
