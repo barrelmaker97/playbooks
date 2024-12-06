@@ -7,6 +7,9 @@ persistence:
 
 securityContext:
   allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
 
 ingress:
   enabled: true
