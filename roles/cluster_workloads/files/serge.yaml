@@ -1,7 +1,9 @@
 ---
-storageClassName:
-  data: longhorn-local
-  weights: longhorn-local
+persistence:
+  data:
+    storageClassName: longhorn-local
+  weights:
+    storageClassName: longhorn-local
 
 securityContext:
   allowPrivilegeEscalation: false
