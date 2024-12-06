@@ -1,3 +1,23 @@
 ---
+storageClassName:
+  data: longhorn-local
+  weights: longhorn-local
+
 securityContext:
   allowPrivilegeEscalation: false
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: chat.poseidon.lan
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  requests:
+    memory: 500Mi
+    cpu: 700m
+  limits:
+    memory: 2Gi
