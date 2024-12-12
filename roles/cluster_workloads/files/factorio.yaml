@@ -1,4 +1,24 @@
 ---
+server:
+  name: "Barrelmaker's Server"
+  description: "First 2.0 Playthrough!"
+  maxPlayers: 5
+  public: false
+
+config:
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  resources:
+    requests:
+      cpu: 20m
+      memory: 20Mi
+    limits:
+      cpu: 60m
+      memory: 60Mi
+
 image:
   tag: 2.0.23
 
