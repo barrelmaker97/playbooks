@@ -14,7 +14,7 @@ ansible-playbook site.yaml
 
 Individual playbooks can be run in a similar manner:
 ```bash
-ansible-playbook cluster_user.yaml
+ansible-playbook setup.yaml
 ```
 # IP Plan
 | Name       | Address       | Hostname           |

@@ -2,7 +2,7 @@
 - name: Setup for cluster creation
   import_playbook: setup.yaml
 - name: Create cluster user
-  import_playbook: cluster_user.yaml
+  import_playbook: user.yaml
 - name: Deploy core services
   import_playbook: core.yaml
 - name: Deploy workloads

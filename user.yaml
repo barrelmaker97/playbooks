@@ -1,0 +1,5 @@
+---
+- name: Create cluster user
+  hosts: localhost
+  roles:
+    - user
