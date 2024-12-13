@@ -1,0 +1,62 @@
+server:
+    name: Barrelmaker's Server
+    description: First 2.0 Playthrough!
+    maxPlayers: 5
+    public: false
+    password: ENC[AES256_GCM,data:FCK86JFSw2JWWg==,iv:jOJe4Vcv/wEN1ZfCTxjxob8kgUJxu7Xz69GxWWjn6TM=,tag:6QStDak1ZAZ5nbmSPP2ffw==,type:str]
+config:
+    securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+            drop:
+                - ALL
+    resources:
+        requests:
+            cpu: 20m
+            memory: 20Mi
+        limits:
+            cpu: 60m
+            memory: 60Mi
+image:
+    tag: 2.0.23
+persistence:
+    storageClassName: longhorn
+    size: 5Gi
+podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 845
+    runAsGroup: 845
+    fsGroup: 845
+securityContext:
+    capabilities:
+        drop:
+            - ALL
+service:
+    type: LoadBalancer
+    port: 34197
+resources:
+    requests:
+        cpu: 800m
+        memory: 1000Mi
+    limits:
+        memory: 2000Mi
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBFbDU0VXpxTjhwWHdmSjl0
+            U1FVVXVFaFVtVHJ5ZEJid3JiTE5Kd3F3Z0NjCmlLUkVCdWdTYmN6TW1mcytDVVFM
+            YUtIU1hSOElVWml6VXRHdDQ5Tk94eFkKLS0tIGczejBablhHcDFGQmpDUDJNdjk2
+            YjFtNy9lRzYrQ0Q1UUJNalJyZC9oMVEKOOAq/Orfy+ZHAIFNPQ2oXbBBA0nWl16H
+            vVXpzw53BrMbamw6Ks5bqYVAUhAkv3ELICRTJHmNpPesDFHWnunPjQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-12-13T18:40:20Z"
+    mac: ENC[AES256_GCM,data:Cj8iBpHB83AejdpeBogJiZ1tpYfH9i3UN3DZFn1rarWxtYs7TZc5C8rOaryDxlkjANaP6CGExUoZu10N/hQLq2rS2UgWenwaadnvvNVW5rR3+cYaQSu6Lqv8DztHd66T0KcAgXKqO+4WYLHJxqUFOhVyLGhqKenOG+qMI5dE3mo=,iv:w+DmWM4+YZ5UP++oqR0oISuBVAeHGNL1GSECzeq9qKo=,tag:q1yB2MH3nlYOhg3LrjaAzw==,type:str]
+    pgp: []
+    encrypted_regex: (^data|^stringData|^cluster|^secrets|^certs|^trustdinfo|^password)
+    version: 3.9.1
