@@ -17,7 +17,6 @@
   loop: "{{ helm_repos | dict2items }}"
   vars:
     helm_repos:
-      # bitnami: https://charts.bitnami.com/bitnami
       barrelmaker: https://charts.barrelmaker.dev
 
 - name: Deploy Helm Charts
@@ -32,12 +31,12 @@
   vars:
     helm_charts:
       ingress: barrelmaker/ingress
-      # gmod: barrelmaker/gmod
       jellyfin: barrelmaker/jellyfin
       niucraft: barrelmaker/minecraft
+      website: barrelmaker/website
       # serge: barrelmaker/serge
       # valheim: barrelmaker/valheim
-      website: barrelmaker/website
+      # gmod: barrelmaker/gmod
 
 - name: Deploy Helm Charts with encrypted values
   kubernetes.core.helm:
