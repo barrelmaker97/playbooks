@@ -89,22 +89,3 @@
     src: user-kubeconfig.yaml
     dest: "{{ cluster_user_kube_dir }}/config"
     mode: "0600"
-
-- name: Create User Namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: "{{ workload_namespace }}"
-
-- name: Create User Resource Quota
-  kubernetes.core.k8s:
-    state: present
-    template: resourcequota-user.yaml
-
-- name: Create User Limit Range
-  kubernetes.core.k8s:
-    state: present
-    template: limitrange-user.yaml

@@ -1,4 +1,27 @@
 ---
+- name: Create User Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ workload_namespace }}"
+
+- name: Set Namespace in kubectl context
+  command: >
+    kubectl config set-context --current "--namespace={{ workload_namespace }}"
+
+- name: Create User Resource Quota
+  kubernetes.core.k8s:
+    state: present
+    template: resourcequota-user.yaml
+
+- name: Create User Limit Range
+  kubernetes.core.k8s:
+    state: present
+    template: limitrange-user.yaml
+
 - name: Install Helm
   become: true
   community.general.snap:
