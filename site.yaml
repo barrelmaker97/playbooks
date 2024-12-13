@@ -6,4 +6,4 @@
 - name: Setup Core Services
   import_playbook: core.yaml
 - name: Deploy Workloads
-  import_playbook: cluster_workloads.yaml
+  import_playbook: workloads.yaml
