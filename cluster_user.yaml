@@ -1,5 +1,0 @@
----
-- name: Setup Cluster User
-  hosts: localhost
-  roles:
-    - cluster_user
