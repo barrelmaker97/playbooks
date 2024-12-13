@@ -9,8 +9,11 @@
         name: "{{ workload_namespace }}"
 
 - name: Set Namespace in kubectl context
-  command: >
-    kubectl config set-context --current "--namespace={{ workload_namespace }}"
+  changed_when: true
+  ansible.builtin.command: >
+    kubectl config set-context
+    --current
+    "--namespace={{ workload_namespace }}"
 
 - name: Create User Resource Quota
   kubernetes.core.k8s:
