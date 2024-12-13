@@ -1,0 +1,5 @@
+---
+- name: Setup for cluster creation
+  hosts: localhost
+  roles:
+    - setup

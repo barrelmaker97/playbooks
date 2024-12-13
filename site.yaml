@@ -1,9 +1,9 @@
 ---
-- name: Set Talos
-  import_playbook: talos_setup.yaml
-- name: Setup Cluster User
+- name: Setup for cluster creation
+  import_playbook: setup.yaml
+- name: Create cluster user
   import_playbook: cluster_user.yaml
-- name: Setup Core Services
+- name: Deploy core services
   import_playbook: core.yaml
-- name: Deploy Workloads
+- name: Deploy workloads
   import_playbook: workloads.yaml
