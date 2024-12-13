@@ -32,10 +32,22 @@
   vars:
     helm_charts:
       ingress: barrelmaker/ingress
-      factorio: barrelmaker/factorio
       # gmod: barrelmaker/gmod
       jellyfin: barrelmaker/jellyfin
       niucraft: barrelmaker/minecraft
       # serge: barrelmaker/serge
       # valheim: barrelmaker/valheim
       website: barrelmaker/website
+
+- name: Deploy Helm Charts with encrypted values
+  kubernetes.core.helm:
+    name: "{{ item.key }}"
+    chart_ref: "{{ item.value }}"
+    release_namespace: "{{ workload_namespace }}"
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ lookup('community.sops.sops', 'files/{{ item.key }}.sops.yaml') | from_yaml }}"
+  loop: "{{ helm_charts | dict2items }}"
+  vars:
+    helm_charts:
+      factorio: barrelmaker/factorio
