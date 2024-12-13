@@ -1,5 +1,5 @@
 ---
-- name: Deploy Workloads
+- name: Deploy workloads
   hosts: localhost
   gather_facts: false
   roles:

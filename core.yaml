@@ -1,5 +1,5 @@
 ---
-- name: Setup Cluster Services
+- name: Deploy core services
   hosts: localhost
   gather_facts: false
   roles:
