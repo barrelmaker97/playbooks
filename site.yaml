@@ -3,7 +3,7 @@
   import_playbook: talos_setup.yaml
 - name: Setup Cluster User
   import_playbook: cluster_user.yaml
-- name: Setup Cluster Services
-  import_playbook: cluster_services.yaml
+- name: Setup Core Services
+  import_playbook: core.yaml
 - name: Deploy Workloads
   import_playbook: cluster_workloads.yaml
