@@ -37,7 +37,7 @@ service:
 resources:
     requests:
         cpu: 800m
-        memory: 1000Mi
+        memory: 1600Mi
     limits:
         memory: 2000Mi
 sops:
@@ -55,8 +55,8 @@ sops:
             YjFtNy9lRzYrQ0Q1UUJNalJyZC9oMVEKOOAq/Orfy+ZHAIFNPQ2oXbBBA0nWl16H
             vVXpzw53BrMbamw6Ks5bqYVAUhAkv3ELICRTJHmNpPesDFHWnunPjQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-12-13T18:40:20Z"
-    mac: ENC[AES256_GCM,data:Cj8iBpHB83AejdpeBogJiZ1tpYfH9i3UN3DZFn1rarWxtYs7TZc5C8rOaryDxlkjANaP6CGExUoZu10N/hQLq2rS2UgWenwaadnvvNVW5rR3+cYaQSu6Lqv8DztHd66T0KcAgXKqO+4WYLHJxqUFOhVyLGhqKenOG+qMI5dE3mo=,iv:w+DmWM4+YZ5UP++oqR0oISuBVAeHGNL1GSECzeq9qKo=,tag:q1yB2MH3nlYOhg3LrjaAzw==,type:str]
+    lastmodified: "2024-12-17T14:55:18Z"
+    mac: ENC[AES256_GCM,data:+fu66CtCyzP/ZvMYig5Ueud0ec8VL9TZwEJsAGGvLuIdOlVkC8UCAGPtRVwpb27YhXU4Hs2XzRt5QOGJx2ancjOg5TQCeYt17uiP8u70/OStwiyt1/u6SyZVkDnNAysLtDEX5jlU05YDaB2TPZ41rRxuH3N4FQue0AS5ZaEBjTQ=,iv:+eR+HBQkhJQpRaHj3eO3qX+MQwgF4rFfrXqrANA9mgY=,tag:2n+fdtiVeeJIeerUFf9I7w==,type:str]
     pgp: []
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^certs|^trustdinfo|^password)
     version: 3.9.1
