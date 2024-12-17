@@ -28,7 +28,7 @@ cert_manager_version: "1.16.2"
 ingress_nginx_version: "4.11.3"
 metrics_server_version: "3.12.2"
 metallb_version: "0.14.8"
-kube_prometheus_stack_version: "66.6.0"
+kube_prometheus_stack_version: "67.2.0"
 longhorn_version: "1.7.2"
 
 # Service configuration
