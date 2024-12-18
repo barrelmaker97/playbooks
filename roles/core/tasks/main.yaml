@@ -274,7 +274,7 @@
                   - ReadWriteOnce
                 resources:
                   requests:
-                    storage: 10Gi
+                    storage: 20Gi
 
 - name: Create Alert Manager Config
   kubernetes.core.k8s:
