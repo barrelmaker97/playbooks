@@ -209,6 +209,15 @@
           base-uri 'self';
           frame-ancestors 'none';
 
+- name: Deploy Prometheus CRDs
+  kubernetes.core.helm:
+    name: prometheus-operator-crds
+    chart_ref: prometheus-community/prometheus-operator-crds
+    chart_version: "{{ prometheus_crds_version }}"
+    release_namespace: monitoring
+    update_repo_cache: true
+    wait: true
+
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
     name: kube-prometheus-stack
