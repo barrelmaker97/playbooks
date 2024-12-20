@@ -274,6 +274,7 @@
           hosts:
             - "prometheus.{{ cluster_domain }}"
         prometheusSpec:
+          retention: 30d
           serviceMonitorSelectorNilUsesHelmValues: false
           storageSpec:
             volumeClaimTemplate:
