@@ -7,8 +7,8 @@ Personal Ansible Playbook Library
 ```
 
 # Secrets Management
-Secret values needed for playbooks are encrypted with age/sops.
-Age and sops will be installed by the `setup.yaml` playbook if they are not present.
+Secret values needed for playbooks are encrypted with age/sops,
+which will be installed by the `setup.yaml` playbook if they are not present.
 The age key file is expected to be at `~/.config/sops/age/keys.txt`.
 
 # Prerequisites
