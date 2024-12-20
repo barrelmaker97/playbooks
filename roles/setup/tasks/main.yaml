@@ -1,4 +1,16 @@
 ---
+- name: Install age
+  become: true
+  ansible.builtin.apt:
+    name: age
+    state: present
+
+- name: Install sops
+  ansible.builtin.include_role:
+    name: community.sops.install
+  vars:
+    sops_install_on_localhost: true
+
 - name: Create Talos config directory
   ansible.builtin.file:
     path: "{{ talos_config_dir }}"
