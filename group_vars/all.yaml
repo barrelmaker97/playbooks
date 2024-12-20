@@ -14,7 +14,7 @@ node_names:
   - node2-poseidon
   - node3-poseidon
 ntp_server: 192.168.15.1
-talos_config_dir: /home/barrelmaker/talos
+talos_config_dir: /home/barrelmaker/.talos
 talos_version: 1.8.4
 workload_namespace: barrelmaker
 
