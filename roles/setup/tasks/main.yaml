@@ -49,6 +49,11 @@
   ansible.builtin.command: >
     talosctl config merge "{{ talos_config_dir }}/talosconfig"
 
+- name: Clean up generated talosconfig
+  ansible.builtin.file:
+    path: "{{ talos_config_dir }}/talosconfig"
+    state: absent
+
 - name: Add nodes to Talos config
   changed_when: true
   ansible.builtin.command:
