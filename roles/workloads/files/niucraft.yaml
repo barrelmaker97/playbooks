@@ -24,6 +24,8 @@ dynmap:
 
 metrics:
   enabled: true
+  dashboard:
+    enabled: true
   serviceMonitor:
     enabled: true
 
