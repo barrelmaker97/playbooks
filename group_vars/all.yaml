@@ -29,7 +29,7 @@ ingress_nginx_version: "4.11.3"
 metrics_server_version: "3.12.2"
 metallb_version: "0.14.9"
 prometheus_crds_version: "17.0.2"
-kube_prometheus_stack_version: "67.3.1"
+kube_prometheus_stack_version: "67.4.0"
 longhorn_version: "1.7.2"
 
 # Service configuration
