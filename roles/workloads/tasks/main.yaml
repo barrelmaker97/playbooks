@@ -60,8 +60,8 @@
       jellyfin: barrelmaker/jellyfin
       niucraft: barrelmaker/minecraft
       website: barrelmaker/website
+      valheim: barrelmaker/valheim
       # serge: barrelmaker/serge
-      # valheim: barrelmaker/valheim
       # gmod: barrelmaker/gmod
 
 - name: Deploy Helm Charts with encrypted values
