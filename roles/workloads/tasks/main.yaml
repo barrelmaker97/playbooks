@@ -60,7 +60,6 @@
       jellyfin: barrelmaker/jellyfin
       niucraft: barrelmaker/minecraft
       website: barrelmaker/website
-      valheim: barrelmaker/valheim
       # serge: barrelmaker/serge
       # gmod: barrelmaker/gmod
 
@@ -76,3 +75,4 @@
   vars:
     helm_charts:
       factorio: barrelmaker/factorio
+      valheim: barrelmaker/valheim
