@@ -44,7 +44,7 @@ properties:
     dynmap:beta,
     chunky
   type: "PAPER"
-  version: "1.21.1"
+  version: "1.21.4"
   viewDistance: "32"
   whitelist: >-
     BakerGang2022,
