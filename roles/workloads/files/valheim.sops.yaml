@@ -1,6 +1,6 @@
 serverName: Barrelmaker
 worldName: Asgard
-public: true
+public: false
 metrics: true
 password: ENC[AES256_GCM,data:+TYDz0gvj3a/bQ==,iv:35Sts08Fv4Q4O6UOaHDgA64kM0aWYBBRTkf5nJzf5TE=,tag:BqLZ4Rh2jO7nx2erdbp6og==,type:str]
 persistence:
@@ -35,8 +35,8 @@ sops:
             emI5RmdsZVdDZCsyS1RmLy9pclRpc0kKpqbAKtCkYDdb/EbWzoTH3DWrHYKm9ecH
             t/OQs3p2XbUabXmfinUQBH3E0yz723UYirkJ/ndVYdHNT7OdybtxFw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-01-17T20:57:53Z"
-    mac: ENC[AES256_GCM,data:AbDJZ7bwCDwkbVgKb+D9j3MqXnI0wXlMl0+AVZoGZXcWizlyb90qGUURPe/wiRMcdg+REssL1C8a8GcKclqJhxpLDNh7yaxvEAq4dXh574JJeCQuWpVIjJgj5JgvyUtUPaRR4HM36Vy2B7b4tnvD6BcZhuQNFt3CZX8wncQpEKs=,iv:tL9e7GXE/C2E/waPcJvp6B5eVkRwkdGAi6q5UNwJT14=,tag:f3aBBha9yYGO1oSyLXyGiA==,type:str]
+    lastmodified: "2025-02-16T04:29:24Z"
+    mac: ENC[AES256_GCM,data:E1Wyn4OcXUBcNGsrVoQShE50J8gPjNlk9eZc3/YMbOJ1RwMS9HJ5t8iUYaLtMJyWofBRz2SneXwd7IuWXu9Mi3BKTKc6mie3pBgyFqpiWD7UdHFK4hFZgkw4sb8mRk1p3w2Yu6qaIMujqS17lADtPnrtjPLlBOnFRNK4jrpOXZ4=,iv:n8kvmFyCJ6gCbGk9ZMpglc84hz2iflfEW/Zd3jTnOco=,tag:CinfLQaRq6nLUN6GlksRwg==,type:str]
     pgp: []
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^certs|^trustdinfo|^password)
-    version: 3.9.3
+    version: 3.9.4
