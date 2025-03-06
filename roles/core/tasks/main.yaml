@@ -44,7 +44,7 @@
   register: longhorn_info
 
 - name: Deploy Longhorn
-  when: '"status" not in longhorn_info'
+  when: '"status" not in longhorn_info or force_longhorn_install'
   kubernetes.core.helm:
     name: longhorn
     chart_ref: longhorn/longhorn
