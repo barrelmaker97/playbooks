@@ -25,7 +25,7 @@ nut_password: hunter2
 
 # Service versions
 cert_manager_version: "1.17.1"
-ingress_nginx_version: "4.11.4"
+ingress_nginx_version: "4.11.5"
 metrics_server_version: "3.12.2"
 metallb_version: "0.14.9"
 prometheus_crds_version: "18.0.1"
