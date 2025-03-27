@@ -59,6 +59,7 @@
       ingress: barrelmaker/ingress
       jellyfin: barrelmaker/jellyfin
       niucraft: barrelmaker/minecraft
+      pistachio: barrelmaker/pistachio
       website: barrelmaker/website
       # serge: barrelmaker/serge
       # gmod: barrelmaker/gmod
