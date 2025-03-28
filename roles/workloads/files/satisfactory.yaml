@@ -1,0 +1,39 @@
+---
+persistence:
+  storageClassName: longhorn
+  size: 20Gi
+
+satisfactoryOpts:
+  maxPlayers: 6
+
+# When deploying for the first time, disable the cert.
+# The server needs to create the directory with the correct
+# permissions, otherwise the secret mounting will set them
+# incorrectly.
+certificate:
+  enabled: true
+  issuerName: letsencrypt-prod
+  issuerKind: ClusterIssuer
+  domain: satisfactory.barrelmaker.dev
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: LoadBalancer
+
+resources:
+  requests:
+    cpu: 1000m
+    memory: 7500Mi
+  limits:
+    memory: 8000Mi
