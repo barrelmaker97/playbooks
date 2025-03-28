@@ -136,6 +136,105 @@
         retain: 30
         task: backup
 
+- name: Create MetalLB Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: metallb-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Deploy MetalLB
+  kubernetes.core.helm:
+    name: metallb
+    chart_ref: metallb/metallb
+    chart_version: "{{ metallb_version }}"
+    release_namespace: metallb-system
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      speaker:
+        ignoreExcludeLB: true
+      prometheus:
+        namespace: monitoring
+        rbacPrometheus: false
+        serviceMonitor:
+          enabled: true
+
+- name: Create IP Address Pool
+  kubernetes.core.k8s:
+    state: present
+    template: ipaddresspool-metallb.yaml
+
+- name: Advertise Load Balanced IP
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
+
+- name: Deploy Ingress Nginx
+  kubernetes.core.helm:
+    name: ingress-nginx
+    chart_ref: ingress-nginx/ingress-nginx
+    chart_version: "{{ ingress_nginx_version }}"
+    release_namespace: ingress-nginx
+    create_namespace: true
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      controller:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+
+- name: Set Nginx Ingress Controller Custom Headers
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/configmap-custom-headers.yaml') | from_yaml }}"
+
+- name: Set Nginx Ingress Controller Config
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
+
+- name: Deploy Cert Manager
+  kubernetes.core.helm:
+    name: cert-manager
+    chart_ref: jetstack/cert-manager
+    chart_version: "{{ cert_manager_version }}"
+    release_namespace: cert-manager
+    create_namespace: true
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      prometheus:
+        enabled: true
+        servicemonitor:
+          enabled: true
+      crds:
+        enabled: true
+
+- name: Create Production Issuer
+  kubernetes.core.k8s:
+    state: present
+    template: issuer-prod.yaml
+
+- name: Create Staging Issuer
+  kubernetes.core.k8s:
+    state: present
+    template: issuer-staging.yaml
+
 - name: Create Monitoring Namespace
   kubernetes.core.k8s:
     state: present
@@ -311,105 +410,6 @@
         enabled: true
       serviceMonitor:
         enabled: true
-
-- name: Create MetalLB Namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: metallb-system
-        labels:
-          pod-security.kubernetes.io/enforce: privileged
-          pod-security.kubernetes.io/audit: privileged
-          pod-security.kubernetes.io/warn: privileged
-
-- name: Deploy MetalLB
-  kubernetes.core.helm:
-    name: metallb
-    chart_ref: metallb/metallb
-    chart_version: "{{ metallb_version }}"
-    release_namespace: metallb-system
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    values_file:
-      speaker:
-        ignoreExcludeLB: true
-      prometheus:
-        namespace: monitoring
-        rbacPrometheus: false
-        serviceMonitor:
-          enabled: true
-
-- name: Create IP Address Pool
-  kubernetes.core.k8s:
-    state: present
-    template: ipaddresspool-metallb.yaml
-
-- name: Advertise Load Balanced IP
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
-
-- name: Deploy Ingress Nginx
-  kubernetes.core.helm:
-    name: ingress-nginx
-    chart_ref: ingress-nginx/ingress-nginx
-    chart_version: "{{ ingress_nginx_version }}"
-    release_namespace: ingress-nginx
-    create_namespace: true
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    values_file:
-      controller:
-        metrics:
-          enabled: true
-          serviceMonitor:
-            enabled: true
-
-- name: Set Nginx Ingress Controller Custom Headers
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', 'files/configmap-custom-headers.yaml') | from_yaml }}"
-
-- name: Set Nginx Ingress Controller Config
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
-
-- name: Deploy Cert Manager
-  kubernetes.core.helm:
-    name: cert-manager
-    chart_ref: jetstack/cert-manager
-    chart_version: "{{ cert_manager_version }}"
-    release_namespace: cert-manager
-    create_namespace: true
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    values_file:
-      prometheus:
-        enabled: true
-        servicemonitor:
-          enabled: true
-      crds:
-        enabled: true
-
-- name: Create Production Issuer
-  kubernetes.core.k8s:
-    state: present
-    template: issuer-prod.yaml
-
-- name: Create Staging Issuer
-  kubernetes.core.k8s:
-    state: present
-    template: issuer-staging.yaml
 
 - name: Create Jellyfin NFS Volumes
   kubernetes.core.k8s:
