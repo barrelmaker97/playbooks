@@ -6,6 +6,12 @@ persistence:
 satisfactoryOpts:
   maxPlayers: 6
 
+certificate:
+  enabled: true
+  issuerName: letsencrypt-prod
+  issuerKind: ClusterIssuer
+  domain: satisfactory.barrelmaker.dev
+
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
