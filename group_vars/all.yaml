@@ -34,7 +34,6 @@ longhorn_version: "1.8.1"
 
 # Service configuration
 email_address: nolancooper97@gmail.com
-force_longhorn_install: false
 metallb_ip_range: 192.168.15.60-192.168.15.69
 
 # Templated variables

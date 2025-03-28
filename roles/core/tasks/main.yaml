@@ -24,6 +24,15 @@
       metrics-server: https://kubernetes-sigs.github.io/metrics-server
       prometheus-community: https://prometheus-community.github.io/helm-charts
 
+- name: Deploy Prometheus CRDs
+  kubernetes.core.helm:
+    name: prometheus-operator-crds
+    chart_ref: prometheus-community/prometheus-operator-crds
+    chart_version: "{{ prometheus_crds_version }}"
+    release_namespace: monitoring
+    update_repo_cache: true
+    wait: true
+
 - name: Create Longhorn Namespace
   kubernetes.core.k8s:
     state: present
@@ -37,14 +46,7 @@
           pod-security.kubernetes.io/audit: privileged
           pod-security.kubernetes.io/warn: privileged
 
-- name: Check if Longhorn is installed
-  kubernetes.core.helm_info:
-    name: longhorn
-    release_namespace: longhorn-system
-  register: longhorn_info
-
 - name: Deploy Longhorn
-  when: '"status" not in longhorn_info or force_longhorn_install'
   kubernetes.core.helm:
     name: longhorn
     chart_ref: longhorn/longhorn
@@ -59,6 +61,9 @@
       persistence:
         defaultDataLocality: best-effort
         defaultClassReplicaCount: 2
+      metrics:
+        serviceMonitor:
+          enabled: true
       defaultSettings:
         allowVolumeCreationWithDegradedAvailability: false
         backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
@@ -130,207 +135,6 @@
           full-backup-interval: "15"
         retain: 30
         task: backup
-
-- name: Create Monitoring Namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: monitoring
-        labels:
-          pod-security.kubernetes.io/enforce: privileged
-          pod-security.kubernetes.io/audit: privileged
-          pod-security.kubernetes.io/warn: privileged
-
-- name: Create Alertmanager Headers ConfigMap
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: alertmanager-headers
-        namespace: monitoring
-      data:
-        Content-Security-Policy: >-
-          default-src 'none';
-          form-action 'self';
-          img-src 'self' data:;
-          object-src 'none';
-          script-src 'self' 'unsafe-inline';
-          style-src 'self';
-          font-src 'self';
-          connect-src 'self';
-          base-uri 'self';
-          frame-ancestors 'none';
-
-- name: Create Grafana Headers ConfigMap
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: grafana-headers
-        namespace: monitoring
-      data:
-        Content-Security-Policy: >-
-          frame-ancestors 'self';
-          default-src 'none';
-          script-src 'self' 'unsafe-inline' 'unsafe-eval';
-          font-src 'self' https://fonts.gstatic.com;
-          connect-src 'self' https://grafana.com data:;
-          img-src 'self' https://grafana.com data:;
-          style-src 'self' 'unsafe-inline';
-          base-uri 'self';
-          form-action 'self';
-
-- name: Create Prometheus Headers ConfigMap
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: prometheus-headers
-        namespace: monitoring
-      data:
-        Content-Security-Policy: >-
-          default-src 'none';
-          form-action 'self';
-          img-src 'self' data:;
-          object-src 'none';
-          script-src 'self' 'unsafe-inline';
-          style-src 'self' 'unsafe-inline';
-          font-src 'self';
-          connect-src 'self';
-          base-uri 'self';
-          frame-ancestors 'none';
-
-- name: Deploy Prometheus CRDs
-  kubernetes.core.helm:
-    name: prometheus-operator-crds
-    chart_ref: prometheus-community/prometheus-operator-crds
-    chart_version: "{{ prometheus_crds_version }}"
-    release_namespace: monitoring
-    update_repo_cache: true
-    wait: true
-
-- name: Deploy Prometheus Stack
-  kubernetes.core.helm:
-    name: kube-prometheus-stack
-    chart_ref: prometheus-community/kube-prometheus-stack
-    chart_version: "{{ kube_prometheus_stack_version }}"
-    release_namespace: monitoring
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    values_file:
-      kubeScheduler:
-        service:
-          selector:
-            k8s-app: kube-scheduler
-      kubeControllerManager:
-        service:
-          selector:
-            k8s-app: kube-controller-manager
-      alertmanager:
-        alertmanagerSpec:
-          alertmanagerConfigMatcherStrategy:
-            type: None
-          storage:
-            volumeClaimTemplate:
-              spec:
-                storageClassName: longhorn
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 10Gi
-        ingress:
-          enabled: true
-          ingressClassName: nginx
-          annotations:
-            nginx.ingress.kubernetes.io/custom-headers: monitoring/alertmanager-headers
-          hosts:
-            - "alertmanager.{{ cluster_domain }}"
-      grafana:
-        ingress:
-          enabled: true
-          ingressClassName: nginx
-          annotations:
-            nginx.ingress.kubernetes.io/custom-headers: monitoring/grafana-headers
-          hosts:
-            - "grafana.{{ cluster_domain }}"
-      prometheus:
-        ingress:
-          enabled: true
-          ingressClassName: nginx
-          annotations:
-            nginx.ingress.kubernetes.io/custom-headers: monitoring/prometheus-headers
-          hosts:
-            - "prometheus.{{ cluster_domain }}"
-        prometheusSpec:
-          retention: 30d
-          serviceMonitorSelectorNilUsesHelmValues: false
-          storageSpec:
-            volumeClaimTemplate:
-              spec:
-                storageClassName: longhorn
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 20Gi
-
-- name: Create Alert Manager Config
-  kubernetes.core.k8s:
-    state: present
-    namespace: monitoring
-    definition: "{{ lookup('file', 'files/alertmanagerconfig.yaml') | from_yaml }}"
-
-- name: Create Discord Webhook URL Secret
-  kubernetes.core.k8s:
-    state: present
-    namespace: monitoring
-    definition: "{{ lookup('community.sops.sops', 'files/secret-discord-webhook-url.sops.yaml') | from_yaml }}"
-
-- name: Enable Longhorn Metrics
-  kubernetes.core.helm:
-    name: longhorn
-    chart_ref: longhorn/longhorn
-    chart_version: "{{ longhorn_version }}"
-    release_namespace: longhorn-system
-    wait: true
-    reset_values: false
-    reuse_values: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    values_file:
-      metrics:
-        serviceMonitor:
-          enabled: true
-
-- name: Deploy Metrics Server
-  kubernetes.core.helm:
-    name: metrics-server
-    chart_ref: metrics-server/metrics-server
-    chart_version: "{{ metrics_server_version }}"
-    release_namespace: kube-system
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    values_file:
-      args:
-        - --kubelet-insecure-tls
-      metrics:
-        enabled: true
-      serviceMonitor:
-        enabled: true
 
 - name: Create MetalLB Namespace
   kubernetes.core.k8s:
@@ -430,6 +234,182 @@
   kubernetes.core.k8s:
     state: present
     template: issuer-staging.yaml
+
+- name: Create Monitoring Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Create Alertmanager Headers ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: alertmanager-headers
+        namespace: monitoring
+      data:
+        Content-Security-Policy: >-
+          default-src 'none';
+          form-action 'self';
+          img-src 'self' data:;
+          object-src 'none';
+          script-src 'self' 'unsafe-inline';
+          style-src 'self';
+          font-src 'self';
+          connect-src 'self';
+          base-uri 'self';
+          frame-ancestors 'none';
+
+- name: Create Grafana Headers ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: grafana-headers
+        namespace: monitoring
+      data:
+        Content-Security-Policy: >-
+          frame-ancestors 'self';
+          default-src 'none';
+          script-src 'self' 'unsafe-inline' 'unsafe-eval';
+          font-src 'self' https://fonts.gstatic.com;
+          connect-src 'self' https://grafana.com data:;
+          img-src 'self' https://grafana.com data:;
+          style-src 'self' 'unsafe-inline';
+          base-uri 'self';
+          form-action 'self';
+
+- name: Create Prometheus Headers ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: prometheus-headers
+        namespace: monitoring
+      data:
+        Content-Security-Policy: >-
+          default-src 'none';
+          form-action 'self';
+          img-src 'self' data:;
+          object-src 'none';
+          script-src 'self' 'unsafe-inline';
+          style-src 'self' 'unsafe-inline';
+          font-src 'self';
+          connect-src 'self';
+          base-uri 'self';
+          frame-ancestors 'none';
+
+- name: Deploy Prometheus Stack
+  kubernetes.core.helm:
+    name: kube-prometheus-stack
+    chart_ref: prometheus-community/kube-prometheus-stack
+    chart_version: "{{ kube_prometheus_stack_version }}"
+    release_namespace: monitoring
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      kubeScheduler:
+        service:
+          selector:
+            k8s-app: kube-scheduler
+      kubeControllerManager:
+        service:
+          selector:
+            k8s-app: kube-controller-manager
+      alertmanager:
+        alertmanagerSpec:
+          alertmanagerConfigMatcherStrategy:
+            type: None
+          storage:
+            volumeClaimTemplate:
+              spec:
+                storageClassName: longhorn
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 10Gi
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            nginx.ingress.kubernetes.io/custom-headers: monitoring/alertmanager-headers
+          hosts:
+            - "alertmanager.{{ cluster_domain }}"
+      grafana:
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            nginx.ingress.kubernetes.io/custom-headers: monitoring/grafana-headers
+          hosts:
+            - "grafana.{{ cluster_domain }}"
+      prometheus:
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            nginx.ingress.kubernetes.io/custom-headers: monitoring/prometheus-headers
+          hosts:
+            - "prometheus.{{ cluster_domain }}"
+        prometheusSpec:
+          retention: 30d
+          serviceMonitorSelectorNilUsesHelmValues: false
+          storageSpec:
+            volumeClaimTemplate:
+              spec:
+                storageClassName: longhorn
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 20Gi
+
+- name: Create Alert Manager Config
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('file', 'files/alertmanagerconfig.yaml') | from_yaml }}"
+
+- name: Create Discord Webhook URL Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('community.sops.sops', 'files/secret-discord-webhook-url.sops.yaml') | from_yaml }}"
+
+- name: Deploy Metrics Server
+  kubernetes.core.helm:
+    name: metrics-server
+    chart_ref: metrics-server/metrics-server
+    chart_version: "{{ metrics_server_version }}"
+    release_namespace: kube-system
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      args:
+        - --kubelet-insecure-tls
+      metrics:
+        enabled: true
+      serviceMonitor:
+        enabled: true
 
 - name: Create Jellyfin NFS Volumes
   kubernetes.core.k8s:
