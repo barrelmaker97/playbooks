@@ -6,6 +6,10 @@ persistence:
 satisfactoryOpts:
   maxPlayers: 6
 
+# When deploying for the first time, disable the cert.
+# The server needs to create the directory with the correct
+# permissions, otherwise the secret mounting will set them
+# incorrectly.
 certificate:
   enabled: true
   issuerName: letsencrypt-prod
