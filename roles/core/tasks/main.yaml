@@ -288,6 +288,7 @@
           connect-src 'self' https://grafana.com data:;
           img-src 'self' https://grafana.com data:;
           style-src 'self' 'unsafe-inline';
+          worker-src 'self' blob:;
           base-uri 'self';
           form-action 'self';
 
