@@ -60,6 +60,7 @@
       jellyfin: barrelmaker/jellyfin
       niucraft: barrelmaker/minecraft
       pistachio: barrelmaker/pistachio
+      satisfactory: barrelmaker/satisfactory
       website: barrelmaker/website
       # serge: barrelmaker/serge
       # gmod: barrelmaker/gmod

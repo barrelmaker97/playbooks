@@ -6,7 +6,7 @@ metadata:
   namespace: "{{ workload_namespace }}"
 spec:
   hard:
-    requests.cpu: 5
-    requests.memory: 16Gi
-#   limits.cpu: 10
-#   limits.memory: 20Gi
+    requests.cpu: 10
+    requests.memory: 30Gi
+#   limits.cpu: 20
+#   limits.memory: 40Gi
