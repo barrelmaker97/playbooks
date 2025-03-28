@@ -46,14 +46,7 @@
           pod-security.kubernetes.io/audit: privileged
           pod-security.kubernetes.io/warn: privileged
 
-- name: Check if Longhorn is installed
-  kubernetes.core.helm_info:
-    name: longhorn
-    release_namespace: longhorn-system
-  register: longhorn_info
-
 - name: Deploy Longhorn
-  when: '"status" not in longhorn_info or force_longhorn_install'
   kubernetes.core.helm:
     name: longhorn
     chart_ref: longhorn/longhorn
@@ -68,6 +61,9 @@
       persistence:
         defaultDataLocality: best-effort
         defaultClassReplicaCount: 2
+      metrics:
+        serviceMonitor:
+          enabled: true
       defaultSettings:
         allowVolumeCreationWithDegradedAvailability: false
         backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
@@ -297,22 +293,6 @@
     state: present
     namespace: monitoring
     definition: "{{ lookup('community.sops.sops', 'files/secret-discord-webhook-url.sops.yaml') | from_yaml }}"
-
-- name: Enable Longhorn Metrics
-  kubernetes.core.helm:
-    name: longhorn
-    chart_ref: longhorn/longhorn
-    chart_version: "{{ longhorn_version }}"
-    release_namespace: longhorn-system
-    wait: true
-    reset_values: false
-    reuse_values: true
-    release_values: "{{ values_file | from_yaml }}"
-  vars:
-    values_file:
-      metrics:
-        serviceMonitor:
-          enabled: true
 
 - name: Deploy Metrics Server
   kubernetes.core.helm:
