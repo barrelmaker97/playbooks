@@ -343,14 +343,13 @@
         grafana.ini:
           auth:
             login_cookie_name: __Host-grafana_session
-          server:
-            enforce_domain: true
           security:
             cookie_samesite: strict
             cookie_secure: true
             x_content_type_options: false
             content_security_policy: true
             content_security_policy_template: >-
+              """
               base-uri 'self';
               connect-src 'self' grafana.com ws://$ROOT_PATH wss://$ROOT_PATH data:;
               default-src 'none';
@@ -361,9 +360,10 @@
               manifest-src 'self';
               media-src 'none';
               object-src 'none';
-              script-src 'strict-dynamic' $NONCE;
+              script-src 'unsafe-eval' 'strict-dynamic' $NONCE;
               style-src 'self' 'unsafe-inline' blob:;
               worker-src 'self' blob:;
+              """
         ingress:
           enabled: true
           ingressClassName: nginx
