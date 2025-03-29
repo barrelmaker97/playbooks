@@ -335,6 +335,22 @@
         grafana.ini:
           security:
             content_security_policy: true
+            content_security_policy_template: >-
+              frame-ancestors 'self';
+              default-src 'none';
+              script-src 'strict-dynamic' $NONCE;
+              font-src 'self';
+              connect-src 'self' grafana.com ws://$ROOT_PATH wss://$ROOT_PATH data:;
+              img-src 'self' https://grafana.com data:;
+              base-uri 'self';
+              style-src 'self' 'unsafe-inline' blob:;
+              object-src 'none';
+              manifest-src 'self';
+              media-src 'none';
+              worker-src 'self' blob:;
+              form-action 'self';
+              base-uri 'self';
+
         ingress:
           enabled: true
           ingressClassName: nginx
