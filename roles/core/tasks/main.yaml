@@ -270,28 +270,6 @@
           base-uri 'self';
           frame-ancestors 'none';
 
-- name: Create Grafana Headers ConfigMap
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: grafana-headers
-        namespace: monitoring
-      data:
-        Content-Security-Policy: >-
-          frame-ancestors 'self';
-          default-src 'none';
-          script-src 'self' 'unsafe-inline' 'unsafe-eval';
-          font-src 'self' https://fonts.gstatic.com;
-          connect-src 'self' https://grafana.com data:;
-          img-src 'self' https://grafana.com data:;
-          style-src 'self' 'unsafe-inline';
-          worker-src 'self' blob:;
-          base-uri 'self';
-          form-action 'self';
-
 - name: Create Prometheus Headers ConfigMap
   kubernetes.core.k8s:
     state: present
@@ -354,11 +332,12 @@
           hosts:
             - "alertmanager.{{ cluster_domain }}"
       grafana:
+        grafana.ini:
+          security:
+            content_security_policy: true
         ingress:
           enabled: true
           ingressClassName: nginx
-          annotations:
-            nginx.ingress.kubernetes.io/custom-headers: monitoring/grafana-headers
           hosts:
             - "grafana.{{ cluster_domain }}"
       prometheus:
