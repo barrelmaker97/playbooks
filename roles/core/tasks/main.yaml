@@ -342,6 +342,9 @@
           existingSecret: grafana-admin-credentials
         grafana.ini:
           security:
+            cookie_samesite: strict
+            cookie_secure: true
+            x_content_type_options: false
             content_security_policy: true
             content_security_policy_template: >-
               base-uri 'self';
