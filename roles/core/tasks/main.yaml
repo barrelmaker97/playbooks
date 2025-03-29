@@ -341,6 +341,10 @@
         admin:
           existingSecret: grafana-admin-credentials
         grafana.ini:
+          auth:
+            login_cookie_name: __Host-grafana_session
+          server:
+            enforce_domain: true
           security:
             cookie_samesite: strict
             cookie_secure: true
