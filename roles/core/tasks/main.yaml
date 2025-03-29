@@ -292,6 +292,12 @@
           base-uri 'self';
           frame-ancestors 'none';
 
+- name: Create Grafana Admin Credentials Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('community.sops.sops', 'files/secret-grafana-admin-credentials.sops.yaml') | from_yaml }}"
+
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
     name: kube-prometheus-stack
@@ -332,6 +338,8 @@
           hosts:
             - "alertmanager.{{ cluster_domain }}"
       grafana:
+        admin:
+          existingSecret: grafana-admin-credentials
         grafana.ini:
           security:
             content_security_policy: true
@@ -349,7 +357,6 @@
               script-src 'strict-dynamic' $NONCE;
               style-src 'self' 'unsafe-inline' blob:;
               worker-src 'self' blob:;
-
         ingress:
           enabled: true
           ingressClassName: nginx
