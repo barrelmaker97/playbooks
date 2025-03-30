@@ -367,8 +367,14 @@
         ingress:
           enabled: true
           ingressClassName: nginx
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-prod
           hosts:
-            - "grafana.{{ cluster_domain }}"
+            - "grafana.{{ external_domain }}"
+          tls:
+            - secretName: grafana-tls
+              hosts:
+                - "grafana.{{ external_domain }}"
       prometheus:
         ingress:
           enabled: true
