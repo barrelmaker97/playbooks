@@ -270,27 +270,6 @@
           base-uri 'self';
           frame-ancestors 'none';
 
-- name: Create Grafana Headers ConfigMap
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: grafana-headers
-        namespace: monitoring
-      data:
-        Content-Security-Policy: >-
-          frame-ancestors 'self';
-          default-src 'none';
-          script-src 'self' 'unsafe-inline' 'unsafe-eval';
-          font-src 'self' https://fonts.gstatic.com;
-          connect-src 'self' https://grafana.com data:;
-          img-src 'self' https://grafana.com data:;
-          style-src 'self' 'unsafe-inline';
-          base-uri 'self';
-          form-action 'self';
-
 - name: Create Prometheus Headers ConfigMap
   kubernetes.core.k8s:
     state: present
@@ -312,6 +291,12 @@
           connect-src 'self';
           base-uri 'self';
           frame-ancestors 'none';
+
+- name: Create Grafana Admin Credentials Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('community.sops.sops', 'files/secret-grafana-admin-credentials.sops.yaml') | from_yaml }}"
 
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
@@ -353,11 +338,35 @@
           hosts:
             - "alertmanager.{{ cluster_domain }}"
       grafana:
+        admin:
+          existingSecret: grafana-admin-credentials
+        grafana.ini:
+          auth:
+            login_cookie_name: __Host-grafana_session
+          security:
+            cookie_samesite: strict
+            cookie_secure: true
+            x_content_type_options: false
+            content_security_policy: true
+            content_security_policy_template: >-
+              """
+              base-uri 'self';
+              connect-src 'self' grafana.com ws://$ROOT_PATH wss://$ROOT_PATH data:;
+              default-src 'none';
+              font-src 'self';
+              form-action 'self';
+              frame-ancestors 'self';
+              img-src 'self' https://grafana.com data:;
+              manifest-src 'self';
+              media-src 'none';
+              object-src 'none';
+              script-src 'unsafe-eval' 'strict-dynamic' $NONCE;
+              style-src 'self' 'unsafe-inline' blob:;
+              worker-src 'self' blob:;
+              """
         ingress:
           enabled: true
           ingressClassName: nginx
-          annotations:
-            nginx.ingress.kubernetes.io/custom-headers: monitoring/grafana-headers
           hosts:
             - "grafana.{{ cluster_domain }}"
       prometheus:
