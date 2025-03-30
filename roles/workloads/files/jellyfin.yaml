@@ -8,6 +8,8 @@ persistence:
     size: 50Gi
 
 podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000

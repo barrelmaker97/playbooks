@@ -6,6 +6,8 @@ persistence:
     storageClassName: longhorn-local
 
 securityContext:
+  seccompProfile:
+    type: RuntimeDefault
   allowPrivilegeEscalation: false
   capabilities:
     drop:

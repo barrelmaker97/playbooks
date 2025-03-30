@@ -57,6 +57,8 @@ properties:
     ninjahomie7
 
 podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000

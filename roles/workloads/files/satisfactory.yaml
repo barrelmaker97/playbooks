@@ -17,6 +17,8 @@ certificate:
   domain: satisfactory.barrelmaker.dev
 
 podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000
