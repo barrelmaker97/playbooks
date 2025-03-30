@@ -18,7 +18,7 @@ config:
             cpu: 60m
             memory: 60Mi
 image:
-    tag: 2.0.41
+    tag: 2.0.42
 persistence:
     storageClassName: longhorn
     size: 5Gi
@@ -57,8 +57,8 @@ sops:
             YjFtNy9lRzYrQ0Q1UUJNalJyZC9oMVEKOOAq/Orfy+ZHAIFNPQ2oXbBBA0nWl16H
             vVXpzw53BrMbamw6Ks5bqYVAUhAkv3ELICRTJHmNpPesDFHWnunPjQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-03-30T18:36:39Z"
-    mac: ENC[AES256_GCM,data:UYR/weM+if84Pw8AQbFjoax6vhyRJKSoms6l4Hwc2uxHY1uz1hNGz/KJoRru877AtjzOmVN+rd+GCxhXzFde6+SQliQEv1zgeOmncCbRplgR1zQuvhbY2oDgJ+pfE4H21b5IT7bYEns4iJXWGrs7l8FJF8I/pGNxwI2ntjF59x4=,iv:kKWPX16Z6Vn28aNhvH8LcIeHvVxG4idRxgbNNI9U1XM=,tag:tcnRqI3p1oCOPW8rbz3Bcg==,type:str]
+    lastmodified: "2025-03-30T18:59:56Z"
+    mac: ENC[AES256_GCM,data:+6XUDZzvCH6RO10sEahFkuzDlmUdaX7daJSSWMlkbid3ihd4XAWQAHeoZjoMNAAOYjlLqXgMicn7nuegnkDoXAyvYhm1izc51eHX0mLnKMnbTPL/rwWl/vgx7rlrvKcFR7DGA/aP5MMT7Agqgu+OMEpnD2e+p2ssahDIDP5cxgI=,iv:l8PHhcnNiBiIR6p7wVH9TtH9rpOeGgLni6JA66rOQ30=,tag:Qcri00lfahDMfFIGdp9zjA==,type:str]
     pgp: []
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^certs|^trustdinfo|^password)
     version: 3.9.4
