@@ -385,6 +385,7 @@
             - "prometheus.{{ cluster_domain }}"
         prometheusSpec:
           retention: 30d
+          ruleSelectorNilUsesHelmValues: false
           serviceMonitorSelectorNilUsesHelmValues: false
           storageSpec:
             volumeClaimTemplate:
