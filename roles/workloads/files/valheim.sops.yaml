@@ -7,6 +7,8 @@ persistence:
     storageClassName: longhorn
     size: 10Gi
 podSecurityContext:
+    seccompProfile:
+        type: RuntimeDefault
     runAsNonRoot: true
     runAsUser: 111
     runAsGroup: 1000
@@ -35,8 +37,8 @@ sops:
             emI5RmdsZVdDZCsyS1RmLy9pclRpc0kKpqbAKtCkYDdb/EbWzoTH3DWrHYKm9ecH
             t/OQs3p2XbUabXmfinUQBH3E0yz723UYirkJ/ndVYdHNT7OdybtxFw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-02-16T04:29:24Z"
-    mac: ENC[AES256_GCM,data:E1Wyn4OcXUBcNGsrVoQShE50J8gPjNlk9eZc3/YMbOJ1RwMS9HJ5t8iUYaLtMJyWofBRz2SneXwd7IuWXu9Mi3BKTKc6mie3pBgyFqpiWD7UdHFK4hFZgkw4sb8mRk1p3w2Yu6qaIMujqS17lADtPnrtjPLlBOnFRNK4jrpOXZ4=,iv:n8kvmFyCJ6gCbGk9ZMpglc84hz2iflfEW/Zd3jTnOco=,tag:CinfLQaRq6nLUN6GlksRwg==,type:str]
+    lastmodified: "2025-03-30T18:28:18Z"
+    mac: ENC[AES256_GCM,data:YnvnWv5ntTMpubHgOHRf9Due1J7mSNsMs3/uaIOS3kaDvb1rCUFJjl8l2WMRsMpAadteka6ijIrsoyxMRoL9e7S2iCMBksGnTSnv4DCXEvFTUk92FhFABldVu6gRZj9HPRy9NGR3s+XaVpcc1AklYf0WMpWneW5Ww3uNkxTa/xo=,iv:kKgehmv8N+seSS8csTUvMEH7KNntyVM/3YQEwWslJuQ=,tag:BfTIJAbw5Gb5/0C2sMFu7w==,type:str]
     pgp: []
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^certs|^trustdinfo|^password)
     version: 3.9.4
