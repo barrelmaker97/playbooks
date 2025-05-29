@@ -31,7 +31,7 @@ metrics_server_version: "3.12.2"
 metallb_version: "0.14.9"
 prometheus_crds_version: "19.0.0"
 kube_prometheus_stack_version: "70.3.0"
-longhorn_version: "1.8.1"
+longhorn_version: "1.9.0"
 
 # Service configuration
 email_address: nolancooper97@gmail.com
