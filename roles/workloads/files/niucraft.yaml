@@ -39,7 +39,7 @@ properties:
   existingOps: "SYNCHRONIZE"
   paperChannel: "default"
   serverName: "NIUCraft"
-  spigetResources: "36618,69584"
+  spigetResources: "36618"
   modrinthProjects: >-
     dynmap:beta,
     chunky
