@@ -16,6 +16,8 @@ gitSync:
     limits:
       memory: 80Mi
 
+replicaCount: 2 # For faster failover
+
 podSecurityContext:
   seccompProfile:
     type: RuntimeDefault

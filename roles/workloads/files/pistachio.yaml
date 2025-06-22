@@ -3,6 +3,8 @@ pistachio:
   ups:
     host: pollux.lan
 
+replicaCount: 2 # For faster failover
+
 podSecurityContext:
   seccompProfile:
     type: RuntimeDefault
