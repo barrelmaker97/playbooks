@@ -1,9 +1,11 @@
 ---
 - name: Apply External CSI CRDs from GitHub
-  shell: "kubectl kustomize https://github.com/kubernetes-csi/external-snapshotter/client/config/crd | kubectl apply -f -"
+  ansible.builtin.shell: "set -o pipefail && kubectl kustomize https://github.com/kubernetes-csi/external-snapshotter/client/config/crd | kubectl apply -f -"
+  changed_when: true
 
 - name: Apply External CSI Contoller from GitHub
-  shell: "kubectl -n kube-system kustomize https://github.com/kubernetes-csi/external-snapshotter/deploy/kubernetes/snapshot-controller | kubectl create -f -"
+  ansible.builtin.shell: "set -o pipefail && kubectl -n kube-system kustomize https://github.com/kubernetes-csi/external-snapshotter/deploy/kubernetes/snapshot-controller | kubectl create -f -"
+  changed_when: true
 
 - name: Install Helm
   become: true
