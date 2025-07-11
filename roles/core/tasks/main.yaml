@@ -1,25 +1,9 @@
 ---
-- name: Create temporary directory
-  ansible.builtin.tempfile:
-    state: directory
-    prefix: external_csi_
-  register: temp_dir
+- name: Apply External CSI CRDs from GitHub
+  shell: "kubectl kustomize https://github.com/kubernetes-csi/external-snapshotter/client/config/crd | kubectl apply -f -"
 
-- name: Clone external-snapshotter repository
-  ansible.builtin.git:
-    repo: git@github.com:kubernetes-csi/external-snapshotter.git
-    dest: "{{ temp_dir.path }}"
-    version: "{{ external_csi_version }}"
-
-- name: Apply CRDs with kubectl
-  command: "kubectl apply -k {{ temp_dir.path }}/client/config/crd"
-  args:
-    chdir: "{{ temp_dir.path }}"
-
-- name: Remove temporary directory
-  ansible.builtin.file:
-    path: "{{ temp_dir.path }}"
-    state: absent
+- name: Apply External CSI Contoller from GitHub
+  shell: "kubectl -n kube-system kustomize https://github.com/kubernetes-csi/external-snapshotter/deploy/kubernetes/snapshot-controller | kubectl create -f -"
 
 - name: Install Helm
   become: true
