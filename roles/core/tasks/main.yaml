@@ -1,4 +1,32 @@
 ---
+- name: Install kustomize
+  become: true
+  community.general.snap:
+    name: kustomize
+    classic: true
+
+- name: Create temporary directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: external_csi_
+  register: temp_dir
+
+- name: Clone external-snapshotter repository
+  ansible.builtin.git:
+    repo: git@github.com:kubernetes-csi/external-snapshotter.git
+    dest: "{{ temp_dir.path }}"
+    version: "{{ external_csi_version }}"
+
+- name: Apply CRDs with kustomize
+  command: "kubectl apply -k {{ temp_dir.path }}/client/config/crd"
+  args:
+    chdir: "{{ temp_dir.path }}"
+
+- name: Remove temporary directory
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
+
 - name: Install Helm
   become: true
   community.general.snap:
