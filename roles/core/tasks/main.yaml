@@ -1,10 +1,4 @@
 ---
-- name: Install kustomize
-  become: true
-  community.general.snap:
-    name: kustomize
-    classic: true
-
 - name: Create temporary directory
   ansible.builtin.tempfile:
     state: directory
@@ -17,7 +11,7 @@
     dest: "{{ temp_dir.path }}"
     version: "{{ external_csi_version }}"
 
-- name: Apply CRDs with kustomize
+- name: Apply CRDs with kubectl
   command: "kubectl apply -k {{ temp_dir.path }}/client/config/crd"
   args:
     chdir: "{{ temp_dir.path }}"
