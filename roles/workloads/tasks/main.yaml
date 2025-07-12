@@ -77,4 +77,4 @@
   vars:
     helm_charts:
       factorio: barrelmaker/factorio
-      valheim: barrelmaker/valheim
+      # valheim: barrelmaker/valheim
