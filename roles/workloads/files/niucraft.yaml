@@ -5,13 +5,24 @@ persistence:
 
 dynmap:
   enabled: true
+  cores: 12
+  config:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 10Mi
+      limits:
+        memory: 30Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
   ingress:
     enabled: true
     className: nginx
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
-      nginx.ingress.kubernetes.io/server-snippet: |
-        add_header Content-Security-Policy "frame-ancestors 'self'; default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self'; base-uri 'self'; form-action 'self';" always;
     hosts:
       - host: niucraft.barrelmaker.dev
         paths:
