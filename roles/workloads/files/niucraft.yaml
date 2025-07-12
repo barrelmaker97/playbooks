@@ -5,6 +5,7 @@ persistence:
 
 dynmap:
   enabled: true
+  cores: 12
   config:
     resources:
       requests:
