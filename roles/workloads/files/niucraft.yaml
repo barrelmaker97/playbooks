@@ -6,6 +6,8 @@ persistence:
 dynmap:
   enabled: true
   cores: 12
+  showOfflinePlayers: true
+  showSpawnBeds: true
   config:
     resources:
       requests:
