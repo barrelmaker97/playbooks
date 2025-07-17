@@ -191,7 +191,6 @@
   vars:
     values_file:
       controller:
-        replicaCount: 2
         metrics:
           enabled: true
           serviceMonitor:
@@ -215,12 +214,12 @@
         add-headers: "ingress-nginx/custom-headers"
         annotation-value-word-blocklist: "load_module,lua_package,_by_lua,location,root,proxy_pass,serviceaccount,{,}"
         enable-brotli: "true"
-        enable-ocsp: "true"
         hsts-max-age: "63072000"
         hsts-preload: "true"
-        server-tokens: "false"
         ssl-reject-handshake: "true"
-        ssl-session-tickets: "false"
+        ssl-session-cache: "true"
+        ssl-session-cache-size: "10m"
+        ssl-session-tickets: "true"
 
 - name: Deploy Cert Manager
   kubernetes.core.helm:
