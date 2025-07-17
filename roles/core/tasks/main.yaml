@@ -248,50 +248,6 @@
           pod-security.kubernetes.io/audit: privileged
           pod-security.kubernetes.io/warn: privileged
 
-- name: Create Alertmanager Headers ConfigMap
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: alertmanager-headers
-        namespace: monitoring
-      data:
-        Content-Security-Policy: >-
-          default-src 'none';
-          form-action 'self';
-          img-src 'self' data:;
-          object-src 'none';
-          script-src 'self' 'unsafe-inline';
-          style-src 'self';
-          font-src 'self';
-          connect-src 'self';
-          base-uri 'self';
-          frame-ancestors 'none';
-
-- name: Create Prometheus Headers ConfigMap
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: prometheus-headers
-        namespace: monitoring
-      data:
-        Content-Security-Policy: >-
-          default-src 'none';
-          form-action 'self';
-          img-src 'self' data:;
-          object-src 'none';
-          script-src 'self' 'unsafe-inline';
-          style-src 'self' 'unsafe-inline';
-          font-src 'self';
-          connect-src 'self';
-          base-uri 'self';
-          frame-ancestors 'none';
-
 - name: Create Grafana Admin Credentials Secret
   kubernetes.core.k8s:
     state: present
@@ -333,8 +289,6 @@
         ingress:
           enabled: true
           ingressClassName: nginx
-          annotations:
-            nginx.ingress.kubernetes.io/custom-headers: monitoring/alertmanager-headers
           hosts:
             - "alertmanager.{{ cluster_domain }}"
       grafana:
@@ -379,8 +333,6 @@
         ingress:
           enabled: true
           ingressClassName: nginx
-          annotations:
-            nginx.ingress.kubernetes.io/custom-headers: monitoring/prometheus-headers
           hosts:
             - "prometheus.{{ cluster_domain }}"
         prometheusSpec:
