@@ -191,6 +191,7 @@
   vars:
     values_file:
       controller:
+        replicaCount: 2
         metrics:
           enabled: true
           serviceMonitor:
