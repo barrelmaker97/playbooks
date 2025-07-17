@@ -204,7 +204,22 @@
 - name: Set Nginx Ingress Controller Config
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('file', 'files/configmap-nginx.yaml') | from_yaml }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: ingress-nginx-controller
+        namespace: ingress-nginx
+      data:
+        add-headers: "ingress-nginx/custom-headers"
+        annotation-value-word-blocklist: "load_module,lua_package,_by_lua,location,root,proxy_pass,serviceaccount,{,}"
+        enable-brotli: "true"
+        enable-ocsp: "true"
+        hsts-max-age: "63072000"
+        hsts-preload: "true"
+        server-tokens: "false"
+        ssl-reject-handshake: "true"
+        ssl-session-tickets: "false"
 
 - name: Deploy Cert Manager
   kubernetes.core.helm:
