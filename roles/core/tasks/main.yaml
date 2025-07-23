@@ -220,6 +220,7 @@
         ssl-session-cache: "true"
         ssl-session-cache-size: "10m"
         ssl-session-tickets: "true"
+        strict-validate-path-type: "false"
 
 - name: Deploy Cert Manager
   kubernetes.core.helm:
