@@ -14,7 +14,7 @@ machine:
   certSANs:
     - {{ node_hostname }}.{{ local_domain }}
   install:
-    image: factory.talos.dev/installer/{{ factory_response.json.id }}:v{{ talos_version }}
+    image: factory.talos.dev/installer/{{ setup_factory_response.json.id }}:v{{ talos_version }}
     disk: {{ install_disk }}
     wipe: false
   network:

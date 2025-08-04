@@ -23,7 +23,7 @@
     method: POST
     src: customization.yaml
     status_code: 201
-  register: factory_response
+  register: setup_factory_response
 
 - name: Create control node machine configs
   loop: "{{ node_names }}"
@@ -78,4 +78,4 @@
 
 - name: Print ISO download link
   ansible.builtin.debug:
-    msg: "https://factory.talos.dev/image/{{ factory_response.json.id }}/v{{ talos_version }}/metal-amd64.iso"
+    msg: "https://factory.talos.dev/image/{{ setup_factory_response.json.id }}/v{{ talos_version }}/metal-amd64.iso"
