@@ -58,7 +58,7 @@ properties:
     https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v3.1.2/minecraft-prometheus-exporter-3.1.2.jar,
     https://www.dynmap.us/builds/dynmap/Dynmap-3.7-SNAPSHOT-spigot.jar
   type: "PAPER"
-  version: "1.21.7"
+  version: "1.21.8"
   seed: "2055796538"
   viewDistance: "32"
   whitelist: >-

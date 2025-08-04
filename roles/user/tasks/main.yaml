@@ -65,7 +65,7 @@
     kind: ConfigMap
     name: kube-root-ca.crt
     namespace: kube-system
-  register: cluster_cert
+  register: user_cluster_cert
 
 - name: Save User Certificate
   ansible.builtin.copy:
@@ -75,7 +75,7 @@
 
 - name: Save Cluster Certificate
   ansible.builtin.copy:
-    content: "{{ cluster_cert.resources[0]['data']['ca.crt'] }}"
+    content: "{{ user_cluster_cert.resources[0]['data']['ca.crt'] }}"
     dest: "{{ user_api_crt }}"
     mode: "0644"
 
