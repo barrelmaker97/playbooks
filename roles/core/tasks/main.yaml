@@ -68,9 +68,9 @@
         allowVolumeCreationWithDegradedAvailability: false
         backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
         defaultDataLocality: best-effort
-        defaultReplicaCount: 2
+        defaultReplicaCount: "{'v1':'2','v2':'2'}"
         replicaAutoBalance: least-effort
-        storageMinimalAvailablePercentage: 10
+        storageMinimalAvailablePercentage: "10"
       ingress:
         enabled: true
         ingressClassName: nginx
