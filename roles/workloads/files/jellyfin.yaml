@@ -1,8 +1,8 @@
 ---
 persistence:
   config:
-    storageClassName: jellyfin-config
-    size: 1Gi
+    storageClassName: longhorn
+    size: 3Gi
   media:
     storageClassName: jellyfin-media
     size: 50Gi
