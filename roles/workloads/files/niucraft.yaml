@@ -56,9 +56,9 @@ properties:
     chunky
   plugins: >-
     https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v3.1.2/minecraft-prometheus-exporter-3.1.2.jar,
-    https://www.dynmap.us/builds/dynmap/Dynmap-3.7-SNAPSHOT-spigot.jar
+    https://github.com/jacob1/dynmap/releases/download/v1.21.10-spigot.0/Dynmap-3.7-beta-11-1.21.9-spigot-spigot.jar
   type: "PAPER"
-  version: "1.21.8"
+  version: "1.21.10"
   seed: "2055796538"
   viewDistance: "32"
   whitelist: >-
