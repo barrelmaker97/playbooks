@@ -393,9 +393,3 @@
         enabled: true
       serviceMonitor:
         enabled: true
-
-- name: Create Jellyfin NFS Volumes
-  kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_fileglob:
-    - templates/pv-*.yaml
