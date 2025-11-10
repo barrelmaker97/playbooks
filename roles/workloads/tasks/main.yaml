@@ -25,6 +25,12 @@
     state: present
     template: limitrange-user.yaml
 
+- name: Create Jellyfin Media Persistent Volume
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_fileglob:
+    - templates/pv-jellyfin-media.yaml
+
 - name: Install Helm
   become: true
   community.general.snap:
