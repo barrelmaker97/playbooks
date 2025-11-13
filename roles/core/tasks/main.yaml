@@ -4,6 +4,7 @@
   community.general.snap:
     name: helm
     classic: true
+    channel: latest/edge  # needed because helm 4 breaks things
 
 - name: Install Helm Diff
   kubernetes.core.helm_plugin:
