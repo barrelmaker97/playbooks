@@ -276,6 +276,11 @@
     namespace: monitoring
     definition: "{{ lookup('file', 'files/secret-additional-scrape-config.yaml') | from_yaml }}"
 
+- name: Create Dashboards ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/configmap-dashboards.yaml') | from_yaml }}"
+
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
     name: kube-prometheus-stack
