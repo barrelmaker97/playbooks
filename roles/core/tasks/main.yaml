@@ -270,6 +270,17 @@
     namespace: monitoring
     definition: "{{ lookup('community.sops.sops', 'files/secret-grafana-admin-credentials.sops.yaml') | from_yaml }}"
 
+- name: Create Additional Prometheus Scrape Config Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('file', 'files/secret-additional-scrape-config.yaml') | from_yaml }}"
+
+- name: Create Dashboards ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/configmap-dashboards.yaml') | from_yaml }}"
+
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
     name: kube-prometheus-stack
@@ -355,6 +366,10 @@
           retention: 30d
           ruleSelectorNilUsesHelmValues: false
           serviceMonitorSelectorNilUsesHelmValues: false
+          additionalScrapeConfigsSecret:
+            enabled: true
+            name: additional-scrape-configs
+            key: prometheus-additional.yaml
           storageSpec:
             volumeClaimTemplate:
               spec:
