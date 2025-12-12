@@ -25,7 +25,7 @@ nut_user: remoteuser
 nut_password: hunter2
 
 # Service versions
-cert_manager_version: "1.19.1"
+cert_manager_version: "1.19.2"
 ingress_nginx_version: "4.14.1"
 metrics_server_version: "3.13.0"
 metallb_version: "0.15.3"
