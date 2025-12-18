@@ -36,21 +36,43 @@ ansible-playbook setup.yaml
 | Node 3     | 192.168.15.43 | node3-poseidon.lan |
 
 # Cluster Bootstrap
-## Node 1
 ```bash
+# Node 1
 talosctl -n node1-poseidon.lan apply-config --insecure --file node1-poseidon.yaml
 talosctl -n node1-poseidon.lan -e node1-poseidon.lan bootstrap
 talosctl -n node1-poseidon.lan -e node1-poseidon.lan kubeconfig
-```
 
-## Node 2
-```bash
+# Node 2
 talosctl -n node2-poseidon.lan apply-config --insecure --file node2-poseidon.yaml
+
+# Node 3
+talosctl -n node3-poseidon.lan apply-config --insecure --file node3-poseidon.yaml
 ```
 
-## Node 3
+# Cluster Upgrade
+## Upgrade Talos
+Be sure to wait for upgrade to complete on each node before proceeding to the next one. This means waiting for all workloads to be in a good state.
 ```bash
-talosctl -n node3-poseidon.lan apply-config --insecure --file node3-poseidon.yaml
+# Node 1
+talosctl -e node2-poseidon.lan -n node1-poseidon.lan upgrade --image factory.talos.dev/installer/<Image ID>:<Talos Version> --preserve
+
+# Node 2
+talosctl -e node1-poseidon.lan -n node2-poseidon.lan upgrade --image factory.talos.dev/installer/<Image ID>:<Talos Version> --preserve
+
+# Node 3
+talosctl -e node1-poseidon.lan -n node3-poseidon.lan upgrade --image factory.talos.dev/installer/<Image ID>:<Talos Version> --preserve
+```
+## Upgrade Talosctl
+Download the talosctl binary from the Github release page for the correct architecture. Then move it to the correct location and make sure it is executable. For example:
+```bash
+sudo mv ./talosctl-linux-amd64 /usr/local/bin/talosctl
+sudo chmod +x /usr/local/bin/talosctl
+```
+
+## Upgrade Kubernetes
+```bash
+talosctl -n <Any Node IP> upgrade-k8s --dry-run
+talosctl -n <Any Node IP> upgrade-k8s
 ```
 
 # License
