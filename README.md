@@ -71,8 +71,8 @@ sudo chmod +x /usr/local/bin/talosctl
 
 ## Upgrade Kubernetes
 ```bash
-talosctl -n <Any Node IP> upgrade-k8s --dry-run
-talosctl -n <Any Node IP> upgrade-k8s
+talosctl -n node1-poseidon.lan upgrade-k8s --dry-run
+talosctl -n node1-poseidon.lan upgrade-k8s
 ```
 
 # License
