@@ -1,6 +1,6 @@
 obscura:
     logLevel: debug
-    jwtSecret: ENC[AES256_GCM,data:RS9m4j6FH/E3aMSX7ZM1BNpZ6usA/wK7/o7tmmwEsuHNe40=,iv:nIDLfB4Rpe9YF8t2BARkrFk5NV1qWQ2hRKM4MjNFx1w=,tag:N2rqld/PL/jeDtsqvjU67w==,type:str]
+    jwtSecret: ENC[AES256_GCM,data:dL+ARDHRqTz8vKh5OSJSY/Muogj4caVMkbwq7w==,iv:mj/f76EPJpde7/vWmCfE9Kz9cQX056vtPb77rzDTs+Q=,tag:+V7JMy8wYfo7he+Zjv+iKA==,type:str]
 postgresql:
     enabled: true
     auth:
@@ -23,26 +23,20 @@ securityContext:
     capabilities:
         drop:
             - ALL
-service:
-    type: LoadBalancer
 ingress:
-    enabled: false
-    className: ""
-    annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-    # nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    # nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    # nginx.ingress.kubernetes.io/websocket-services: "obscura"
+    enabled: true
+    className: nginx
+    annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
-        - host: obscura.local
+        - host: obscura.barrelmaker.dev
           paths:
             - path: /
-              pathType: ImplementationSpecific
-    tls: []
-    #  - secretName: obscura-tls
-    #    hosts:
-    #      - obscura.local
+              pathType: Prefix
+    tls:
+        - secretName: obscura-tls
+          hosts:
+            - obscura.barrelmaker.dev
 sops:
     age:
         - recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
@@ -54,7 +48,7 @@ sops:
             ZlRlMmxSTi9WSTZYWVE5dVEraEZ5TVkKROx2qETm8P7/4hQFtgLxwpBm56YSqQkK
             h84ZIstNZgY/ZEEo9fhsivpKDM49AqroarK3wlukhbrzM9MmRTCDOA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-01-19T15:01:22Z"
-    mac: ENC[AES256_GCM,data:z3PPhX3xOF2wyZVUTMAKN2wlampzG8jgeERuAKi9C5VGnHK+XpLdRPtnacc/kCOl6yuq5tiiiUzwOE0M44F9F58Uo4Vu8O6XLXng3TXfmcx9VqBEwEhhbN/AubcD89dBZFDfPQSAl2LtA7ge03JeNxXr3slmIjuL4/Qoqy/K6Yo=,iv:OxCPLQqI12/hVZlxmVnt+qlgvuEynMwmZjomIzPH4Mg=,tag:KXyx/dhgawVWtq41eJOsMQ==,type:str]
+    lastmodified: "2026-01-19T15:13:57Z"
+    mac: ENC[AES256_GCM,data:SxCCTZGLXmZbGALcJ1sEKhDva+rPtOAj5De1YcGsvbUbqWvl7ytr9aVX3P/RE1etS+PO08XkspJclSLMl72hTDzUo1ltBKtWy9VJL/dDE3TDwq2W97QLwsUHj1QG20oAH/xG32nOIrR1mC18JtYwYG4tzyUVP6Esk6e7/DFHfJU=,iv:wSC6eUrOw50m/Hp7GRsZW+KxPRjdmStxcVsRFwDz8mg=,tag:IIn3GTqsWsYkdLqD0de8aA==,type:str]
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^password)
     version: 3.11.0
