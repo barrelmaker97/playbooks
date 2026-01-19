@@ -85,4 +85,5 @@
     helm_charts:
       factorio: barrelmaker/factorio
       loch: barrelmaker/factorio
+      obscura: barrelmaker/obscura
       # valheim: barrelmaker/valheim
