@@ -1,6 +1,6 @@
 # vim: ft=yaml
 ---
 exclude_paths:
-  - .sops.yaml
+  - "*.sops.yaml"
 warn_list:
   - experimental

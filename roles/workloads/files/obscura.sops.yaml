@@ -1,0 +1,54 @@
+obscura:
+    logLevel: debug
+    jwtSecret: ENC[AES256_GCM,data:dL+ARDHRqTz8vKh5OSJSY/Muogj4caVMkbwq7w==,iv:mj/f76EPJpde7/vWmCfE9Kz9cQX056vtPb77rzDTs+Q=,tag:+V7JMy8wYfo7he+Zjv+iKA==,type:str]
+postgresql:
+    enabled: true
+    auth:
+        password: ENC[AES256_GCM,data:DcQDhZCZT7+KTMUx0YBqgQ==,iv:OlEvEeSouJU1ZQBD4rVflVJaOUkqOW+empANDQQJFaQ=,tag:2Xzn11TYI3+VN4lrrktzZw==,type:str]
+podSecurityContext:
+    fsGroup: 1000
+    runAsGroup: 1000
+    runAsUser: 1000
+    runAsNonRoot: true
+    seccompProfile:
+        type: RuntimeDefault
+resources:
+    requests:
+        cpu: 100m
+        memory: 128Mi
+    limits:
+        memory: 256Mi
+securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+        drop:
+            - ALL
+ingress:
+    enabled: true
+    className: nginx
+    annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+        - host: obscura.barrelmaker.dev
+          paths:
+            - path: /
+              pathType: Prefix
+    tls:
+        - secretName: obscura-tls
+          hosts:
+            - obscura.barrelmaker.dev
+sops:
+    age:
+        - recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBuTGRnT1g1SXladDJYYmtO
+            TEpadUNHYitad3pIbGNnRGxIUVNoTmlLcmtJCjF5V2Zoc1g2eTFhMUtHa0Q0d2JZ
+            Y3JnN3VHby9tTWU0R0pQMUdLa2JjQkkKLS0tIFd6SHVqRjRnU1ExRnVsM1pjelEr
+            ZlRlMmxSTi9WSTZYWVE5dVEraEZ5TVkKROx2qETm8P7/4hQFtgLxwpBm56YSqQkK
+            h84ZIstNZgY/ZEEo9fhsivpKDM49AqroarK3wlukhbrzM9MmRTCDOA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-01-19T15:13:57Z"
+    mac: ENC[AES256_GCM,data:SxCCTZGLXmZbGALcJ1sEKhDva+rPtOAj5De1YcGsvbUbqWvl7ytr9aVX3P/RE1etS+PO08XkspJclSLMl72hTDzUo1ltBKtWy9VJL/dDE3TDwq2W97QLwsUHj1QG20oAH/xG32nOIrR1mC18JtYwYG4tzyUVP6Esk6e7/DFHfJU=,iv:wSC6eUrOw50m/Hp7GRsZW+KxPRjdmStxcVsRFwDz8mg=,tag:IIn3GTqsWsYkdLqD0de8aA==,type:str]
+    encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^password)
+    version: 3.11.0
