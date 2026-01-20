@@ -1,10 +1,12 @@
 obscura:
     logLevel: debug
-    jwtSecret: ENC[AES256_GCM,data:dL+ARDHRqTz8vKh5OSJSY/Muogj4caVMkbwq7w==,iv:mj/f76EPJpde7/vWmCfE9Kz9cQX056vtPb77rzDTs+Q=,tag:+V7JMy8wYfo7he+Zjv+iKA==,type:str]
+    jwtSecret: ENC[AES256_GCM,data:3QDxSNazmgW3h/CkgBrod3M=,iv:ClHZxTBPRkGLfQ88vz5PgJ7m4T7Y5vOSID5G4mHgYkg=,tag:yM05t0cMyE6FWQlO4DGnPg==,type:str]
 postgresql:
     enabled: true
     auth:
-        password: ENC[AES256_GCM,data:DcQDhZCZT7+KTMUx0YBqgQ==,iv:OlEvEeSouJU1ZQBD4rVflVJaOUkqOW+empANDQQJFaQ=,tag:2Xzn11TYI3+VN4lrrktzZw==,type:str]
+        password: ENC[AES256_GCM,data:ghlFrWdRQvbGUdSfaMKM1v9m/g==,iv:aKbD4dpZ8NQ2egnCYaCi/qE43Uel6aC+wZy9YgfQx1M=,tag:QenyO141QhLqsTWg7xRzeg==,type:str]
+minio:
+    rootPassword: ENC[AES256_GCM,data:538fjU5Yjbxs9qF5QITDTCh+Pw==,iv:rYWMryXZAHcE/rMqB6wwaRKTj/mkp5dgJ5kuDr3+JIk=,tag:mawwKOPdv102bvim+bYJnA==,type:str]
 podSecurityContext:
     fsGroup: 1000
     runAsGroup: 1000
@@ -47,13 +49,13 @@ sops:
         - recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBuTGRnT1g1SXladDJYYmtO
-            TEpadUNHYitad3pIbGNnRGxIUVNoTmlLcmtJCjF5V2Zoc1g2eTFhMUtHa0Q0d2JZ
-            Y3JnN3VHby9tTWU0R0pQMUdLa2JjQkkKLS0tIFd6SHVqRjRnU1ExRnVsM1pjelEr
-            ZlRlMmxSTi9WSTZYWVE5dVEraEZ5TVkKROx2qETm8P7/4hQFtgLxwpBm56YSqQkK
-            h84ZIstNZgY/ZEEo9fhsivpKDM49AqroarK3wlukhbrzM9MmRTCDOA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBKK2psbS8yNTd2RFhkOFpt
+            NkthNFNVQWMyK05MYjhyZ0RPWjdIQ043TFRBCkJyYnpaa2x3ZEpPUlNGNXYySEtH
+            cnNEZEVtN1hTdlFucUxSeFRkVE40eHcKLS0tIGdPaTdpZ2o4bkIzTEV1NDEyMHB3
+            SW5iTDZCVENCaDhJZ3hVWmVwNmw5YWMKPNoiEOcl79bLJCuvjfwRQz+RymYFxeYl
+            t8G5ohCFECLtdKK4/trFcCnQR/sfX6R2UNUd7Qsbcjp7Os5Sx5vKgA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-01-20T02:13:15Z"
-    mac: ENC[AES256_GCM,data:dUydv7C5Nz7P2PiFoUV2dL6y+E1zmdA5qyWBjitg5/2j39i5QXJuCxl/xXdY8oWmIoGwoF0uM0h2GBVo0r9j1YRTSvmZLiEIAiigxlzseOoCui3FHtiBt3x9HNbAsLNrg4NoYtPXuLZWiA1dSh9BF6H0aMBkNl+Q3SDg4SDGzOA=,iv:4MUR8i6xHinQysc3qT4RwLn2priO137TavPGmaEcKc4=,tag:Yf4P5LUfpEmxCAqiEDnD+A==,type:str]
-    encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^password)
+    lastmodified: "2026-01-20T17:52:40Z"
+    mac: ENC[AES256_GCM,data:hVWJML9XRuMEKdP26lletvlTa9fL3Tm6YiarziQToii00yR8SEZ3bd7SCK6d78LDOZZJLUaV64+94soGVgouC3fOCRuIlcDYIS/2Uki3R/iYLEh1xcRhxuxQNkzisNNWN0lv5OieQkM1VVrMkl3Qh0rfLftIUFYmuzGVmAA1nl8=,iv:mY4TRCqIFw9mcRJmRRN0n0QIgNcaBUrD63WKnbP7WBE=,tag:lY+vZ4bTMlUENSS34QSdyA==,type:str]
+    encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^rootPassword|^password)
     version: 3.11.0
