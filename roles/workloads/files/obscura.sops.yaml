@@ -1,5 +1,4 @@
 obscura:
-    logLevel: debug
     jwtSecret: ENC[AES256_GCM,data:3QDxSNazmgW3h/CkgBrod3M=,iv:ClHZxTBPRkGLfQ88vz5PgJ7m4T7Y5vOSID5G4mHgYkg=,tag:yM05t0cMyE6FWQlO4DGnPg==,type:str]
 postgresql:
     enabled: true
@@ -8,9 +7,9 @@ postgresql:
 minio:
     rootPassword: ENC[AES256_GCM,data:538fjU5Yjbxs9qF5QITDTCh+Pw==,iv:rYWMryXZAHcE/rMqB6wwaRKTj/mkp5dgJ5kuDr3+JIk=,tag:mawwKOPdv102bvim+bYJnA==,type:str]
 podSecurityContext:
-    fsGroup: 1000
-    runAsGroup: 1000
-    runAsUser: 1000
+    fsGroup: 10001
+    runAsGroup: 10001
+    runAsUser: 10001
     runAsNonRoot: true
     seccompProfile:
         type: RuntimeDefault
@@ -54,7 +53,7 @@ sops:
             SW5iTDZCVENCaDhJZ3hVWmVwNmw5YWMKPNoiEOcl79bLJCuvjfwRQz+RymYFxeYl
             t8G5ohCFECLtdKK4/trFcCnQR/sfX6R2UNUd7Qsbcjp7Os5Sx5vKgA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-01-20T18:12:04Z"
-    mac: ENC[AES256_GCM,data:64wNBi5reia+BfLuLYgKaxJLTa7+c6k0/lpxZCmors49l45XsKApwETbohT7HLDSoiiarznjWvfK6s8T5UdbE6C0uybWOCEQG+JZwTZ7RZhYRXaFmvAcWf1ZYEEPMEQkboY3wZIbijklWHq6RcHu7tAjPSOqDF6L7GPiaBsOynQ=,iv:5wSbOx+Ev0oum6Qs3g+Z/X8z5h9jOdX+fILito0OJxo=,tag:uKaQJHvCEY9RW0Z7DkwXkA==,type:str]
+    lastmodified: "2026-01-29T18:19:04Z"
+    mac: ENC[AES256_GCM,data:/iXV8KjtRGFWMFG5pBCt/zEZ/7I5oTMWPRwjmT7/9Wo95XBsV70Mfk0UVhYh3e3jdZIaM5iJDYL5dYfk6uHwZ2gkSjRMBGCSM01t6FsKcxl1TJuIwQ7Bu2601KZ4kXRQrTnjnyK+yVU1B+yTMmSUqwYGn3ly4U224Tv2AsYgU50=,iv:nDiYYh9Re0srkoYGVc8bLwxfS9fHChsZFSVyHi3/x7k=,tag:m2i9J26rvHFABhy9vdCeVw==,type:str]
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^rootPassword|^password)
     version: 3.11.0
