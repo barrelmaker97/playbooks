@@ -241,6 +241,84 @@
       crds:
         enabled: true
 
+- name: Deploy Trust Manager
+  kubernetes.core.helm:
+    name: trust-manager
+    chart_ref: jetstack/trust-manager
+    chart_version: "{{ trust_manager_version }}"
+    release_namespace: cert-manager
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      app:
+        trust:
+          namespace: cert-manager
+
+- name: Create Internal Self-Signed Issuer
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: selfsigned-issuer
+      spec:
+        selfSigned: {}
+
+- name: Create Internal Root CA Certificate
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: internal-root-ca
+        namespace: cert-manager
+      spec:
+        isCA: true
+        commonName: "internal-root-ca"
+        duration: 8760h  # 1 year
+        renewBefore: 720h  # 30 days
+        secretName: internal-root-ca-secret
+        privateKey:
+          algorithm: ECDSA
+          size: 256
+        issuerRef:
+          name: selfsigned-issuer
+          kind: ClusterIssuer
+          group: cert-manager.io
+
+- name: Create Internal CA Issuer
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: internal-ca
+      spec:
+        ca:
+          secretName: internal-root-ca-secret
+
+- name: Create Trust Bundle
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: trust.cert-manager.io/v1alpha1
+      kind: Bundle
+      metadata:
+        name: internal-trust
+      spec:
+        sources:
+          - secret:
+              name: internal-root-ca-secret
+              key: ca.crt
+        target:
+          configMap:
+            key: ca-certificates.crt
+
 - name: Create Production Issuer
   kubernetes.core.k8s:
     state: present
