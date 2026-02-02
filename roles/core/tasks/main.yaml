@@ -249,7 +249,9 @@
     release_namespace: cert-manager
     update_repo_cache: true
     wait: true
-    release_values:
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
       app:
         trust:
           namespace: cert-manager
@@ -277,6 +279,8 @@
       spec:
         isCA: true
         commonName: "internal-root-ca"
+        duration: 8760h  # 1 year
+        renewBefore: 720h  # 30 days
         secretName: internal-root-ca-secret
         privateKey:
           algorithm: ECDSA
@@ -305,7 +309,7 @@
       apiVersion: trust.cert-manager.io/v1alpha1
       kind: Bundle
       metadata:
-        name: barrelmaker-trust
+        name: internal-trust
       spec:
         sources:
           - secret:
