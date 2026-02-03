@@ -25,14 +25,14 @@ nut_user: remoteuser
 nut_password: hunter2
 
 # Service versions
-cert_manager_version: "1.19.2"
+cert_manager_version: "1.19.3"
 trust_manager_version: "0.20.3"
-ingress_nginx_version: "4.14.2"
+ingress_nginx_version: "4.14.3"
 metrics_server_version: "3.13.0"
 metallb_version: "0.15.3"
 prometheus_crds_version: "26.0.1"
 kube_prometheus_stack_version: "81.3.0"
-longhorn_version: "1.10.2"
+longhorn_version: "1.11.0"
 
 # Service configuration
 email_address: nolancooper97@gmail.com
