@@ -18,6 +18,13 @@ postgresql:
         password: ENC[AES256_GCM,data:tWANQLke3NqjbPROotVsU6wGHQ==,iv:+ibBpRO7Cxf8iq6HcaOrbUcn7/G8ekGdVFamsmBfwBY=,tag:hVQRuoqUcT8bXhiuRBdclg==,type:str]
     metrics:
         enabled: true
+        resourcesPreset: none
+        resources:
+            requests:
+                cpu: 100m
+                memory: 128Mi
+            limits:
+                memory: 256Mi
         serviceMonitor:
             enabled: true
             namespace: barrelmaker
@@ -88,7 +95,7 @@ sops:
             QzVTMHhGSFhqTjBNaHBWMEovbFVpYzQKTRoOW6xSHa4xIp9VK9/T60CzsrlCwVG+
             EPDppEGO+WvmOgN51joNZG6+lBDeDbUI5Avh85rfNrvBVaszeePpoQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-02T21:22:45Z"
-    mac: ENC[AES256_GCM,data:SMsHfiAKy9Nfxp6HeM8TCbIxioT++onl/Qx8fQ7G71IWt65dpMXd0jemzIO2K1nwvf2+u6PWk/TW/TpP3EAVBIHByHzT1ot6q8A6zX87eh7Ezj+vqWdqwZhfb+bLKDsXj4wV4aEt/PF+XAYLxWeIexW6eAM5QybzOwpV9f/wfGw=,iv:xtyZKLfZcJddFvn4vDlFQ56RllGD3IPpKMzWrkgZnkk=,tag:3OSU6yfW9XhMnQoSoW+PTw==,type:str]
+    lastmodified: "2026-02-02T23:58:07Z"
+    mac: ENC[AES256_GCM,data:2DarjrrVuLfTy/R98Zeid6dwVxKLSkkLuC2UCY5zkMH6KImG3GTTFAgKVoczKZAfaor72h0mF/WeXtDLTY/fhFbLwK41YXl3wPiwjkUSBqRr5xB/5x545g5Qiwdiip6aLhL50WP9XcJw7c4urnNNIIGgZ76hTzWyIHLiZXzgkiA=,iv:zuyu/6j0fyuS/ojsIGuzdC80ne3LDk7ejAzJBIjrkVE=,tag:Ih4gmOxP3523hTauvDcyTQ==,type:str]
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^rootPassword|^password)
     version: 3.11.0
