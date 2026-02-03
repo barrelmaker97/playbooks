@@ -45,8 +45,9 @@ minio:
     metrics:
         serviceMonitor:
             enabled: true
+            includeNode: true
             namespace: barrelmaker
-            labels:
+            additionalLabels:
                 release: prometheus-stack
 podSecurityContext:
     fsGroup: 10001
@@ -95,7 +96,7 @@ sops:
             QzVTMHhGSFhqTjBNaHBWMEovbFVpYzQKTRoOW6xSHa4xIp9VK9/T60CzsrlCwVG+
             EPDppEGO+WvmOgN51joNZG6+lBDeDbUI5Avh85rfNrvBVaszeePpoQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-02T23:58:07Z"
-    mac: ENC[AES256_GCM,data:2DarjrrVuLfTy/R98Zeid6dwVxKLSkkLuC2UCY5zkMH6KImG3GTTFAgKVoczKZAfaor72h0mF/WeXtDLTY/fhFbLwK41YXl3wPiwjkUSBqRr5xB/5x545g5Qiwdiip6aLhL50WP9XcJw7c4urnNNIIGgZ76hTzWyIHLiZXzgkiA=,iv:zuyu/6j0fyuS/ojsIGuzdC80ne3LDk7ejAzJBIjrkVE=,tag:Ih4gmOxP3523hTauvDcyTQ==,type:str]
+    lastmodified: "2026-02-03T00:13:38Z"
+    mac: ENC[AES256_GCM,data:ymjgdLIEzH4TVoFBI8fRUlhWLWW3wvKG+EsqdsreHHD+oYb18UQ7BFtwWz7lE+bvkE0IsoBfsysEtK0vyYz4ZfHlqQVnNL7T0BwN+H9XJV+8yeZlNFfg8ALTS2Qwc5CMK11pjZiGUjt2qZCGSy5Kmw58zl0yf0ElJn8XZMmYe5o=,iv:G54VTe4tbTnZJb9e+3x4NqOlIN1FGMNEOxLPeujNfLo=,tag:qpEwDDKSYRDR4AIl2fLDPA==,type:str]
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^rootPassword|^password)
     version: 3.11.0
