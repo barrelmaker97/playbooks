@@ -1,13 +1,54 @@
 obscura:
-    jwtSecret: ENC[AES256_GCM,data:3QDxSNazmgW3h/CkgBrod3M=,iv:ClHZxTBPRkGLfQ88vz5PgJ7m4T7Y5vOSID5G4mHgYkg=,tag:yM05t0cMyE6FWQlO4DGnPg==,type:str]
+    jwtSecret: ENC[AES256_GCM,data:JSBBhdksw0ZD1r6AhShwXvA=,iv:Ww5qtm7o6u5/7nOUAPJ5XBNDqIW3kfJYTwci+zs3Gqk=,tag:yPKdBH/YvOLjgKpMms6p7w==,type:str]
 postgresql:
     enabled: true
     primary:
         resourcesPreset: none
+        resources:
+            requests:
+                cpu: 100m
+                memory: 256Mi
+            limits:
+                memory: 512Mi
+        persistence:
+            enabled: true
+            storageClass: longhorn
+            size: 8Gi
     auth:
-        password: ENC[AES256_GCM,data:ghlFrWdRQvbGUdSfaMKM1v9m/g==,iv:aKbD4dpZ8NQ2egnCYaCi/qE43Uel6aC+wZy9YgfQx1M=,tag:QenyO141QhLqsTWg7xRzeg==,type:str]
+        password: ENC[AES256_GCM,data:tWANQLke3NqjbPROotVsU6wGHQ==,iv:+ibBpRO7Cxf8iq6HcaOrbUcn7/G8ekGdVFamsmBfwBY=,tag:hVQRuoqUcT8bXhiuRBdclg==,type:str]
+    metrics:
+        enabled: true
+        resourcesPreset: none
+        resources:
+            requests:
+                cpu: 100m
+                memory: 128Mi
+            limits:
+                memory: 256Mi
+        serviceMonitor:
+            enabled: true
+            namespace: barrelmaker
+            labels:
+                release: prometheus-stack
 minio:
-    rootPassword: ENC[AES256_GCM,data:538fjU5Yjbxs9qF5QITDTCh+Pw==,iv:rYWMryXZAHcE/rMqB6wwaRKTj/mkp5dgJ5kuDr3+JIk=,tag:mawwKOPdv102bvim+bYJnA==,type:str]
+    persistence:
+        enabled: true
+        storageClass: longhorn
+        size: 10Gi
+    resources:
+        requests:
+            cpu: 100m
+            memory: 256Mi
+        limits:
+            memory: 512Mi
+    rootPassword: ENC[AES256_GCM,data:YvsrhEiNNpIpADbXbCdpH6oifQ==,iv:zwYMw6sAoUSjOF1E9yQDU+2HcoVAfDI3u02dAh/vxuo=,tag:ZMuBPBE3X8zQBDrShfyHpg==,type:str]
+    metrics:
+        serviceMonitor:
+            enabled: true
+            includeNode: true
+            namespace: barrelmaker
+            additionalLabels:
+                release: prometheus-stack
 podSecurityContext:
     fsGroup: 10001
     runAsGroup: 10001
@@ -49,13 +90,13 @@ sops:
         - recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBKK2psbS8yNTd2RFhkOFpt
-            NkthNFNVQWMyK05MYjhyZ0RPWjdIQ043TFRBCkJyYnpaa2x3ZEpPUlNGNXYySEtH
-            cnNEZEVtN1hTdlFucUxSeFRkVE40eHcKLS0tIGdPaTdpZ2o4bkIzTEV1NDEyMHB3
-            SW5iTDZCVENCaDhJZ3hVWmVwNmw5YWMKPNoiEOcl79bLJCuvjfwRQz+RymYFxeYl
-            t8G5ohCFECLtdKK4/trFcCnQR/sfX6R2UNUd7Qsbcjp7Os5Sx5vKgA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBhMXJLeWwvUDVhUkY1UEd2
+            OHVPMks4aTZDM0QzZGRpM0JwZi90cXZDR1RnCnNFckJtWFVvYmZuMVB0aFNDL2NJ
+            OXN6Rkc2K3d6aEJ1SDRuNEtQMXBEZmMKLS0tIHZMdk4rVlp2K251QUsyaU1MbEla
+            QzVTMHhGSFhqTjBNaHBWMEovbFVpYzQKTRoOW6xSHa4xIp9VK9/T60CzsrlCwVG+
+            EPDppEGO+WvmOgN51joNZG6+lBDeDbUI5Avh85rfNrvBVaszeePpoQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-02T03:47:42Z"
-    mac: ENC[AES256_GCM,data:Yx/wu0ObxYTxdBHK+QJ/gfXa40iPz3LSVtht+/tiOdwKU9558KpMKXZG9mI1BfG+3DwXo9qlSKd+0pn4BN/h3uuH4TEpnNxXL/TO+pURZpiW9KYuP5zMnPm4qSRFe9wbxhoCDahdpJEiPCk4UUVZttBTqdEB/7KdAvsr5cn8Z9k=,iv:9y6pFMRAC8Qt5bBis1tugSeHMqIV/QP9z0JDHkXY7w4=,tag:vJjb2XdqV7mLxRDXDdZ6vw==,type:str]
+    lastmodified: "2026-02-03T00:13:38Z"
+    mac: ENC[AES256_GCM,data:ymjgdLIEzH4TVoFBI8fRUlhWLWW3wvKG+EsqdsreHHD+oYb18UQ7BFtwWz7lE+bvkE0IsoBfsysEtK0vyYz4ZfHlqQVnNL7T0BwN+H9XJV+8yeZlNFfg8ALTS2Qwc5CMK11pjZiGUjt2qZCGSy5Kmw58zl0yf0ElJn8XZMmYe5o=,iv:G54VTe4tbTnZJb9e+3x4NqOlIN1FGMNEOxLPeujNfLo=,tag:qpEwDDKSYRDR4AIl2fLDPA==,type:str]
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^rootPassword|^password)
     version: 3.11.0
