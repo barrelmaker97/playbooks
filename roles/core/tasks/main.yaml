@@ -457,7 +457,7 @@
                 endpoint: 0.0.0.0:4318
         exporters:
           otlp/tempo:
-            endpoint: tempo-meta.monitoring.svc.cluster.local:4317
+            endpoint: tempo.monitoring.svc.cluster.local:4317
             tls:
               insecure: true
           otlphttp/loki:
