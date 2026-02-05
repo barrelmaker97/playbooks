@@ -33,6 +33,9 @@ metallb_version: "0.15.3"
 prometheus_crds_version: "26.0.1"
 kube_prometheus_stack_version: "81.3.0"
 longhorn_version: "1.11.0"
+loki_version: "6.51.0"
+tempo_version: "1.26.1"
+otel_collector_version: "0.144.0"
 
 # Service configuration
 email_address: nolancooper97@gmail.com

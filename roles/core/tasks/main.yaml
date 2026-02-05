@@ -18,11 +18,14 @@
   loop: "{{ helm_repos | dict2items }}"
   vars:
     helm_repos:
+      grafana: https://grafana.github.io/helm-charts
+      grafana-community: https://grafana-community.github.io/helm-charts
       ingress-nginx: https://kubernetes.github.io/ingress-nginx
       jetstack: https://charts.jetstack.io
       longhorn: https://charts.longhorn.io
       metallb: https://metallb.github.io/metallb
       metrics-server: https://kubernetes-sigs.github.io/metrics-server
+      open-telemetry: https://open-telemetry.github.io/opentelemetry-helm-charts
       prometheus-community: https://prometheus-community.github.io/helm-charts
 
 - name: Deploy Prometheus CRDs
@@ -359,6 +362,125 @@
     state: present
     definition: "{{ lookup('file', 'files/configmap-dashboards.yaml') | from_yaml }}"
 
+- name: Deploy Loki
+  kubernetes.core.helm:
+    name: loki
+    chart_ref: grafana/loki
+    chart_version: "{{ loki_version }}"
+    release_namespace: monitoring
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      loki:
+        auth_enabled: false
+        commonConfig:
+          replication_factor: 1
+        storage:
+          type: filesystem
+        schemaConfig:
+          configs:
+            - from: "2024-04-01"
+              store: tsdb
+              object_store: filesystem
+              schema: v13
+              index:
+                prefix: index_
+                period: 24h
+      deploymentMode: SingleBinary
+      singleBinary:
+        replicas: 1
+        persistence:
+          enabled: true
+          storageClass: longhorn
+          size: 10Gi
+      # These flags are required to disable the default S3 requirements in 6.x
+      backend:
+        replicas: 0
+      read:
+        replicas: 0
+      write:
+        replicas: 0
+      sidecar:
+        rules:
+          enabled: false
+      resultsCache:
+        enabled: false
+      chunksCache:
+        enabled: false
+
+- name: Deploy Tempo
+  kubernetes.core.helm:
+    name: tempo
+    chart_ref: grafana-community/tempo
+    chart_version: "{{ tempo_version }}"
+    release_namespace: monitoring
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      tempo:
+        storage:
+          trace:
+            backend: local
+            local:
+              path: /var/tempo/traces
+            wal:
+              path: /var/tempo/wal
+      persistence:
+        enabled: true
+        storageClass: longhorn
+        size: 10Gi
+
+- name: Deploy OTel Collector
+  kubernetes.core.helm:
+    name: otel-collector
+    chart_ref: open-telemetry/opentelemetry-collector
+    chart_version: "{{ otel_collector_version }}"
+    release_namespace: monitoring
+    update_repo_cache: true
+    wait: true
+    release_values: "{{ values_file | from_yaml }}"
+  vars:
+    values_file:
+      image:
+        repository: "otel/opentelemetry-collector-contrib"
+      command:
+        name: "otelcol-contrib"
+      mode: deployment
+      config:
+        receivers:
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+              http:
+                endpoint: 0.0.0.0:4318
+        exporters:
+          otlp/tempo:
+            endpoint: tempo-meta.monitoring.svc.cluster.local:4317
+            tls:
+              insecure: true
+          otlphttp/loki:
+            endpoint: http://loki.monitoring.svc.cluster.local:3100/otlp/v1/logs
+          prometheusremotewrite:
+            endpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090/api/v1/write
+            tls:
+              insecure: true
+        service:
+          pipelines:
+            traces:
+              receivers: [otlp]
+              exporters: [otlp/tempo]
+            metrics:
+              receivers: [otlp]
+              exporters: [prometheusremotewrite]
+            logs:
+              receivers: [otlp]
+              exporters: [otlphttp/loki]
+
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
     name: kube-prometheus-stack
@@ -399,6 +521,20 @@
       grafana:
         admin:
           existingSecret: grafana-admin-credentials
+        additionalDataSources:
+          - name: Loki
+            type: loki
+            url: http://loki.monitoring.svc.cluster.local:3100
+            access: proxy
+            isDefault: false
+          - name: Tempo
+            type: tempo
+            url: http://tempo.monitoring.svc.cluster.local:3100
+            access: proxy
+            isDefault: false
+            jsonData:
+              lokiSearch:
+                datasourceUid: 'Loki'
         grafana.ini:
           auth:
             login_cookie_name: __Host-grafana_session
