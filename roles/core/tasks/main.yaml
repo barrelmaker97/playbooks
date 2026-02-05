@@ -456,11 +456,11 @@
               http:
                 endpoint: 0.0.0.0:4318
         exporters:
-          otlp/tempo:
+          otlp_grpc/tempo:
             endpoint: tempo.monitoring.svc.cluster.local:4317
             tls:
               insecure: true
-          otlphttp/loki:
+          otlp_http/loki:
             endpoint: http://loki.monitoring.svc.cluster.local:3100/otlp/v1/logs
           prometheusremotewrite:
             endpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090/api/v1/write
@@ -470,13 +470,13 @@
           pipelines:
             traces:
               receivers: [otlp]
-              exporters: [otlp/tempo]
+              exporters: [otlp_grpc/tempo]
             metrics:
               receivers: [otlp]
               exporters: [prometheusremotewrite]
             logs:
               receivers: [otlp]
-              exporters: [otlphttp/loki]
+              exporters: [otlp_http/loki]
 
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
