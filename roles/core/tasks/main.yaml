@@ -425,9 +425,7 @@
   vars:
     values_file:
       tempo:
-        storage:
-          trace:
-            backend: local
+        retention: 720h
       persistence:
         enabled: true
         storageClass: longhorn
