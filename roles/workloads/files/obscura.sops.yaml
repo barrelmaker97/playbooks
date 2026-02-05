@@ -1,5 +1,6 @@
 obscura:
-    jwtSecret: ENC[AES256_GCM,data:JSBBhdksw0ZD1r6AhShwXvA=,iv:Ww5qtm7o6u5/7nOUAPJ5XBNDqIW3kfJYTwci+zs3Gqk=,tag:yPKdBH/YvOLjgKpMms6p7w==,type:str]
+    auth:
+        jwtSecret: ENC[AES256_GCM,data:M9YiuvQUvW9Hpei8YKdUcAA=,iv:f61yzPx6PoEubeDlULEpVZxFV98q5tmAOZOX4wde870=,tag:x5GxrOcj7nGbf30ry0iGZA==,type:str]
 postgresql:
     enabled: true
     primary:
@@ -96,7 +97,7 @@ sops:
             QzVTMHhGSFhqTjBNaHBWMEovbFVpYzQKTRoOW6xSHa4xIp9VK9/T60CzsrlCwVG+
             EPDppEGO+WvmOgN51joNZG6+lBDeDbUI5Avh85rfNrvBVaszeePpoQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-03T00:13:38Z"
-    mac: ENC[AES256_GCM,data:ymjgdLIEzH4TVoFBI8fRUlhWLWW3wvKG+EsqdsreHHD+oYb18UQ7BFtwWz7lE+bvkE0IsoBfsysEtK0vyYz4ZfHlqQVnNL7T0BwN+H9XJV+8yeZlNFfg8ALTS2Qwc5CMK11pjZiGUjt2qZCGSy5Kmw58zl0yf0ElJn8XZMmYe5o=,iv:G54VTe4tbTnZJb9e+3x4NqOlIN1FGMNEOxLPeujNfLo=,tag:qpEwDDKSYRDR4AIl2fLDPA==,type:str]
+    lastmodified: "2026-02-05T01:42:02Z"
+    mac: ENC[AES256_GCM,data:vqCKQyzGYRsUeVADhpVSHzdqrpXcE7/KXcRBefy+s5yY7eN1S9Q5pPfC54gd6xNea5VlprLtUcJW7sCQ+w7RrVPuWlQm+fV02Q507AAVlj2lT4nhQkd/dmXibumO826PKs6AvXn/IYwll5HvVi5znQXDsGRp18kU8WHQHJWssGM=,iv:w1UJHGjiq0UEgITtUTvGfZKd+Xi8OWnxKfAPh/EDJn0=,tag:/xixzkt+4L8EYkEnysdrbA==,type:str]
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^rootPassword|^password)
     version: 3.11.0
