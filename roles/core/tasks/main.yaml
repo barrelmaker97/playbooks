@@ -402,9 +402,6 @@
         replicas: 0
       write:
         replicas: 0
-      sidecar:
-        rules:
-          enabled: false
       resultsCache:
         enabled: false
       chunksCache:
@@ -425,10 +422,6 @@
         storage:
           trace:
             backend: local
-            local:
-              path: /var/tempo/traces
-            wal:
-              path: /var/tempo/wal
       persistence:
         enabled: true
         storageClass: longhorn
