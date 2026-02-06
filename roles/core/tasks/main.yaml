@@ -426,6 +426,7 @@
     values_file:
       tempo:
         retention: 720h
+        reportingEnabled: false
       persistence:
         enabled: true
         storageClass: longhorn
