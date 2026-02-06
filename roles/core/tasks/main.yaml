@@ -466,7 +466,7 @@
             tls:
               insecure: true
           otlp_http/loki:
-            endpoint: http://loki.monitoring.svc.cluster.local:3100/otlp/v1/logs
+            endpoint: http://loki.monitoring.svc.cluster.local:3100/otlp
           prometheusremotewrite:
             endpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090/api/v1/write
             tls:
@@ -529,17 +529,40 @@
         additionalDataSources:
           - name: Loki
             type: loki
+            uid: loki
             url: http://loki.monitoring.svc.cluster.local:3100
             access: proxy
             isDefault: false
+            jsonData:
+              derivedFields:
+                - name: "trace_id"
+                  matcherType: "label"
+                  matcherRegex: "trace_id"
+                  url: "$${__value.raw}"
+                  datasourceUid: "tempo"
+                  urlDisplayLabel: "Trace: $${__value.raw}"
           - name: Tempo
             type: tempo
+            uid: tempo
             url: http://tempo.monitoring.svc.cluster.local:3200
             access: proxy
             isDefault: false
             jsonData:
+              tracesToLogsV2:
+                customQuery: true
+                datasourceUid: "loki"
+                query: '{$${__tags}} | trace_id = "$${__trace.traceId}"'
+                tags:
+                  - key: "service.name"
+                    value: "service_name"
+              serviceMap:
+                datasourceUid: "prometheus"
+              search:
+                hide: false
+              nodeGraph:
+                enabled: true
               lokiSearch:
-                datasourceUid: 'Loki'
+                datasourceUid: "loki"
         grafana.ini:
           auth:
             login_cookie_name: __Host-grafana_session
@@ -582,6 +605,7 @@
           hosts:
             - "prometheus.{{ cluster_domain }}"
         prometheusSpec:
+          enableRemoteWriteReceiver: true
           retention: 30d
           ruleSelectorNilUsesHelmValues: false
           serviceMonitorSelectorNilUsesHelmValues: false
