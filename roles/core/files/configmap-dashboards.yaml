@@ -6,7 +6,7 @@ metadata:
   labels:
     grafana_dashboard: "1"
 data:
-  nodes.json: |
+  homelab-nodes.json: |
     {
       "annotations": {
         "list": [
@@ -585,7 +585,7 @@ data:
       "timepicker": {},
       "timezone": "",
       "title": "Nodes",
-      "uid": "S1asZd2Gz",
+      "uid": "S1asZd2Gh",
       "version": 1
     }
   openwrt.json: |
