@@ -62,6 +62,10 @@
     release_values: "{{ values_file | from_yaml }}"
   vars:
     values_file:
+      image:  # TODO remove this section after 1.11.1 is released
+        longhorn:
+          instanceManager:
+            tag: v1.11.0-hotfix-1
       persistence:
         defaultDataLocality: best-effort
         defaultClassReplicaCount: 2
