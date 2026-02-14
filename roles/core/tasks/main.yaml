@@ -465,6 +465,21 @@
           batch:
             send_batch_size: 8192
             timeout: 200ms
+          k8sattributes:
+            extract:
+              metadata:
+                - k8s.namespace.name
+                - k8s.pod.name
+                - k8s.pod.uid
+                - k8s.node.name
+                - k8s.deployment.name
+                - k8s.statefulset.name
+                - k8s.daemonset.name
+                - k8s.cronjob.name
+                - k8s.job.name
+            pod_association:
+              - sources:
+                  - from: connection
         exporters:
           otlp_grpc/tempo:
             endpoint: tempo.monitoring.svc.cluster.local:4317
@@ -480,16 +495,28 @@
           pipelines:
             traces:
               receivers: [otlp]
-              processors: [batch]
+              processors: [k8sattributes, batch]
               exporters: [otlp_grpc/tempo]
             metrics:
               receivers: [otlp]
-              processors: [batch]
+              processors: [k8sattributes, batch]
               exporters: [prometheusremotewrite]
             logs:
               receivers: [otlp]
-              processors: [batch]
+              processors: [k8sattributes, batch]
               exporters: [otlp_http/loki]
+      clusterRole:
+        create: true
+        rules:
+          - apiGroups: [""]
+            resources: ["pods", "namespaces", "nodes"]
+            verbs: ["get", "watch", "list"]
+          - apiGroups: ["apps"]
+            resources: ["replicasets", "deployments", "statefulsets", "daemonsets"]
+            verbs: ["get", "watch", "list"]
+          - apiGroups: ["batch"]
+            resources: ["jobs", "cronjobs"]
+            verbs: ["get", "watch", "list"]
 
 - name: Deploy Prometheus Stack
   kubernetes.core.helm:
