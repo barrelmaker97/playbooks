@@ -1,3 +1,4 @@
+replicaCount: 3
 obscura:
     auth:
         jwtSecret: ENC[AES256_GCM,data:M9YiuvQUvW9Hpei8YKdUcAA=,iv:f61yzPx6PoEubeDlULEpVZxFV98q5tmAOZOX4wde870=,tag:x5GxrOcj7nGbf30ry0iGZA==,type:str]
@@ -100,7 +101,7 @@ sops:
             QzVTMHhGSFhqTjBNaHBWMEovbFVpYzQKTRoOW6xSHa4xIp9VK9/T60CzsrlCwVG+
             EPDppEGO+WvmOgN51joNZG6+lBDeDbUI5Avh85rfNrvBVaszeePpoQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-06T21:49:25Z"
-    mac: ENC[AES256_GCM,data:mVLziHhGIlghP4Y2wMdlEmdaHWvH5m5g91zaBmw0L1ZGOneL5RdUjGYsKpeNT47/0LCRla36qoFWmAJ1UjK47mf4ouV4+3CvoSwAlybfiKaQuh3FYPrWL1o+cE9QXFohPKsCyrNYxuyS01DFokrdZdgeR3EKhxIXdNZ43NCjY+Y=,iv:M61kebkqa+qqIB+twGkDaQhuGkJVN5dEDIzgW5Vw9yg=,tag:JCGzs/aioaGDGm8g2Se7NQ==,type:str]
+    lastmodified: "2026-02-18T17:38:24Z"
+    mac: ENC[AES256_GCM,data:imHPny0jRm/l2qmH1hKzrX2AOkAAFuC2zyg8NfyrmT8hJLf2Sg20tx4xJNpowYtOVc6dqqsk54jdYSgdSOyarvmajx9LG90CEw/yk+h3jGKX+vRHkgjEgGqc0mmMotpVsK4i2kUrsEmyfJio8D41cNV1JHugisu0ygVSAQIsBpU=,iv:i+bxVqgAY/+WFEF6ewqPk+xivoX7vHHP7Q61eicjP08=,tag:mDfcCGkp3M5XiD7ld0Uadw==,type:str]
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^rootPassword|^password)
     version: 3.11.0
