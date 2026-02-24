@@ -26,15 +26,15 @@ nut_password: hunter2
 
 # Service versions
 cert_manager_version: "1.19.3"
-trust_manager_version: "0.21.0"
+trust_manager_version: "0.21.1"
 ingress_nginx_version: "4.14.3"
 metrics_server_version: "3.13.0"
 metallb_version: "0.15.3"
 prometheus_crds_version: "26.0.1"
 kube_prometheus_stack_version: "81.3.0"
 longhorn_version: "1.11.0"  # TODO remove hotfix image from core tasks after 1.11.1 release
-loki_version: "6.52.0"
-tempo_version: "1.26.1"
+loki_version: "6.53.0"
+tempo_version: "1.26.4"
 otel_collector_version: "0.145.0"
 
 # Service configuration
