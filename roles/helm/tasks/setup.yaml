@@ -4,7 +4,7 @@
   community.general.snap:
     name: helm
     classic: true
-    channel: latest/edge  # needed because helm 4 breaks things
+    channel: latest/stable
 
 - name: Check if Helm Diff is installed
   ansible.builtin.command: helm plugin list
