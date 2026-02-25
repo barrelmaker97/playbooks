@@ -1,21 +1,8 @@
 ---
-- name: Install Helm
-  become: true
-  community.general.snap:
+- name: Setup Helm
+  ansible.builtin.include_role:
     name: helm
-    classic: true
-    channel: latest/edge  # needed because helm 4 breaks things
-
-- name: Install Helm Diff
-  kubernetes.core.helm_plugin:
-    state: present
-    plugin_path: "https://github.com/databus23/helm-diff"
-
-- name: Add Helm Repos
-  kubernetes.core.helm_repository:
-    name: "{{ item.key }}"
-    repo_url: "{{ item.value }}"
-  loop: "{{ helm_repos | dict2items }}"
+    tasks_from: setup
   vars:
     helm_repos:
       grafana: https://grafana.github.io/helm-charts
@@ -29,13 +16,14 @@
       prometheus-community: https://prometheus-community.github.io/helm-charts
 
 - name: Deploy Prometheus CRDs
-  kubernetes.core.helm:
-    name: prometheus-operator-crds
-    chart_ref: prometheus-community/prometheus-operator-crds
-    chart_version: "{{ prometheus_crds_version }}"
-    release_namespace: monitoring
-    update_repo_cache: true
-    wait: true
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: prometheus-operator-crds
+    helm_chart_ref: prometheus-community/prometheus-operator-crds
+    helm_chart_version: "{{ prometheus_crds_version }}"
+    helm_chart_namespace: monitoring
 
 - name: Create Longhorn Namespace
   kubernetes.core.k8s:
@@ -51,38 +39,15 @@
           pod-security.kubernetes.io/warn: privileged
 
 - name: Deploy Longhorn
-  kubernetes.core.helm:
-    name: longhorn
-    chart_ref: longhorn/longhorn
-    chart_version: "{{ longhorn_version }}"
-    release_namespace: longhorn-system
-    create_namespace: true
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      image:  # TODO remove this section after 1.11.1 is released
-        longhorn:
-          instanceManager:
-            tag: v1.11.0-hotfix-1
-      persistence:
-        defaultDataLocality: best-effort
-        defaultClassReplicaCount: 2
-      metrics:
-        serviceMonitor:
-          enabled: true
-      defaultSettings:
-        allowVolumeCreationWithDegradedAvailability: false
-        backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
-        defaultDataLocality: best-effort
-        defaultReplicaCount: "{'v1':'2','v2':'2'}"
-        replicaAutoBalance: least-effort
-        storageMinimalAvailablePercentage: "10"
-      ingress:
-        enabled: true
-        ingressClassName: nginx
-        host: "longhorn.{{ cluster_domain }}"
+    helm_chart_name: longhorn
+    helm_chart_ref: longhorn/longhorn
+    helm_chart_version: "{{ longhorn_version }}"
+    helm_chart_namespace: longhorn-system
+    helm_chart_values_template: "{{ role_path }}/templates/values/longhorn.yaml.j2"
 
 - name: Create Longhorn Local Storage Class
   kubernetes.core.k8s:
@@ -158,23 +123,15 @@
           pod-security.kubernetes.io/warn: privileged
 
 - name: Deploy MetalLB
-  kubernetes.core.helm:
-    name: metallb
-    chart_ref: metallb/metallb
-    chart_version: "{{ metallb_version }}"
-    release_namespace: metallb-system
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      speaker:
-        ignoreExcludeLB: true
-      prometheus:
-        namespace: monitoring
-        rbacPrometheus: false
-        serviceMonitor:
-          enabled: true
+    helm_chart_name: metallb
+    helm_chart_ref: metallb/metallb
+    helm_chart_version: "{{ metallb_version }}"
+    helm_chart_namespace: metallb-system
+    helm_chart_values_template: "{{ role_path }}/templates/values/metallb.yaml.j2"
 
 - name: Create IP Address Pool
   kubernetes.core.k8s:
@@ -187,22 +144,15 @@
     definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
 
 - name: Deploy Ingress Nginx
-  kubernetes.core.helm:
-    name: ingress-nginx
-    chart_ref: ingress-nginx/ingress-nginx
-    chart_version: "{{ ingress_nginx_version }}"
-    release_namespace: ingress-nginx
-    create_namespace: true
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      controller:
-        metrics:
-          enabled: true
-          serviceMonitor:
-            enabled: true
+    helm_chart_name: ingress-nginx
+    helm_chart_ref: ingress-nginx/ingress-nginx
+    helm_chart_version: "{{ ingress_nginx_version }}"
+    helm_chart_namespace: ingress-nginx
+    helm_chart_values_template: "{{ role_path }}/templates/values/ingress-nginx.yaml.j2"
 
 - name: Set Nginx Ingress Controller Custom Headers
   kubernetes.core.k8s:
@@ -230,38 +180,26 @@
         ssl-session-tickets: "true"
 
 - name: Deploy Cert Manager
-  kubernetes.core.helm:
-    name: cert-manager
-    chart_ref: jetstack/cert-manager
-    chart_version: "{{ cert_manager_version }}"
-    release_namespace: cert-manager
-    create_namespace: true
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      prometheus:
-        enabled: true
-        servicemonitor:
-          enabled: true
-      crds:
-        enabled: true
+    helm_chart_name: cert-manager
+    helm_chart_ref: jetstack/cert-manager
+    helm_chart_version: "{{ cert_manager_version }}"
+    helm_chart_namespace: cert-manager
+    helm_chart_values_template: "{{ role_path }}/templates/values/cert-manager.yaml.j2"
 
 - name: Deploy Trust Manager
-  kubernetes.core.helm:
-    name: trust-manager
-    chart_ref: jetstack/trust-manager
-    chart_version: "{{ trust_manager_version }}"
-    release_namespace: cert-manager
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      app:
-        trust:
-          namespace: cert-manager
+    helm_chart_name: trust-manager
+    helm_chart_ref: jetstack/trust-manager
+    helm_chart_version: "{{ trust_manager_version }}"
+    helm_chart_namespace: cert-manager
+    helm_chart_values_template: "{{ role_path }}/templates/values/trust-manager.yaml.j2"
 
 - name: Create Internal Self-Signed Issuer
   kubernetes.core.k8s:
@@ -367,293 +305,48 @@
     definition: "{{ lookup('file', 'files/configmap-dashboards.yaml') | from_yaml }}"
 
 - name: Deploy Loki
-  kubernetes.core.helm:
-    name: loki
-    chart_ref: grafana/loki
-    chart_version: "{{ loki_version }}"
-    release_namespace: monitoring
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      loki:
-        auth_enabled: false
-        commonConfig:
-          replication_factor: 1
-        storage:
-          type: filesystem
-        schemaConfig:
-          configs:
-            - from: "2024-04-01"
-              store: tsdb
-              object_store: filesystem
-              schema: v13
-              index:
-                prefix: index_
-                period: 24h
-        compactor:
-          retention_enabled: true
-          delete_request_store: filesystem
-        limits_config:
-          retention_period: 720h  # 30 days
-          max_query_lookback: 720h  # 30 days
-      deploymentMode: SingleBinary
-      singleBinary:
-        replicas: 1
-        persistence:
-          enabled: true
-          storageClass: longhorn
-          size: 10Gi
-      # These flags are required to disable the default S3 requirements in 6.x
-      backend:
-        replicas: 0
-      read:
-        replicas: 0
-      write:
-        replicas: 0
-      resultsCache:
-        enabled: false
-      chunksCache:
-        enabled: false
+    helm_chart_name: loki
+    helm_chart_ref: grafana/loki
+    helm_chart_version: "{{ loki_version }}"
+    helm_chart_namespace: monitoring
+    helm_chart_values_template: "{{ role_path }}/templates/values/loki.yaml.j2"
 
 - name: Deploy Tempo
-  kubernetes.core.helm:
-    name: tempo
-    chart_ref: grafana-community/tempo
-    chart_version: "{{ tempo_version }}"
-    release_namespace: monitoring
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      tempo:
-        retention: 720h
-        reportingEnabled: false
-      persistence:
-        enabled: true
-        storageClass: longhorn
-        size: 10Gi
+    helm_chart_name: tempo
+    helm_chart_ref: grafana-community/tempo
+    helm_chart_version: "{{ tempo_version }}"
+    helm_chart_namespace: monitoring
+    helm_chart_values_template: "{{ role_path }}/templates/values/tempo.yaml.j2"
 
 - name: Deploy OTel Collector
-  kubernetes.core.helm:
-    name: otel-collector
-    chart_ref: open-telemetry/opentelemetry-collector
-    chart_version: "{{ otel_collector_version }}"
-    release_namespace: monitoring
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      fullnameOverride: otel
-      image:
-        repository: "otel/opentelemetry-collector-contrib"
-      command:
-        name: "otelcol-contrib"
-      mode: deployment
-      config:
-        receivers:
-          otlp:
-            protocols:
-              grpc:
-                endpoint: 0.0.0.0:4317
-              http:
-                endpoint: 0.0.0.0:4318
-        processors:
-          batch:
-            send_batch_size: 8192
-            timeout: 200ms
-          k8sattributes:
-            extract:
-              metadata:
-                - k8s.namespace.name
-                - k8s.pod.name
-                - k8s.pod.uid
-                - k8s.node.name
-                - k8s.deployment.name
-                - k8s.statefulset.name
-                - k8s.daemonset.name
-                - k8s.cronjob.name
-                - k8s.job.name
-            pod_association:
-              - sources:
-                  - from: connection
-        exporters:
-          otlp_grpc/tempo:
-            endpoint: tempo.monitoring.svc.cluster.local:4317
-            tls:
-              insecure: true
-          otlp_http/loki:
-            endpoint: http://loki.monitoring.svc.cluster.local:3100/otlp
-          prometheusremotewrite:
-            endpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090/api/v1/write
-            tls:
-              insecure: true
-        service:
-          pipelines:
-            traces:
-              receivers: [otlp]
-              processors: [k8sattributes, batch]
-              exporters: [otlp_grpc/tempo]
-            metrics:
-              receivers: [otlp]
-              processors: [k8sattributes, batch]
-              exporters: [prometheusremotewrite]
-            logs:
-              receivers: [otlp]
-              processors: [k8sattributes, batch]
-              exporters: [otlp_http/loki]
-      clusterRole:
-        create: true
-        rules:
-          - apiGroups: [""]
-            resources: ["pods", "namespaces", "nodes"]
-            verbs: ["get", "watch", "list"]
-          - apiGroups: ["apps"]
-            resources: ["replicasets", "deployments", "statefulsets", "daemonsets"]
-            verbs: ["get", "watch", "list"]
-          - apiGroups: ["batch"]
-            resources: ["jobs", "cronjobs"]
-            verbs: ["get", "watch", "list"]
+    helm_chart_name: otel-collector
+    helm_chart_ref: open-telemetry/opentelemetry-collector
+    helm_chart_version: "{{ otel_collector_version }}"
+    helm_chart_namespace: monitoring
+    helm_chart_values_template: "{{ role_path }}/templates/values/otel-collector.yaml.j2"
 
 - name: Deploy Prometheus Stack
-  kubernetes.core.helm:
-    name: kube-prometheus-stack
-    chart_ref: prometheus-community/kube-prometheus-stack
-    chart_version: "{{ kube_prometheus_stack_version }}"
-    release_namespace: monitoring
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      kubeScheduler:
-        service:
-          selector:
-            k8s-app: kube-scheduler
-      kubeControllerManager:
-        service:
-          selector:
-            k8s-app: kube-controller-manager
-      alertmanager:
-        alertmanagerSpec:
-          alertmanagerConfigMatcherStrategy:
-            type: None
-          storage:
-            volumeClaimTemplate:
-              spec:
-                storageClassName: longhorn
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 10Gi
-        ingress:
-          enabled: true
-          ingressClassName: nginx
-          hosts:
-            - "alertmanager.{{ cluster_domain }}"
-      grafana:
-        admin:
-          existingSecret: grafana-admin-credentials
-        additionalDataSources:
-          - name: Loki
-            type: loki
-            uid: loki
-            url: http://loki.monitoring.svc.cluster.local:3100
-            access: proxy
-            isDefault: false
-            jsonData:
-              derivedFields:
-                - name: "trace_id"
-                  matcherType: "label"
-                  matcherRegex: "trace_id"
-                  url: "$${__value.raw}"
-                  datasourceUid: "tempo"
-                  urlDisplayLabel: "Trace: $${__value.raw}"
-          - name: Tempo
-            type: tempo
-            uid: tempo
-            url: http://tempo.monitoring.svc.cluster.local:3200
-            access: proxy
-            isDefault: false
-            jsonData:
-              tracesToLogsV2:
-                customQuery: true
-                datasourceUid: "loki"
-                query: '{$${__tags}} | trace_id = "$${__trace.traceId}"'
-                tags:
-                  - key: "service.name"
-                    value: "service_name"
-              serviceMap:
-                datasourceUid: "prometheus"
-              search:
-                hide: false
-              nodeGraph:
-                enabled: true
-              lokiSearch:
-                datasourceUid: "loki"
-        grafana.ini:
-          auth:
-            login_cookie_name: __Host-grafana_session
-          security:
-            cookie_samesite: strict
-            cookie_secure: true
-            x_content_type_options: false
-            content_security_policy: true
-            content_security_policy_template: >-
-              """
-              base-uri 'self';
-              connect-src 'self' grafana.com ws://$ROOT_PATH wss://$ROOT_PATH data:;
-              default-src 'none';
-              font-src 'self';
-              form-action 'self';
-              frame-ancestors 'self';
-              img-src 'self' https://grafana.com data:;
-              manifest-src 'self';
-              media-src 'none';
-              object-src 'none';
-              script-src 'unsafe-eval' 'strict-dynamic' $NONCE;
-              style-src 'self' 'unsafe-inline' blob:;
-              worker-src 'self' blob:;
-              """
-        ingress:
-          enabled: true
-          ingressClassName: nginx
-          annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-prod
-          hosts:
-            - "grafana.{{ external_domain }}"
-          tls:
-            - secretName: grafana-tls
-              hosts:
-                - "grafana.{{ external_domain }}"
-      prometheus:
-        ingress:
-          enabled: true
-          ingressClassName: nginx
-          hosts:
-            - "prometheus.{{ cluster_domain }}"
-        prometheusSpec:
-          enableRemoteWriteReceiver: true
-          retention: 30d
-          ruleSelectorNilUsesHelmValues: false
-          serviceMonitorSelectorNilUsesHelmValues: false
-          additionalScrapeConfigsSecret:
-            enabled: true
-            name: additional-scrape-configs
-            key: prometheus-additional.yaml
-          storageSpec:
-            volumeClaimTemplate:
-              spec:
-                storageClassName: longhorn
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 20Gi
+    helm_chart_name: kube-prometheus-stack
+    helm_chart_ref: prometheus-community/kube-prometheus-stack
+    helm_chart_version: "{{ kube_prometheus_stack_version }}"
+    helm_chart_namespace: monitoring
+    helm_chart_values_template: "{{ role_path }}/templates/values/kube-prometheus-stack.yaml.j2"
 
 - name: Create Alert Manager Config
   kubernetes.core.k8s:
@@ -668,19 +361,12 @@
     definition: "{{ lookup('community.sops.sops', 'files/secret-discord-webhook-url.sops.yaml') | from_yaml }}"
 
 - name: Deploy Metrics Server
-  kubernetes.core.helm:
-    name: metrics-server
-    chart_ref: metrics-server/metrics-server
-    chart_version: "{{ metrics_server_version }}"
-    release_namespace: kube-system
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ values_file | from_yaml }}"
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
   vars:
-    values_file:
-      args:
-        - --kubelet-insecure-tls
-      metrics:
-        enabled: true
-      serviceMonitor:
-        enabled: true
+    helm_chart_name: metrics-server
+    helm_chart_ref: metrics-server/metrics-server
+    helm_chart_version: "{{ metrics_server_version }}"
+    helm_chart_namespace: kube-system
+    helm_chart_values_template: "{{ role_path }}/templates/values/metrics-server.yaml.j2"

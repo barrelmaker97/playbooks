@@ -1,0 +1,72 @@
+---
+- name: "Check for template values for {{ helm_chart_name }}"
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "{{ helm_chart_values_template }}"
+  register: helm_template_values_file
+  when: helm_chart_values_template is defined
+
+- name: "Check for sops values for {{ helm_chart_name }}"
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "{{ helm_chart_sops_file }}"
+  register: helm_sops_values_file
+  when: helm_chart_sops_file is defined
+
+- name: "Deploy {{ helm_chart_name }}"
+  ansible.builtin.shell: |
+    set -e
+
+    run_helm() {
+      local CMD=$1
+      shift
+
+      helm $CMD {{ helm_chart_name }} {{ helm_chart_ref }} \
+        --namespace {{ helm_chart_namespace }} \
+        {% if helm_chart_version != 'latest' %}
+        --version {{ helm_chart_version }} \
+        {% endif %} \
+        "$@" \
+        {% if helm_template_values_file.stat is defined and helm_template_values_file.stat.exists %}
+        --values <(cat <<'EOF'
+    {{ lookup('template', helm_chart_values_template) }}
+    EOF
+        ) \
+        {% endif %}
+        {% if helm_sops_values_file.stat is defined and helm_sops_values_file.stat.exists %}
+        --values <(cat <<'EOF'
+    {{ lookup('community.sops.sops', helm_chart_sops_file) }}
+    EOF
+        ) \
+        {% endif %}
+        < /dev/null
+    }
+
+    # Run helm diff
+    set +e
+    run_helm "diff upgrade" --allow-unreleased --detailed-exitcode
+    DIFF_RC=$?
+    set -e
+
+    if [ $DIFF_RC -eq 0 ]; then
+      # No changes detected
+      exit 0
+    elif [ $DIFF_RC -eq 2 ]; then
+      # Changes detected, run upgrade
+      run_helm "upgrade --install" \
+        --create-namespace \
+        --wait \
+        --atomic \
+        --cleanup-on-fail \
+        --history-max 5 \
+        --timeout 5m
+      exit 2
+    else
+      # Diff failed with an error
+      exit $DIFF_RC
+    fi
+  args:
+    executable: /bin/bash
+  register: helm_deploy
+  changed_when: helm_deploy.rc == 2
+  failed_when: helm_deploy.rc not in [0, 2]
