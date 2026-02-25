@@ -1,0 +1,108 @@
+replicaCount: 3
+obscura:
+    auth:
+        jwtSecret: ENC[AES256_GCM,data:DvY4EpStokLqzh34iCe0YwE=,iv:xsZVQZEEY13e6HjwmHTCaUd66wOLOG7n4JeAlveKlBQ=,tag:oZJWRt+Ng8QzvoWrXw5XCQ==,type:str]
+    telemetry:
+        otlpEndpoint: http://otel.monitoring.svc.cluster.local:4317
+        logFormat: json
+postgresql:
+    enabled: true
+    primary:
+        resourcesPreset: none
+        resources:
+            requests:
+                cpu: 100m
+                memory: 256Mi
+            limits:
+                memory: 512Mi
+        persistence:
+            enabled: true
+            storageClass: longhorn
+            size: 8Gi
+    auth:
+        password: ENC[AES256_GCM,data:Q6LqP6nheAalQ0Ehx6mIQSK26w==,iv:gcEHQtCD/CT1PbFy1TMXhWXMWviJMO7zyYvk+QzgVgs=,tag:fxPvXH0qlBUWHFB7mj77Wg==,type:str]
+        postgresPassword: ENC[AES256_GCM,data:++0+vo0Iase2cOEDeQHUh2y6NRej9Pdf,iv:ckgcysdXZDErx8SQwMHwl09OCG2/rr7Eed3TTPRowgE=,tag:zKhNUODUCkaPnXMuISIFpw==,type:str]
+    metrics:
+        enabled: true
+        resourcesPreset: none
+        resources:
+            requests:
+                cpu: 100m
+                memory: 128Mi
+            limits:
+                memory: 256Mi
+        serviceMonitor:
+            enabled: true
+            namespace: barrelmaker
+            labels:
+                release: prometheus-stack
+minio:
+    persistence:
+        enabled: true
+        storageClass: longhorn
+        size: 10Gi
+    resources:
+        requests:
+            cpu: 100m
+            memory: 256Mi
+        limits:
+            memory: 512Mi
+    rootPassword: ENC[AES256_GCM,data:brpN+CP8rykvYizvdC/F6MJLKQ==,iv:YUurSEsmIKBWZJ+ZTFCtkcTrQuBXuB3Ul9y1LhwWobA=,tag:82ZbZAYzV5GHLFPFTKbB6Q==,type:str]
+    metrics:
+        serviceMonitor:
+            enabled: true
+            includeNode: true
+            namespace: barrelmaker
+            additionalLabels:
+                release: prometheus-stack
+podSecurityContext:
+    fsGroup: 10001
+    runAsGroup: 10001
+    runAsUser: 10001
+    runAsNonRoot: true
+    seccompProfile:
+        type: RuntimeDefault
+resources:
+    requests:
+        cpu: 100m
+        memory: 128Mi
+    limits:
+        memory: 256Mi
+securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+        drop:
+            - ALL
+ingress:
+    enabled: true
+    className: nginx
+    annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, PUT, OPTIONS, DELETE
+        nginx.ingress.kubernetes.io/cors-allow-origin: https://rhelsing.github.io
+        nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    hosts:
+        - host: dev.obscura.barrelmaker.dev
+          paths:
+            - path: /
+              pathType: Prefix
+    tls:
+        - secretName: dev-obscura-tls
+          hosts:
+            - dev.obscura.barrelmaker.dev
+sops:
+    age:
+        - recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSByN3RMdytzanhKWTIxRlg1
+            Y1dmcVZlSXpveEt3eVNBd3FLdjdRQk9aL0N3CmkzUzdqWlUwK2p4cHJxbkFJYjBr
+            VVkyblJNcDhYdGZyZXIrWEdrQjBEUFEKLS0tIHB5KytpS0QwWUFSVUJrOWw2cU9C
+            cEY1UmkwbmFFM04vNnJBd2FxU0Q4NjQKwRJG3QIeTcQXVo2Gt7we7HX9ivYEX7SD
+            XBTJwCJSLHfzAfNDsLVQg2WR39X/GQWAqdKLlYreQ+KUCVKbuaGVuw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-25T21:10:40Z"
+    mac: ENC[AES256_GCM,data:TMDEbQlQ+i/X9s8pEAbjDt/h2yttxJjuMPUUwNY30kGOCrsXe0QOqAlSTsWpu90/QmVXOz+bhXNFkkXG0kw9XvYMXcPV3+GWVJnxsSpPaRap10CC+ka1ooVq2e2IlsOR/rwRn1lvO5qNr3dxNTxv8ZPJLvyOC9doFfKV0ta8LM8=,iv:VnMgIwkye3bSTszeEHafUurXa54oS1WhNv369aAqYak=,tag:ZIRQgQwGwZO6jK1RGTddsQ==,type:str]
+    encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|.*[Pp]assword$)
+    version: 3.11.0
