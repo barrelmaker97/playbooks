@@ -4,12 +4,14 @@
   ansible.builtin.stat:
     path: "{{ helm_chart_values_template }}"
   register: helm_template_values_file
+  when: helm_chart_values_template is defined
 
 - name: "Check for sops values for {{ helm_chart_name }}"
   delegate_to: localhost
   ansible.builtin.stat:
     path: "{{ helm_chart_sops_file }}"
   register: helm_sops_values_file
+  when: helm_chart_sops_file is defined
 
 - name: "Deploy {{ helm_chart_name }}"
   ansible.builtin.shell: |
@@ -25,13 +27,13 @@
         --version {{ helm_chart_version }} \
         {% endif %} \
         "$@" \
-        {% if helm_template_values_file.stat.exists %}
+        {% if helm_template_values_file.stat is defined and helm_template_values_file.stat.exists %}
         --values <(cat <<'EOF'
     {{ lookup('template', helm_chart_values_template) }}
     EOF
         ) \
         {% endif %}
-        {% if helm_sops_values_file.stat.exists %}
+        {% if helm_sops_values_file.stat is defined and helm_sops_values_file.stat.exists %}
         --values <(cat <<'EOF'
     {{ lookup('community.sops.sops', helm_chart_sops_file) }}
     EOF
