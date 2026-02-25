@@ -38,6 +38,16 @@
     classic: true
     channel: latest/edge  # needed because helm 4 breaks things
 
+- name: Check if Helm Diff is installed
+  ansible.builtin.command: helm plugin list
+  register: workloads_helm_plugins
+  changed_when: false
+
+- name: Install Helm Diff
+  ansible.builtin.command: helm plugin install https://github.com/databus23/helm-diff
+  when: "'diff' not in workloads_helm_plugins.stdout"
+  changed_when: true
+
 - name: Add Helm Repos
   ansible.builtin.command: >
     helm repo add {{ item.key }} {{ item.value }}
