@@ -1,0 +1,125 @@
+kubeScheduler:
+  service:
+    selector:
+      k8s-app: kube-scheduler
+kubeControllerManager:
+  service:
+    selector:
+      k8s-app: kube-controller-manager
+alertmanager:
+  alertmanagerSpec:
+    alertmanagerConfigMatcherStrategy:
+      type: None
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - "alertmanager.{{ cluster_domain }}"
+grafana:
+  admin:
+    existingSecret: grafana-admin-credentials
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      uid: loki
+      url: http://loki.monitoring.svc.cluster.local:3100
+      access: proxy
+      isDefault: false
+      jsonData:
+        derivedFields:
+          - name: "trace_id"
+            matcherType: "label"
+            matcherRegex: "trace_id"
+            url: "$${__value.raw}"
+            datasourceUid: "tempo"
+            urlDisplayLabel: "Trace: $${__value.raw}"
+    - name: Tempo
+      type: tempo
+      uid: tempo
+      url: http://tempo.monitoring.svc.cluster.local:3200
+      access: proxy
+      isDefault: false
+      jsonData:
+        tracesToLogsV2:
+          customQuery: true
+          datasourceUid: "loki"
+          query: '{$${__tags}} | trace_id = "$${__trace.traceId}"'
+          tags:
+            - key: "service.name"
+              value: "service_name"
+        serviceMap:
+          datasourceUid: "prometheus"
+        search:
+          hide: false
+        nodeGraph:
+          enabled: true
+        lokiSearch:
+          datasourceUid: "loki"
+  grafana.ini:
+    auth:
+      login_cookie_name: __Host-grafana_session
+    security:
+      cookie_samesite: strict
+      cookie_secure: true
+      x_content_type_options: false
+      content_security_policy: true
+      content_security_policy_template: >-
+        """
+        base-uri 'self';
+        connect-src 'self' grafana.com ws://$ROOT_PATH wss://$ROOT_PATH data:;
+        default-src 'none';
+        font-src 'self';
+        form-action 'self';
+        frame-ancestors 'self';
+        img-src 'self' https://grafana.com data:;
+        manifest-src 'self';
+        media-src 'none';
+        object-src 'none';
+        script-src 'unsafe-eval' 'strict-dynamic' $NONCE;
+        style-src 'self' 'unsafe-inline' blob:;
+        worker-src 'self' blob:;
+        """
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - "grafana.{{ external_domain }}"
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - "grafana.{{ external_domain }}"
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - "prometheus.{{ cluster_domain }}"
+  prometheusSpec:
+    enableRemoteWriteReceiver: true
+    retention: 30d
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    additionalScrapeConfigsSecret:
+      enabled: true
+      name: additional-scrape-configs
+      key: prometheus-additional.yaml
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi

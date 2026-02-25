@@ -1,0 +1,21 @@
+image:  # TODO remove this section after 1.11.1 is released
+  longhorn:
+    instanceManager:
+      tag: v1.11.0-hotfix-1
+persistence:
+  defaultDataLocality: best-effort
+  defaultClassReplicaCount: 2
+metrics:
+  serviceMonitor:
+    enabled: true
+defaultSettings:
+  allowVolumeCreationWithDegradedAvailability: false
+  backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
+  defaultDataLocality: best-effort
+  defaultReplicaCount: "{'v1':'2','v2':'2'}"
+  replicaAutoBalance: least-effort
+  storageMinimalAvailablePercentage: "10"
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  host: "longhorn.{{ cluster_domain }}"
