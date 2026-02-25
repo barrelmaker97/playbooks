@@ -25,6 +25,10 @@
     state: present
     template: limitrange-user.yaml
 
+- name: Set workload role path
+  ansible.builtin.set_fact:
+    workloads_role_path: "{{ role_path }}"
+
 - name: Create Jellyfin Media Persistent Volume
   kubernetes.core.k8s:
     template: "{{ item }}"
@@ -49,8 +53,8 @@
     helm_chart_ref: "{{ item.value.ref }}"
     helm_chart_version: "{{ item.value.version | default('latest') }}"
     helm_chart_namespace: "{{ workload_namespace }}"
-    helm_chart_values_template: "{{ role_path }}/templates/values/{{ item.key }}.yaml.j2"
-    helm_chart_sops_file: "{{ role_path }}/files/{{ item.key }}.sops.yaml"
+    helm_chart_values_template: "{{ workloads_role_path }}/templates/values/{{ item.key }}.yaml.j2"
+    helm_chart_sops_file: "{{ workloads_role_path }}/files/{{ item.key }}.sops.yaml"
     # To pin a version, add it to the dictionary: { ref: repository/chart, version: 1.2.3 }
     helm_charts:
       ingress: { ref: barrelmaker/ingress }

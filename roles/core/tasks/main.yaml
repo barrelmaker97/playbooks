@@ -1,4 +1,8 @@
 ---
+- name: Set core role path
+  ansible.builtin.set_fact:
+    core_role_path: "{{ role_path }}"
+
 - name: Setup Helm
   ansible.builtin.include_role:
     name: helm
@@ -47,7 +51,7 @@
     helm_chart_ref: longhorn/longhorn
     helm_chart_version: "{{ longhorn_version }}"
     helm_chart_namespace: longhorn-system
-    helm_chart_values_template: "{{ role_path }}/templates/values/longhorn.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/longhorn.yaml.j2"
 
 - name: Create Longhorn Local Storage Class
   kubernetes.core.k8s:
@@ -131,7 +135,7 @@
     helm_chart_ref: metallb/metallb
     helm_chart_version: "{{ metallb_version }}"
     helm_chart_namespace: metallb-system
-    helm_chart_values_template: "{{ role_path }}/templates/values/metallb.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/metallb.yaml.j2"
 
 - name: Create IP Address Pool
   kubernetes.core.k8s:
@@ -152,7 +156,7 @@
     helm_chart_ref: ingress-nginx/ingress-nginx
     helm_chart_version: "{{ ingress_nginx_version }}"
     helm_chart_namespace: ingress-nginx
-    helm_chart_values_template: "{{ role_path }}/templates/values/ingress-nginx.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/ingress-nginx.yaml.j2"
 
 - name: Set Nginx Ingress Controller Custom Headers
   kubernetes.core.k8s:
@@ -188,7 +192,7 @@
     helm_chart_ref: jetstack/cert-manager
     helm_chart_version: "{{ cert_manager_version }}"
     helm_chart_namespace: cert-manager
-    helm_chart_values_template: "{{ role_path }}/templates/values/cert-manager.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/cert-manager.yaml.j2"
 
 - name: Deploy Trust Manager
   ansible.builtin.include_role:
@@ -199,7 +203,7 @@
     helm_chart_ref: jetstack/trust-manager
     helm_chart_version: "{{ trust_manager_version }}"
     helm_chart_namespace: cert-manager
-    helm_chart_values_template: "{{ role_path }}/templates/values/trust-manager.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/trust-manager.yaml.j2"
 
 - name: Create Internal Self-Signed Issuer
   kubernetes.core.k8s:
@@ -313,7 +317,7 @@
     helm_chart_ref: grafana/loki
     helm_chart_version: "{{ loki_version }}"
     helm_chart_namespace: monitoring
-    helm_chart_values_template: "{{ role_path }}/templates/values/loki.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/loki.yaml.j2"
 
 - name: Deploy Tempo
   ansible.builtin.include_role:
@@ -324,7 +328,7 @@
     helm_chart_ref: grafana-community/tempo
     helm_chart_version: "{{ tempo_version }}"
     helm_chart_namespace: monitoring
-    helm_chart_values_template: "{{ role_path }}/templates/values/tempo.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/tempo.yaml.j2"
 
 - name: Deploy OTel Collector
   ansible.builtin.include_role:
@@ -335,7 +339,7 @@
     helm_chart_ref: open-telemetry/opentelemetry-collector
     helm_chart_version: "{{ otel_collector_version }}"
     helm_chart_namespace: monitoring
-    helm_chart_values_template: "{{ role_path }}/templates/values/otel-collector.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/otel-collector.yaml.j2"
 
 - name: Deploy Prometheus Stack
   ansible.builtin.include_role:
@@ -346,7 +350,7 @@
     helm_chart_ref: prometheus-community/kube-prometheus-stack
     helm_chart_version: "{{ kube_prometheus_stack_version }}"
     helm_chart_namespace: monitoring
-    helm_chart_values_template: "{{ role_path }}/templates/values/kube-prometheus-stack.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/kube-prometheus-stack.yaml.j2"
 
 - name: Create Alert Manager Config
   kubernetes.core.k8s:
@@ -369,4 +373,4 @@
     helm_chart_ref: metrics-server/metrics-server
     helm_chart_version: "{{ metrics_server_version }}"
     helm_chart_namespace: kube-system
-    helm_chart_values_template: "{{ role_path }}/templates/values/metrics-server.yaml.j2"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/metrics-server.yaml.j2"
