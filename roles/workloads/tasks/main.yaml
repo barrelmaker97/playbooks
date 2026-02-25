@@ -38,52 +38,47 @@
     classic: true
     channel: latest/edge  # needed because helm 4 breaks things
 
+- name: Check if Helm Diff is installed
+  ansible.builtin.command: helm plugin list
+  register: workloads_helm_plugins
+  changed_when: false
+
 - name: Install Helm Diff
-  kubernetes.core.helm_plugin:
-    state: present
-    plugin_path: "https://github.com/databus23/helm-diff"
+  ansible.builtin.command: helm plugin install https://github.com/databus23/helm-diff
+  when: "'diff' not in workloads_helm_plugins.stdout"
+  changed_when: true
 
 - name: Add Helm Repos
-  kubernetes.core.helm_repository:
-    name: "{{ item.key }}"
-    repo_url: "{{ item.value }}"
+  ansible.builtin.command: >
+    helm repo add {{ item.key }} {{ item.value }}
   loop: "{{ helm_repos | dict2items }}"
   vars:
     helm_repos:
       barrelmaker: https://charts.barrelmaker.dev
+  changed_when: true
+
+- name: Update Helm Repos
+  ansible.builtin.command: helm repo update
+  changed_when: true
 
 - name: Deploy Helm Charts
-  kubernetes.core.helm:
-    name: "{{ item.key }}"
-    chart_ref: "{{ item.value }}"
-    release_namespace: "{{ workload_namespace }}"
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ lookup('file', 'files/{{ item.key }}.yaml') | from_yaml }}"
+  ansible.builtin.include_tasks: deploy_chart.yaml
   loop: "{{ helm_charts | dict2items }}"
   vars:
+    chart_name: "{{ item.key }}"
+    chart_ref: "{{ item.value.ref }}"
+    chart_version: "{{ item.value.version | default('latest') }}"
+    # To pin a version, add it to the dictionary: { ref: repository/chart, version: 1.2.3 }
     helm_charts:
-      ingress: barrelmaker/ingress
-      jellyfin: barrelmaker/jellyfin
-      niucraft: barrelmaker/minecraft
-      pistachio: barrelmaker/pistachio
-      satisfactory: barrelmaker/satisfactory
-      website: barrelmaker/website
-      # serge: barrelmaker/serge
-      # gmod: barrelmaker/gmod
-
-- name: Deploy Helm Charts with encrypted values
-  kubernetes.core.helm:
-    name: "{{ item.key }}"
-    chart_ref: "{{ item.value }}"
-    release_namespace: "{{ workload_namespace }}"
-    update_repo_cache: true
-    wait: true
-    release_values: "{{ lookup('community.sops.sops', 'files/{{ item.key }}.sops.yaml') | from_yaml }}"
-  loop: "{{ helm_charts | dict2items }}"
-  vars:
-    helm_charts:
-      factorio: barrelmaker/factorio
-      loch: barrelmaker/factorio
-      obscura: barrelmaker/obscura
-      # valheim: barrelmaker/valheim
+      ingress: { ref: barrelmaker/ingress }
+      jellyfin: { ref: barrelmaker/jellyfin }
+      niucraft: { ref: barrelmaker/minecraft }
+      pistachio: { ref: barrelmaker/pistachio }
+      satisfactory: { ref: barrelmaker/satisfactory }
+      website: { ref: barrelmaker/website }
+      factorio: { ref: barrelmaker/factorio }
+      loch: { ref: barrelmaker/factorio }
+      obscura: { ref: barrelmaker/obscura }
+      # serge: { ref: barrelmaker/serge }
+      # gmod: { ref: barrelmaker/gmod }
+      # valheim: { ref: barrelmaker/valheim }

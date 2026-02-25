@@ -1,7 +1,7 @@
 replicaCount: 3
 obscura:
     auth:
-        jwtSecret: ENC[AES256_GCM,data:M9YiuvQUvW9Hpei8YKdUcAA=,iv:f61yzPx6PoEubeDlULEpVZxFV98q5tmAOZOX4wde870=,tag:x5GxrOcj7nGbf30ry0iGZA==,type:str]
+        jwtSecret: ENC[AES256_GCM,data:SsKcfBv98gALykNlMGv8wpE=,iv:KJs8vM23jPbbPXroBoTSzob4lG+56lzJwr2abg5p+cY=,tag:8stzfAbBgHiM6AZNeGr/oQ==,type:str]
     telemetry:
         otlpEndpoint: http://otel.monitoring.svc.cluster.local:4317
         logFormat: json
@@ -20,7 +20,8 @@ postgresql:
             storageClass: longhorn
             size: 8Gi
     auth:
-        password: ENC[AES256_GCM,data:tWANQLke3NqjbPROotVsU6wGHQ==,iv:+ibBpRO7Cxf8iq6HcaOrbUcn7/G8ekGdVFamsmBfwBY=,tag:hVQRuoqUcT8bXhiuRBdclg==,type:str]
+        password: ENC[AES256_GCM,data:Shn7RkNKmx2x48OfHz2Sf3kTgA==,iv:xTuRxGjoidaKPDUGkRdMLzhiG31H8utJPymfpUFdC5s=,tag:DJhvZ3rOFeeRFESPpPSEAw==,type:str]
+        postgresPassword: ENC[AES256_GCM,data:nsu8qeMGBuvp2/CepnRXFICyLvGEfg9z,iv:7AMEru2Ud9sy4osnFxwqgsvv/Fkqc9MzHO7N8knux+E=,tag:BEN8m6YbZB8riVT99/w96Q==,type:str]
     metrics:
         enabled: true
         resourcesPreset: none
@@ -46,7 +47,7 @@ minio:
             memory: 256Mi
         limits:
             memory: 512Mi
-    rootPassword: ENC[AES256_GCM,data:YvsrhEiNNpIpADbXbCdpH6oifQ==,iv:zwYMw6sAoUSjOF1E9yQDU+2HcoVAfDI3u02dAh/vxuo=,tag:ZMuBPBE3X8zQBDrShfyHpg==,type:str]
+    rootPassword: ENC[AES256_GCM,data:TX9EhYKYLfx2SpnEkqNk1RS7HQ==,iv:YE7h1vB3OX07W1Q57UhrDusHnHi3JJbE8Nl78OJpBxA=,tag:j2ZWa+ukW8SrwPYYTF1uVg==,type:str]
     metrics:
         serviceMonitor:
             enabled: true
@@ -95,13 +96,13 @@ sops:
         - recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBhMXJLeWwvUDVhUkY1UEd2
-            OHVPMks4aTZDM0QzZGRpM0JwZi90cXZDR1RnCnNFckJtWFVvYmZuMVB0aFNDL2NJ
-            OXN6Rkc2K3d6aEJ1SDRuNEtQMXBEZmMKLS0tIHZMdk4rVlp2K251QUsyaU1MbEla
-            QzVTMHhGSFhqTjBNaHBWMEovbFVpYzQKTRoOW6xSHa4xIp9VK9/T60CzsrlCwVG+
-            EPDppEGO+WvmOgN51joNZG6+lBDeDbUI5Avh85rfNrvBVaszeePpoQ==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBmcXMwMnhtcWpvRHRRZlND
+            ME8rSVM2UmlQOGtGWWtYTnNPbWFsajZDcEc0Cm5Yam1qZW90TS9NbWNFZ1JkUEdv
+            Yzl3eGhVTnJFSlZuamY0ekJ0ZGpZb3cKLS0tIEtGU05CaEJWclRDc3lScWVlMjV1
+            MWd3VlBDRjRuSXNKT2VpSXNSTlVTMmcK2w5Zf1VD2TII0Oz8TgyLcoAEAxT0s9PE
+            QeMplHeXAfVm3RICxb87k9R9u9eeWd+L8RM8qnx+Vj9Pq5otbdbuuw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-18T17:38:24Z"
-    mac: ENC[AES256_GCM,data:imHPny0jRm/l2qmH1hKzrX2AOkAAFuC2zyg8NfyrmT8hJLf2Sg20tx4xJNpowYtOVc6dqqsk54jdYSgdSOyarvmajx9LG90CEw/yk+h3jGKX+vRHkgjEgGqc0mmMotpVsK4i2kUrsEmyfJio8D41cNV1JHugisu0ygVSAQIsBpU=,iv:i+bxVqgAY/+WFEF6ewqPk+xivoX7vHHP7Q61eicjP08=,tag:mDfcCGkp3M5XiD7ld0Uadw==,type:str]
-    encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^rootPassword|^password)
+    lastmodified: "2026-02-25T18:17:56Z"
+    mac: ENC[AES256_GCM,data:kiSIN9d4oyeqiRs9CYeIEuEyDzioeANI3TIcpUSKPt+LBMYA2LDvQ0wCUom/q5hKW4qr059v6kppYPPUyufPKDeulAFWuoZK9VNhGaFxTVRCeXpk6rfZcsy/nmaPHmGl4g7ux1GQAxlqmEMgK8j2Ns+uLpGbNNvTeUwUF/y+YEo=,iv:mGpI9P2kJ8cs+XoVYoS/mVvRRQJBCzglSSOJ0iMJ/gQ=,tag:NaMw74OdRkAe5bn/8bzZ5w==,type:str]
+    encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|.*[Pp]assword$)
     version: 3.11.0

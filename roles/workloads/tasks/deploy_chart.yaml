@@ -1,0 +1,70 @@
+---
+- name: "Check for template values for {{ chart_name }}"
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "roles/workloads/templates/values/{{ chart_name }}.yaml.j2"
+  register: workloads_template_values_file
+
+- name: "Check for sops values for {{ chart_name }}"
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "roles/workloads/files/{{ chart_name }}.sops.yaml"
+  register: workloads_sops_values_file
+
+- name: "Deploy {{ chart_name }}"
+  ansible.builtin.shell: |
+    set -e
+
+    run_helm() {
+      local CMD=$1
+      shift
+
+      helm $CMD {{ chart_name }} {{ chart_ref }} \
+        --namespace {{ workload_namespace }} \
+        {% if chart_version != 'latest' %}
+        --version {{ chart_version }} \
+        {% endif %} \
+        "$@" \
+        {% if workloads_template_values_file.stat.exists %}
+        --values <(cat <<'EOF'
+    {{ lookup('template', 'templates/values/' + chart_name + '.yaml.j2') }}
+    EOF
+        ) \
+        {% endif %}
+        {% if workloads_sops_values_file.stat.exists %}
+        --values <(cat <<'EOF'
+    {{ lookup('community.sops.sops', 'files/' + chart_name + '.sops.yaml') }}
+    EOF
+        ) \
+        {% endif %}
+        < /dev/null
+    }
+
+    # Run helm diff
+    set +e
+    run_helm "diff upgrade" --allow-unreleased --detailed-exitcode
+    DIFF_RC=$?
+    set -e
+
+    if [ $DIFF_RC -eq 0 ]; then
+      # No changes detected
+      exit 0
+    elif [ $DIFF_RC -eq 2 ]; then
+      # Changes detected, run upgrade
+      run_helm "upgrade --install" \
+        --create-namespace \
+        --wait \
+        --atomic \
+        --cleanup-on-fail \
+        --history-max 5 \
+        --timeout 5m
+      exit 2
+    else
+      # Diff failed with an error
+      exit $DIFF_RC
+    fi
+  args:
+    executable: /bin/bash
+  register: workloads_helm_deploy
+  changed_when: workloads_helm_deploy.rc == 2
+  failed_when: workloads_helm_deploy.rc not in [0, 2]
