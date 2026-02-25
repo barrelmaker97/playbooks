@@ -1,17 +1,17 @@
 ---
-- name: "Check for template values for {{ chart_name }}"
+- name: "Check for template values for {{ helm_chart_name }}"
   delegate_to: localhost
   ansible.builtin.stat:
-    path: "roles/workloads/templates/values/{{ chart_name }}.yaml.j2"
-  register: workloads_template_values_file
+    path: "{{ helm_chart_values_template }}"
+  register: helm_template_values_file
 
-- name: "Check for sops values for {{ chart_name }}"
+- name: "Check for sops values for {{ helm_chart_name }}"
   delegate_to: localhost
   ansible.builtin.stat:
-    path: "roles/workloads/files/{{ chart_name }}.sops.yaml"
-  register: workloads_sops_values_file
+    path: "{{ helm_chart_sops_file }}"
+  register: helm_sops_values_file
 
-- name: "Deploy {{ chart_name }}"
+- name: "Deploy {{ helm_chart_name }}"
   ansible.builtin.shell: |
     set -e
 
@@ -19,21 +19,21 @@
       local CMD=$1
       shift
 
-      helm $CMD {{ chart_name }} {{ chart_ref }} \
-        --namespace {{ workload_namespace }} \
-        {% if chart_version != 'latest' %}
-        --version {{ chart_version }} \
+      helm $CMD {{ helm_chart_name }} {{ helm_chart_ref }} \
+        --namespace {{ helm_chart_namespace }} \
+        {% if helm_chart_version != 'latest' %}
+        --version {{ helm_chart_version }} \
         {% endif %} \
         "$@" \
-        {% if workloads_template_values_file.stat.exists %}
+        {% if helm_template_values_file.stat.exists %}
         --values <(cat <<'EOF'
-    {{ lookup('template', 'templates/values/' + chart_name + '.yaml.j2') }}
+    {{ lookup('template', helm_chart_values_template) }}
     EOF
         ) \
         {% endif %}
-        {% if workloads_sops_values_file.stat.exists %}
+        {% if helm_sops_values_file.stat.exists %}
         --values <(cat <<'EOF'
-    {{ lookup('community.sops.sops', 'files/' + chart_name + '.sops.yaml') }}
+    {{ lookup('community.sops.sops', helm_chart_sops_file) }}
     EOF
         ) \
         {% endif %}
@@ -65,6 +65,6 @@
     fi
   args:
     executable: /bin/bash
-  register: workloads_helm_deploy
-  changed_when: workloads_helm_deploy.rc == 2
-  failed_when: workloads_helm_deploy.rc not in [0, 2]
+  register: helm_deploy
+  changed_when: helm_deploy.rc == 2
+  failed_when: helm_deploy.rc not in [0, 2]
