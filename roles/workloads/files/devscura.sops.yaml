@@ -82,6 +82,7 @@ ingress:
         nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, PUT, OPTIONS, DELETE
         nginx.ingress.kubernetes.io/cors-allow-origin: https://rhelsing.github.io
         nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        nginx.ingress.kubernetes.io/proxy-body-size: 55m
     hosts:
         - host: dev.obscura.barrelmaker.dev
           paths:
@@ -102,7 +103,7 @@ sops:
             cEY1UmkwbmFFM04vNnJBd2FxU0Q4NjQKwRJG3QIeTcQXVo2Gt7we7HX9ivYEX7SD
             XBTJwCJSLHfzAfNDsLVQg2WR39X/GQWAqdKLlYreQ+KUCVKbuaGVuw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-25T21:10:40Z"
-    mac: ENC[AES256_GCM,data:TMDEbQlQ+i/X9s8pEAbjDt/h2yttxJjuMPUUwNY30kGOCrsXe0QOqAlSTsWpu90/QmVXOz+bhXNFkkXG0kw9XvYMXcPV3+GWVJnxsSpPaRap10CC+ka1ooVq2e2IlsOR/rwRn1lvO5qNr3dxNTxv8ZPJLvyOC9doFfKV0ta8LM8=,iv:VnMgIwkye3bSTszeEHafUurXa54oS1WhNv369aAqYak=,tag:ZIRQgQwGwZO6jK1RGTddsQ==,type:str]
+    lastmodified: "2026-02-26T22:28:30Z"
+    mac: ENC[AES256_GCM,data:HxxjxfFx/vsunashXDmHINtzJ4jLVd3WwPObKfxZqTYK1qDsg0lZi9yquUVaJri56tH3f7iAXSW40ePP6O5M7+QZGwJriUQTfNWwcDSc5Ob9TJWGVvcPgRpBuzbPrRvkrIJuxAYJOutWw7YxlAHr4eGQ2ziy2vg3/hjj26sEn5Q=,iv:bvzZ3Nnl7Eg7zN1NpuJEu75oTqmFG+uAUghOG6qhi8I=,tag:wj6V2OWfK1sieVYMncoqgw==,type:str]
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|.*[Pp]assword$)
     version: 3.11.0
