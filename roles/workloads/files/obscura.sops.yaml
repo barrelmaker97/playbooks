@@ -5,6 +5,8 @@ obscura:
     telemetry:
         otlpEndpoint: http://otel.monitoring.svc.cluster.local:4317
         logFormat: json
+    server:
+        trustedProxies: 10.244.0.0/16
 postgresql:
     enabled: true
     primary:
@@ -103,7 +105,7 @@ sops:
             MWd3VlBDRjRuSXNKT2VpSXNSTlVTMmcK2w5Zf1VD2TII0Oz8TgyLcoAEAxT0s9PE
             QeMplHeXAfVm3RICxb87k9R9u9eeWd+L8RM8qnx+Vj9Pq5otbdbuuw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-26T22:28:49Z"
-    mac: ENC[AES256_GCM,data:mhR+MwoDHY1S3JUhHm6OoFAcdHj9vVS+5BnNEtF3PgjiKFjS0DBXliOQqA9rK0j6JklcfA9QBuocCqaDSPvZwayhalZOMxzXygGHMGTUeQBGeyE+g901csiM2YUFXnbvsX7F6Dn2rKokD7KCR46KWGyyrYfWeQyiEFwGDcpAG5c=,iv:3J0q7MJj0R3P8blu/QKt7Pk/Bwi4aAnF8Hm0Rt0SMz8=,tag:oTvgS8Bs+xlKbj45JlAxhg==,type:str]
+    lastmodified: "2026-02-26T23:00:39Z"
+    mac: ENC[AES256_GCM,data:vlLZgef9UuwF0KEVbmZS1feN+0P4+FD4cScrztP5vB96Q1en38W7NI1UecVnGsSGsbXMsSHxEHF6jSPakyO3ykAMdwXw19+PM+gFu1Og+xBtkZ/peeP+fQTqwIRFt8oqFyKkTabx9CwFQ1GDQBnUR+ipFQkUHVA2wUNFwehGLZ0=,iv:IhDNB1hYClcNymNRsdZI1Y49myPyVahGTkuIJGRFT2o=,tag:oPhXXOCJOFTzV2AxhIe9LA==,type:str]
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|.*[Pp]assword$)
     version: 3.11.0
