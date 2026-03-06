@@ -66,7 +66,7 @@
       factorio: { ref: barrelmaker/factorio }
       loch: { ref: barrelmaker/factorio }
       obscura: { ref: barrelmaker/obscura, version: 0.8.1 }
-      devscura: { ref: barrelmaker/obscura, version: 0.8.1 }
+      devscura: { ref: barrelmaker/obscura, version: 0.8.2 }
       # serge: { ref: barrelmaker/serge }
       # gmod: { ref: barrelmaker/gmod }
       # valheim: { ref: barrelmaker/valheim }
