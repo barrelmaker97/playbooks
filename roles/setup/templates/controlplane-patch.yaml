@@ -18,12 +18,15 @@ machine:
     disk: {{ install_disk }}
     wipe: false
   network:
-    hostname: {{ node_hostname }}
     interfaces:
       - interface: {{ interface_name }}
         dhcp: true
         vip:
           ip: {{ cluster_vip }}
+    extraHostEntries:
+      - ip: {{ cluster_vip }}
+        aliases:
+          - kube.{{ cluster_domain }}
   time:
       disabled: false
       bootTimeout: 2m0s
@@ -52,3 +55,8 @@ apiVersion: v1alpha1
 kind: WatchdogTimerConfig
 device: /dev/watchdog0
 timeout: 2m
+---
+apiVersion: v1alpha1
+kind: HostnameConfig
+auto: off
+hostname: {{ node_hostname }}
