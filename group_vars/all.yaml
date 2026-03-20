@@ -32,7 +32,7 @@ metrics_server_version: "3.13.0"
 metallb_version: "0.15.3"
 prometheus_crds_version: "27.0.0"
 kube_prometheus_stack_version: "82.4.0"
-longhorn_version: "1.11.0"  # TODO remove hotfix image from core tasks after 1.11.1 release
+longhorn_version: "1.11.1"
 loki_version: "6.53.0"
 tempo_version: "1.26.5"
 otel_collector_version: "0.145.0"
