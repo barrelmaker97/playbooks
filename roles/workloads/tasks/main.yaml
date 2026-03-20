@@ -65,7 +65,7 @@
       website: { ref: barrelmaker/website }
       factorio: { ref: barrelmaker/factorio }
       loch: { ref: barrelmaker/factorio }
-      obscura: { ref: barrelmaker/obscura, version: 0.8.2 }
+      obscura: { ref: barrelmaker/obscura, version: 0.9.0 }
       devscura: { ref: barrelmaker/obscura, version: 0.9.0 }
       # serge: { ref: barrelmaker/serge }
       # gmod: { ref: barrelmaker/gmod }
