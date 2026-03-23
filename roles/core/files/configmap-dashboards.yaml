@@ -403,7 +403,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "builder",
-              "expr": "node_memory_MemAvailable_bytes{job=\"nodes\"} / node_memory_MemTotal_bytes",
+              "expr": "(node_memory_MemTotal_bytes{job=\"nodes\"} - node_memory_MemAvailable_bytes{job=\"nodes\"}) / node_memory_MemTotal_bytes{job=\"nodes\"}",
               "interval": "",
               "legendFormat": "{{node_name}}",
               "range": true,
