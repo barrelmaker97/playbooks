@@ -1,11 +1,0 @@
---2026-03-11 17:30:43--  https://release-assets.githubusercontent.com/github-production-release-asset/109451092/4e014730-de53-4cc3-a6b6-9a0324235300?sp=r
-Resolving release-assets.githubusercontent.com (release-assets.githubusercontent.com)... 185.199.108.133, 185.199.110.133, 185.199.109.133, ...
-Connecting to release-assets.githubusercontent.com (release-assets.githubusercontent.com)|185.199.108.133|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 97677496 (93M) [application/octet-stream]
-Saving to: ‘4e014730-de53-4cc3-a6b6-9a0324235300?sp=r’
-
-         4e014730-   0%[               ]       0  --.-KB/s                       4e014730-d   6%[>              ]   6.37M  31.9MB/s                      4e014730-de  15%[=>             ]  14.34M  35.9MB/s                     4e014730-de5  23%[==>            ]  21.86M  36.4MB/s                    4e014730-de53  31%[===>           ]  28.95M  36.2MB/s                   4e014730-de53-  38%[====>          ]  36.25M  36.2MB/s                  4e014730-de53-4  47%[======>        ]  44.41M  37.0MB/s                 4e014730-de53-4c  56%[=======>       ]  52.61M  37.5MB/s                4e014730-de53-4cc  65%[========>      ]  60.57M  37.8MB/s               4e014730-de53-4cc3  71%[=========>     ]  66.98M  37.1MB/s               e014730-de53-4cc3-  80%[===========>   ]  75.36M  37.6MB/s               014730-de53-4cc3-a  90%[============>  ]  83.86M  38.1MB/s               14730-de53-4cc3-a6  98%[=============> ]  91.72M  38.1MB/s               4e014730-de53-4cc3 100%[==============>]  93.15M  38.2MB/s    in 2.4s    
-
-2026-03-11 17:30:45 (38.2 MB/s) - ‘4e014730-de53-4cc3-a6b6-9a0324235300?sp=r’ saved [97677496/97677496]
-

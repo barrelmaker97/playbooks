@@ -1,7 +1,7 @@
 vrrp_script chk_pihole {
     script "/usr/local/bin/check_pihole.sh"
     interval 2
-    weight -20
+    weight -60
 }
 
 vrrp_instance VI_1 {
@@ -10,10 +10,6 @@ vrrp_instance VI_1 {
     virtual_router_id {{ keepalived_router_id }}
     priority {{ keepalived_priority }}
     advert_int 1
-    authentication {
-        auth_type PASS
-        auth_pass pihole_ha
-    }
     virtual_ipaddress {
         {{ keepalived_vip }}
     }

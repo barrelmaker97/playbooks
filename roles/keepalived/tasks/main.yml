@@ -1,8 +1,12 @@
 ---
 - name: Install keepalived
   ansible.builtin.apt:
-    name: keepalived
+    name:
+      - keepalived
+      - dnsutils
     state: present
+    update_cache: true
+    cache_valid_time: 3600
 
 - name: Copy track script
   ansible.builtin.copy:
