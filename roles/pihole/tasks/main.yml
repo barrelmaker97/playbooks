@@ -59,8 +59,12 @@
   changed_when: false
 
 - name: Read current totp_secret from config file
-  ansible.builtin.shell:
-    cmd: grep -oP 'totp_secret = "\K[^"]+' /etc/pihole/pihole.toml
+  ansible.builtin.command:
+    argv:
+      - grep
+      - -oP
+      - 'totp_secret = "\K[^"]+'
+      - /etc/pihole/pihole.toml
   register: pihole_current_totp
   changed_when: false
   failed_when: false
@@ -104,163 +108,33 @@
     status_code: 200
   register: pihole_auth
 
-- name: Get current adlists
-  ansible.builtin.uri:
-    url: http://localhost/api/lists
-    method: GET
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-  register: pihole_lists
+- name: Manage Pi-hole via API
+  block:
+    - name: Manage adlists
+      ansible.builtin.include_tasks: adlists.yml
 
-- name: Add missing adlists
-  ansible.builtin.uri:
-    url: http://localhost/api/lists?type=block
-    method: POST
-    body_format: json
-    body:
-      address: "{{ item }}"
-      comment: "Managed by Ansible"
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 201
-  loop: "{{ pihole_adlists | difference(pihole_lists.json.lists | map(attribute='address')) }}"
-  register: pihole_lists_added
-  changed_when: true
+    - name: Manage groups
+      ansible.builtin.include_tasks: groups.yml
 
-- name: Remove unmanaged adlists
-  ansible.builtin.uri:
-    url: "http://localhost/api/lists/{{ item | urlencode() }}?type=block"
-    method: DELETE
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 204
-  loop: "{{ pihole_lists.json.lists | map(attribute='address') | difference(pihole_adlists) }}"
-  register: pihole_lists_removed
-  changed_when: true
+    - name: Manage clients
+      ansible.builtin.include_tasks: clients.yml
 
-- name: Update gravity
-  ansible.builtin.uri:
-    url: http://localhost/api/action/gravity
-    method: POST
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 200
-    timeout: 120
-  when: (pihole_lists_added.results | default([]) | length > 0) or
-        (pihole_lists_removed.results | default([]) | length > 0)
+    - name: Manage domain rules
+      ansible.builtin.include_tasks: domains.yml
+      loop:
+        - { type: deny, kind: exact, key: deny_exact }
+        - { type: deny, kind: regex, key: deny_regex }
+        - { type: allow, kind: exact, key: allow_exact }
+        - { type: allow, kind: regex, key: allow_regex }
+      loop_control:
+        loop_var: domain_type
 
-- name: Get current groups
-  ansible.builtin.uri:
-    url: http://localhost/api/groups
-    method: GET
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-  register: pihole_current_groups
-
-- name: Add missing groups
-  ansible.builtin.uri:
-    url: http://localhost/api/groups
-    method: POST
-    body_format: json
-    body:
-      name: "{{ item.name }}"
-      comment: "{{ item.comment | default('Managed by Ansible') }}"
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 201
-  loop: "{{ pihole_groups }}"
-  when: item.name not in (pihole_current_groups.json.groups | map(attribute='name'))
-  changed_when: true
-
-- name: Remove unmanaged groups
-  ansible.builtin.uri:
-    url: "http://localhost/api/groups/{{ item | urlencode() }}"
-    method: DELETE
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 204
-  loop: "{{ pihole_current_groups.json.groups | map(attribute='name') | reject('equalto', 'Default') | difference(pihole_groups | map(attribute='name')) }}"
-  changed_when: true
-
-- name: Refresh groups after changes
-  ansible.builtin.uri:
-    url: http://localhost/api/groups
-    method: GET
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-  register: pihole_current_groups
-
-- name: Build group name to ID map
-  ansible.builtin.set_fact:
-    pihole_group_id_map: "{{ dict(pihole_current_groups.json.groups | map(attribute='name') | zip(pihole_current_groups.json.groups | map(attribute='id'))) }}"
-
-- name: Get current clients
-  ansible.builtin.uri:
-    url: http://localhost/api/clients
-    method: GET
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-  register: pihole_current_clients
-
-- name: Add missing clients
-  ansible.builtin.uri:
-    url: http://localhost/api/clients
-    method: POST
-    body_format: json
-    body:
-      client: "{{ item.client }}"
-      comment: "{{ item.comment | default('') }}"
-      groups: "{{ item.groups | map('extract', pihole_group_id_map) | list }}"
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 201
-  loop: "{{ pihole_clients }}"
-  when: item.client not in (pihole_current_clients.json.clients | map(attribute='client'))
-  changed_when: true
-
-- name: Update existing clients with wrong groups
-  ansible.builtin.uri:
-    url: "http://localhost/api/clients/{{ item.client | urlencode() }}"
-    method: PUT
-    body_format: json
-    body:
-      comment: "{{ item.comment | default('') }}"
-      groups: "{{ item.groups | map('extract', pihole_group_id_map) | list }}"
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 200
-  loop: "{{ pihole_clients }}"
-  when: >
-    item.client in (pihole_current_clients.json.clients | map(attribute='client')) and
-    (pihole_current_clients.json.clients | selectattr('client', 'equalto', item.client) | first).groups | sort
-    != (item.groups | map('extract', pihole_group_id_map) | list) | sort
-  changed_when: true
-
-- name: Remove unmanaged clients
-  ansible.builtin.uri:
-    url: "http://localhost/api/clients/{{ item | urlencode() }}"
-    method: DELETE
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 204
-  loop: "{{ pihole_current_clients.json.clients | map(attribute='client') | difference(pihole_clients | map(attribute='client')) }}"
-  changed_when: true
-
-- name: Manage domain rules
-  ansible.builtin.include_tasks: domains.yml
-  loop:
-    - { type: deny, kind: exact, key: deny_exact }
-    - { type: deny, kind: regex, key: deny_regex }
-    - { type: allow, kind: exact, key: allow_exact }
-    - { type: allow, kind: regex, key: allow_regex }
-  loop_control:
-    loop_var: domain_type
-
-- name: Logout Pi-hole API session
-  ansible.builtin.uri:
-    url: http://localhost/api/auth
-    method: DELETE
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 204
-  when: pihole_auth.json.session.sid is defined
+  always:
+    - name: Logout Pi-hole API session
+      ansible.builtin.uri:
+        url: http://localhost/api/auth
+        method: DELETE
+        headers:
+          sid: "{{ pihole_auth.json.session.sid }}"
+        status_code: 204
+      when: pihole_auth.json.session.sid is defined

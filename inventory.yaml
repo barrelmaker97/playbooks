@@ -10,7 +10,7 @@ all:
           ansible_host: 192.168.15.30
           keepalived_state: BACKUP
           keepalived_priority: 100
-  vars:
-    keepalived_vip: 192.168.15.80
-    keepalived_interface: eth0
-    keepalived_router_id: 51
+      vars:
+        keepalived_vip: 192.168.15.80
+        keepalived_interface: eth0
+        keepalived_router_id: 51

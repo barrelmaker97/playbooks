@@ -4,6 +4,9 @@
   become: true
   gather_facts: true
   roles:
-    - unbound
-    - pihole
-    - keepalived
+    - role: unbound
+      tags: [unbound]
+    - role: pihole
+      tags: [pihole]
+    - role: keepalived
+      tags: [keepalived]
