@@ -16,7 +16,7 @@ node_names:
   - node3-poseidon
 ntp_server: 192.168.15.1
 talos_config_dir: /home/barrelmaker/.talos
-talos_version: "1.12.5"
+talos_version: "1.12.6"
 workload_namespace: barrelmaker
 
 # NUT connection
@@ -27,12 +27,12 @@ nut_password: hunter2
 # Service versions
 cert_manager_version: "1.20.0"
 trust_manager_version: "0.22.0"
-ingress_nginx_version: "4.15.0"
+ingress_nginx_version: "4.15.1"
 metrics_server_version: "3.13.0"
 metallb_version: "0.15.3"
-prometheus_crds_version: "27.0.0"
-kube_prometheus_stack_version: "82.4.0"
-longhorn_version: "1.11.0"  # TODO remove hotfix image from core tasks after 1.11.1 release
+prometheus_crds_version: "28.0.0"
+kube_prometheus_stack_version: "82.13.0"
+longhorn_version: "1.11.1"
 loki_version: "6.53.0"
 tempo_version: "1.26.5"
 otel_collector_version: "0.145.0"
