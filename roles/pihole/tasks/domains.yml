@@ -1,0 +1,33 @@
+---
+- name: "Get current domain rules — {{ domain_type.type ~ '/' ~ domain_type.kind }}"
+  ansible.builtin.uri:
+    url: "http://localhost/api/domains/{{ domain_type.type }}/{{ domain_type.kind }}"
+    method: GET
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+  register: pihole_current_domains
+
+- name: "Add missing domain rules — {{ domain_type.type ~ '/' ~ domain_type.kind }}"
+  ansible.builtin.uri:
+    url: "http://localhost/api/domains/{{ domain_type.type }}/{{ domain_type.kind }}"
+    method: POST
+    body_format: json
+    body:
+      domain: "{{ item.domain }}"
+      comment: "{{ item.comment | default('Managed by Ansible') }}"
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 201
+  loop: "{{ pihole_domains[domain_type.key] }}"
+  when: item.domain not in (pihole_current_domains.json.domains | map(attribute='domain'))
+  changed_when: true
+
+- name: "Remove unmanaged domain rules — {{ domain_type.type ~ '/' ~ domain_type.kind }}"
+  ansible.builtin.uri:
+    url: "http://localhost/api/domains/{{ domain_type.type }}/{{ domain_type.kind }}/{{ item | urlencode() }}"
+    method: DELETE
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 204
+  loop: "{{ pihole_current_domains.json.domains | map(attribute='domain') | difference(pihole_domains[domain_type.key] | map(attribute='domain')) }}"
+  changed_when: true

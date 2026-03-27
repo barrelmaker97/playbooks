@@ -9,6 +9,15 @@ pihole_config:
   misc.dnsmasq_lines: '["local-ttl=300"]'
   webserver.interface.boxed: "false"
 
+pihole_groups:
+  - name: Exempt
+
+pihole_clients:
+  - client: "80:E4:BA:34:6F:A7"
+    comment: Liliana Work Laptop
+    groups:
+      - Exempt
+
 pihole_adlists:
   - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
   - http://sysctl.org/cameleon/hosts
@@ -26,3 +35,33 @@ pihole_adlists:
   - https://v.firebog.net/hosts/Prigent-Crypto.txt
   - https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt
   - https://big.oisd.nl
+
+pihole_domains:
+  deny_exact:
+    - domain: track-east.mobileadtrading.com
+      comment: Migrated from blacklist
+    - domain: api.fing.io
+      comment: Migrated from blacklist
+    - domain: telemetry.deeparc.net
+      comment: Added from Query Log
+  deny_regex:
+    - domain: "(\\.|^)online-metrix\\.net$"
+      comment: Port Scanner
+    - domain: "(\\.|^)clickfunnels\\.com$"
+      comment: ""
+    - domain: "(\\.|^)adserver\\.snapads\\.com$"
+      comment: Snapchat Ads
+  allow_exact:
+    - domain: dbl.oisd.nl
+      comment: Migrated from whitelist
+    - domain: fonts.gstatic.com
+      comment: Google Fonts
+    - domain: wo.vzwwo.com
+      comment: Verizon Wifi Calling
+    - domain: events.bsky.app
+      comment: Bluesky Loading
+  allow_regex:
+    - domain: "(\\.|^)wix\\.com$"
+      comment: Wix
+    - domain: "(\\.|^)intuit\\.com$"
+      comment: Intuit (TurboTax, CreditKarma, Mint)

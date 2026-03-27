@@ -27,6 +27,7 @@
     path: /etc/pihole
     owner: pihole
     group: pihole
+    mode: "0775"
     state: directory
 
 - name: Read current pihole config values
@@ -36,7 +37,12 @@
   changed_when: false
 
 - name: Apply pihole configuration
-  ansible.builtin.shell: "pihole-FTL --config {{ item.item.key }} '{{ item.item.value }}'"
+  ansible.builtin.command:
+    argv:
+      - pihole-FTL
+      - --config
+      - "{{ item.item.key }}"
+      - "{{ item.item.value }}"
   loop: "{{ pihole_current_config.results }}"
   register: pihole_set_result
   changed_when: pihole_set_result.stdout | trim != item.stdout | trim
@@ -60,14 +66,26 @@
   failed_when: false
 
 - name: Set pwhash
-  ansible.builtin.shell: "pihole-FTL --config webserver.api.pwhash '{{ pihole_secrets.secrets.pwhash }}'"
+  ansible.builtin.command:
+    argv:
+      - pihole-FTL
+      - --config
+      - webserver.api.pwhash
+      - "{{ pihole_secrets.secrets.pwhash }}"
   when: pihole_current_pwhash.stdout | trim != pihole_secrets.secrets.pwhash
+  changed_when: true
   no_log: true
   notify: Restart pihole
 
 - name: Set totp_secret
-  ansible.builtin.shell: "pihole-FTL --config webserver.api.totp_secret '{{ pihole_secrets.secrets.totp_secret }}'"
+  ansible.builtin.command:
+    argv:
+      - pihole-FTL
+      - --config
+      - webserver.api.totp_secret
+      - "{{ pihole_secrets.secrets.totp_secret }}"
   when: pihole_current_totp.stdout | trim != pihole_secrets.secrets.totp_secret
+  changed_when: true
   no_log: true
   notify: Restart pihole
 
@@ -130,6 +148,113 @@
     timeout: 120
   when: (pihole_lists_added.results | default([]) | length > 0) or
         (pihole_lists_removed.results | default([]) | length > 0)
+
+- name: Get current groups
+  ansible.builtin.uri:
+    url: http://localhost/api/groups
+    method: GET
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+  register: pihole_current_groups
+
+- name: Add missing groups
+  ansible.builtin.uri:
+    url: http://localhost/api/groups
+    method: POST
+    body_format: json
+    body:
+      name: "{{ item.name }}"
+      comment: "{{ item.comment | default('Managed by Ansible') }}"
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 201
+  loop: "{{ pihole_groups }}"
+  when: item.name not in (pihole_current_groups.json.groups | map(attribute='name'))
+  changed_when: true
+
+- name: Remove unmanaged groups
+  ansible.builtin.uri:
+    url: "http://localhost/api/groups/{{ item | urlencode() }}"
+    method: DELETE
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 204
+  loop: "{{ pihole_current_groups.json.groups | map(attribute='name') | reject('equalto', 'Default') | difference(pihole_groups | map(attribute='name')) }}"
+  changed_when: true
+
+- name: Refresh groups after changes
+  ansible.builtin.uri:
+    url: http://localhost/api/groups
+    method: GET
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+  register: pihole_current_groups
+
+- name: Build group name to ID map
+  ansible.builtin.set_fact:
+    pihole_group_id_map: "{{ dict(pihole_current_groups.json.groups | map(attribute='name') | zip(pihole_current_groups.json.groups | map(attribute='id'))) }}"
+
+- name: Get current clients
+  ansible.builtin.uri:
+    url: http://localhost/api/clients
+    method: GET
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+  register: pihole_current_clients
+
+- name: Add missing clients
+  ansible.builtin.uri:
+    url: http://localhost/api/clients
+    method: POST
+    body_format: json
+    body:
+      client: "{{ item.client }}"
+      comment: "{{ item.comment | default('') }}"
+      groups: "{{ item.groups | map('extract', pihole_group_id_map) | list }}"
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 201
+  loop: "{{ pihole_clients }}"
+  when: item.client not in (pihole_current_clients.json.clients | map(attribute='client'))
+  changed_when: true
+
+- name: Update existing clients with wrong groups
+  ansible.builtin.uri:
+    url: "http://localhost/api/clients/{{ item.client | urlencode() }}"
+    method: PUT
+    body_format: json
+    body:
+      comment: "{{ item.comment | default('') }}"
+      groups: "{{ item.groups | map('extract', pihole_group_id_map) | list }}"
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 200
+  loop: "{{ pihole_clients }}"
+  when: >
+    item.client in (pihole_current_clients.json.clients | map(attribute='client')) and
+    (pihole_current_clients.json.clients | selectattr('client', 'equalto', item.client) | first).groups | sort
+    != (item.groups | map('extract', pihole_group_id_map) | list) | sort
+  changed_when: true
+
+- name: Remove unmanaged clients
+  ansible.builtin.uri:
+    url: "http://localhost/api/clients/{{ item | urlencode() }}"
+    method: DELETE
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 204
+  loop: "{{ pihole_current_clients.json.clients | map(attribute='client') | difference(pihole_clients | map(attribute='client')) }}"
+  changed_when: true
+
+- name: Manage domain rules
+  ansible.builtin.include_tasks: domains.yml
+  loop:
+    - { type: deny, kind: exact, key: deny_exact }
+    - { type: deny, kind: regex, key: deny_regex }
+    - { type: allow, kind: exact, key: allow_exact }
+    - { type: allow, kind: regex, key: allow_regex }
+  loop_control:
+    loop_var: domain_type
 
 - name: Logout Pi-hole API session
   ansible.builtin.uri:
