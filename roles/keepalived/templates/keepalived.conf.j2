@@ -1,7 +1,12 @@
+global_defs {
+    enable_script_security
+}
+
 vrrp_script chk_pihole {
     script "/usr/local/bin/check_pihole.sh"
     interval 2
     weight -60
+    user root
 }
 
 vrrp_instance VI_1 {
