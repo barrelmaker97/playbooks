@@ -1,0 +1,44 @@
+---
+- name: Install unbound
+  ansible.builtin.apt:
+    name: unbound
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Create unbound config directory
+  ansible.builtin.file:
+    path: /etc/unbound/unbound.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download root hints
+  ansible.builtin.get_url:
+    url: https://www.internic.net/domain/named.cache
+    dest: /var/lib/unbound/root.hints
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart unbound
+
+- name: Copy unbound configurations
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/unbound/unbound.conf.d/{{ item | basename }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_fileglob:
+    - "files/*.conf"
+  notify: Restart unbound
+
+- name: Flush handlers to restart unbound before other roles
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure unbound is enabled and started
+  ansible.builtin.systemd:
+    name: unbound
+    enabled: true
+    state: started

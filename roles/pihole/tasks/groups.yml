@@ -1,0 +1,45 @@
+---
+- name: Get current groups
+  ansible.builtin.uri:
+    url: http://localhost/api/groups
+    method: GET
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+  register: pihole_current_groups
+
+- name: Add missing groups
+  ansible.builtin.uri:
+    url: http://localhost/api/groups
+    method: POST
+    body_format: json
+    body:
+      name: "{{ item.name }}"
+      comment: "{{ item.comment | default('Managed by Ansible') }}"
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 201
+  loop: "{{ pihole_groups }}"
+  when: item.name not in (pihole_current_groups.json.groups | map(attribute='name'))
+  changed_when: true
+
+- name: Remove unmanaged groups
+  ansible.builtin.uri:
+    url: "http://localhost/api/groups/{{ item | urlencode() }}"
+    method: DELETE
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 204
+  loop: "{{ pihole_current_groups.json.groups | map(attribute='name') | reject('equalto', 'Default') | difference(pihole_groups | map(attribute='name')) }}"
+  changed_when: true
+
+- name: Refresh groups after changes
+  ansible.builtin.uri:
+    url: http://localhost/api/groups
+    method: GET
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+  register: pihole_current_groups
+
+- name: Build group name to ID map
+  ansible.builtin.set_fact:
+    pihole_group_id_map: "{{ dict(pihole_current_groups.json.groups | map(attribute='name') | zip(pihole_current_groups.json.groups | map(attribute='id'))) }}"

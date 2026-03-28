@@ -1,0 +1,34 @@
+---
+- name: Get current adlists
+  ansible.builtin.uri:
+    url: http://localhost/api/lists
+    method: GET
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+  register: pihole_lists
+
+- name: Add missing adlists
+  ansible.builtin.uri:
+    url: http://localhost/api/lists?type=block
+    method: POST
+    body_format: json
+    body:
+      address: "{{ item }}"
+      comment: "Managed by Ansible"
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 201
+  loop: "{{ pihole_adlists | difference(pihole_lists.json.lists | map(attribute='address')) }}"
+  register: pihole_lists_added
+  changed_when: true
+
+- name: Remove unmanaged adlists
+  ansible.builtin.uri:
+    url: "http://localhost/api/lists/{{ item | urlencode() }}?type=block"
+    method: DELETE
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 204
+  loop: "{{ pihole_lists.json.lists | map(attribute='address') | difference(pihole_adlists) }}"
+  register: pihole_lists_removed
+  changed_when: true

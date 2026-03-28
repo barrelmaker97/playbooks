@@ -1,0 +1,12 @@
+---
+- name: Deploy DNS Stack
+  hosts: dns_servers
+  become: true
+  gather_facts: true
+  roles:
+    - role: unbound
+      tags: [unbound]
+    - role: pihole
+      tags: [pihole]
+    - role: keepalived
+      tags: [keepalived]

@@ -1,0 +1,24 @@
+global_defs {
+    enable_script_security
+}
+
+vrrp_script chk_pihole {
+    script "/usr/local/bin/check_pihole.sh"
+    interval 2
+    weight -60
+    user root
+}
+
+vrrp_instance VI_1 {
+    state {{ keepalived_state }}
+    interface {{ keepalived_interface }}
+    virtual_router_id {{ keepalived_router_id }}
+    priority {{ keepalived_priority }}
+    advert_int 1
+    virtual_ipaddress {
+        {{ keepalived_vip }}
+    }
+    track_script {
+        chk_pihole
+    }
+}

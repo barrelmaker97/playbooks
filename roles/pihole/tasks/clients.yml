@@ -1,0 +1,52 @@
+---
+- name: Get current clients
+  ansible.builtin.uri:
+    url: http://localhost/api/clients
+    method: GET
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+  register: pihole_current_clients
+
+- name: Add missing clients
+  ansible.builtin.uri:
+    url: http://localhost/api/clients
+    method: POST
+    body_format: json
+    body:
+      client: "{{ item.client }}"
+      comment: "{{ item.comment | default('') }}"
+      groups: "{{ item.groups | map('extract', pihole_group_id_map) | list }}"
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 201
+  loop: "{{ pihole_clients }}"
+  when: item.client not in (pihole_current_clients.json.clients | map(attribute='client'))
+  changed_when: true
+
+- name: Update existing clients with wrong groups
+  ansible.builtin.uri:
+    url: "http://localhost/api/clients/{{ item.client | urlencode() }}"
+    method: PUT
+    body_format: json
+    body:
+      comment: "{{ item.comment | default('') }}"
+      groups: "{{ item.groups | map('extract', pihole_group_id_map) | list }}"
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 200
+  loop: "{{ pihole_clients }}"
+  when: >
+    item.client in (pihole_current_clients.json.clients | map(attribute='client')) and
+    (pihole_current_clients.json.clients | selectattr('client', 'equalto', item.client) | first).groups | sort
+    != (item.groups | map('extract', pihole_group_id_map) | list) | sort
+  changed_when: true
+
+- name: Remove unmanaged clients
+  ansible.builtin.uri:
+    url: "http://localhost/api/clients/{{ item | urlencode() }}"
+    method: DELETE
+    headers:
+      sid: "{{ pihole_auth.json.session.sid }}"
+    status_code: 204
+  loop: "{{ pihole_current_clients.json.clients | map(attribute='client') | difference(pihole_clients | map(attribute='client')) }}"
+  changed_when: true

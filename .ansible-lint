@@ -2,5 +2,6 @@
 ---
 exclude_paths:
   - "*.sops.yaml"
+  - inventory.yaml
 warn_list:
   - experimental

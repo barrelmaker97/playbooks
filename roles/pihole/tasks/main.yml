@@ -1,0 +1,156 @@
+---
+- name: Check if Pi-hole is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/pihole
+  register: pihole_bin
+
+- name: Download Pi-hole installer
+  ansible.builtin.get_url:
+    url: https://install.pi-hole.net
+    dest: /tmp/pihole-install.sh
+    mode: '0755'
+  when: not pihole_bin.stat.exists
+
+- name: Create /etc/pihole for setupVars
+  ansible.builtin.file:
+    path: /etc/pihole
+    state: directory
+    mode: '0755'
+  when: not pihole_bin.stat.exists
+
+- name: Pre-seed setupVars.conf so installer skips dialogs
+  ansible.builtin.copy:
+    dest: /etc/pihole/setupVars.conf
+    content: ""
+    mode: '0644'
+  when: not pihole_bin.stat.exists
+
+- name: Install Pi-hole unattended
+  ansible.builtin.command: bash /tmp/pihole-install.sh --unattended
+  when: not pihole_bin.stat.exists
+  changed_when: true
+
+- name: Ensure pihole-FTL is started
+  ansible.builtin.systemd:
+    name: pihole-FTL
+    enabled: true
+    state: started
+
+- name: Ensure /etc/pihole is owned by pihole
+  ansible.builtin.file:
+    path: /etc/pihole
+    owner: pihole
+    group: pihole
+    mode: "0775"
+    state: directory
+
+- name: Read current pihole config values
+  ansible.builtin.command: "pihole-FTL --config {{ item.key }}"
+  loop: "{{ pihole_config | dict2items }}"
+  register: pihole_current_config
+  changed_when: false
+
+- name: Apply pihole configuration
+  ansible.builtin.command:
+    argv:
+      - pihole-FTL
+      - --config
+      - "{{ item.item.key }}"
+      - "{{ item.item.value }}"
+  loop: "{{ pihole_current_config.results }}"
+  register: pihole_set_result
+  changed_when: pihole_set_result.stdout | trim != item.stdout | trim
+
+- name: Load Pi-hole secrets
+  ansible.builtin.set_fact:
+    pihole_secrets: "{{ lookup('community.sops.sops', role_path + '/files/pihole.sops.yaml') | from_yaml }}"
+  no_log: true
+
+- name: Read current pwhash
+  ansible.builtin.command: pihole-FTL --config webserver.api.pwhash
+  register: pihole_current_pwhash
+  changed_when: false
+
+- name: Read current totp_secret from config file
+  ansible.builtin.command:
+    argv:
+      - grep
+      - -oP
+      - 'totp_secret = "\K[^"]+'
+      - /etc/pihole/pihole.toml
+  register: pihole_current_totp
+  changed_when: false
+  failed_when: false
+
+- name: Set pwhash
+  ansible.builtin.command:
+    argv:
+      - pihole-FTL
+      - --config
+      - webserver.api.pwhash
+      - "{{ pihole_secrets.secrets.pwhash }}"
+  when: pihole_current_pwhash.stdout | trim != pihole_secrets.secrets.pwhash
+  changed_when: true
+  no_log: true
+
+- name: Set totp_secret
+  ansible.builtin.command:
+    argv:
+      - pihole-FTL
+      - --config
+      - webserver.api.totp_secret
+      - "{{ pihole_secrets.secrets.totp_secret }}"
+  when: pihole_current_totp.stdout | trim != pihole_secrets.secrets.totp_secret
+  changed_when: true
+  no_log: true
+
+- name: Read Pi-hole CLI password
+  ansible.builtin.slurp:
+    src: /etc/pihole/cli_pw
+  register: pihole_cli_pw
+
+- name: Authenticate with Pi-hole API
+  ansible.builtin.uri:
+    url: http://localhost/api/auth
+    method: POST
+    body_format: json
+    body:
+      password: "{{ pihole_cli_pw.content | b64decode }}"
+    status_code: 200
+  register: pihole_auth
+
+- name: Manage Pi-hole via API
+  block:
+    - name: Manage adlists
+      ansible.builtin.include_tasks: adlists.yml
+
+    - name: Manage groups
+      ansible.builtin.include_tasks: groups.yml
+
+    - name: Manage clients
+      ansible.builtin.include_tasks: clients.yml
+
+    - name: Manage domain rules
+      ansible.builtin.include_tasks: domains.yml
+      loop:
+        - { type: deny, kind: exact, key: deny_exact }
+        - { type: deny, kind: regex, key: deny_regex }
+        - { type: allow, kind: exact, key: allow_exact }
+        - { type: allow, kind: regex, key: allow_regex }
+      loop_control:
+        loop_var: domain_type
+
+    - name: Update gravity after all changes
+      ansible.builtin.command: pihole -g
+      when: pihole_lists_added is changed or pihole_lists_removed is changed
+      changed_when: true
+
+  always:
+    - name: Logout Pi-hole API session
+      ansible.builtin.uri:
+        url: http://localhost/api/auth
+        method: DELETE
+        headers:
+          sid: "{{ pihole_auth.json.session.sid }}"
+        status_code: 204
+      when: pihole_auth.json.session.sid is defined
