@@ -21,7 +21,7 @@
 - name: Pre-seed setupVars.conf so installer skips dialogs
   ansible.builtin.copy:
     dest: /etc/pihole/setupVars.conf
-    content: ""
+    content: "PIHOLE_DNS_1=127.0.0.1#5335\n"
     mode: '0644'
   when: not pihole_bin.stat.exists
 
