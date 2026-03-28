@@ -32,14 +32,3 @@
   loop: "{{ pihole_lists.json.lists | map(attribute='address') | difference(pihole_adlists) }}"
   register: pihole_lists_removed
   changed_when: true
-
-- name: Update gravity
-  ansible.builtin.uri:
-    url: http://localhost/api/action/gravity
-    method: POST
-    headers:
-      sid: "{{ pihole_auth.json.session.sid }}"
-    status_code: 200
-    timeout: 120
-  when: (pihole_lists_added.results | default([]) | length > 0) or
-        (pihole_lists_removed.results | default([]) | length > 0)

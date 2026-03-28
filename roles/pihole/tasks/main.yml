@@ -11,6 +11,20 @@
     mode: '0755'
   when: not pihole_bin.stat.exists
 
+- name: Create /etc/pihole for setupVars
+  ansible.builtin.file:
+    path: /etc/pihole
+    state: directory
+    mode: '0755'
+  when: not pihole_bin.stat.exists
+
+- name: Pre-seed setupVars.conf so installer skips dialogs
+  ansible.builtin.copy:
+    dest: /etc/pihole/setupVars.conf
+    content: ""
+    mode: '0644'
+  when: not pihole_bin.stat.exists
+
 - name: Install Pi-hole unattended
   ansible.builtin.command: bash /tmp/pihole-install.sh --unattended
   when: not pihole_bin.stat.exists
@@ -46,7 +60,6 @@
   loop: "{{ pihole_current_config.results }}"
   register: pihole_set_result
   changed_when: pihole_set_result.stdout | trim != item.stdout | trim
-  notify: Restart pihole
 
 - name: Load Pi-hole secrets
   ansible.builtin.set_fact:
@@ -79,7 +92,6 @@
   when: pihole_current_pwhash.stdout | trim != pihole_secrets.secrets.pwhash
   changed_when: true
   no_log: true
-  notify: Restart pihole
 
 - name: Set totp_secret
   ansible.builtin.command:
@@ -91,7 +103,6 @@
   when: pihole_current_totp.stdout | trim != pihole_secrets.secrets.totp_secret
   changed_when: true
   no_log: true
-  notify: Restart pihole
 
 - name: Read Pi-hole CLI password
   ansible.builtin.slurp:
@@ -128,6 +139,11 @@
         - { type: allow, kind: regex, key: allow_regex }
       loop_control:
         loop_var: domain_type
+
+    - name: Update gravity after all changes
+      ansible.builtin.command: pihole -g
+      when: pihole_lists_added is changed or pihole_lists_removed is changed
+      changed_when: true
 
   always:
     - name: Logout Pi-hole API session

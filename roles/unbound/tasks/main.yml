@@ -34,6 +34,9 @@
     - "files/*.conf"
   notify: Restart unbound
 
+- name: Flush handlers to restart unbound before other roles
+  ansible.builtin.meta: flush_handlers
+
 - name: Ensure unbound is enabled and started
   ansible.builtin.systemd:
     name: unbound
