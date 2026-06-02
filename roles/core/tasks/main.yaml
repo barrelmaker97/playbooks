@@ -361,7 +361,7 @@
 - name: Create Longhorn Snapshot Alerts
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('file', 'files/prometheusrule-longhorn-snapshots.yaml') | from_yaml }}"
+    definition: "{{ lookup('template', 'prometheusrule-longhorn-snapshots.yaml.j2') | from_yaml }}"
 
 - name: Create Discord Webhook URL Secret
   kubernetes.core.k8s:
