@@ -1,3 +1,9 @@
+kubeEtcd:
+  enabled: true
+  endpoints:
+{% for n in node_names %}
+    - {{ n }}.{{ local_domain }}
+{%- endfor %}
 kubeScheduler:
   service:
     selector:
