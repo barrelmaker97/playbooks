@@ -8,7 +8,7 @@ defaultSettings:
   allowVolumeCreationWithDegradedAvailability: false
   backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
   defaultDataLocality: best-effort
-  defaultReplicaCount: "{'v1':'2','v2':'2'}"
+  defaultReplicaCount: "2"
   replicaAutoBalance: least-effort
   snapshotMaxCount: "{{ longhorn_snapshot_max_count }}"
   storageMinimalAvailablePercentage: "10"
