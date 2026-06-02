@@ -1,0 +1,39 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: longhorn-snapshots
+  namespace: monitoring
+spec:
+  groups:
+    - name: longhorn-snapshots
+      rules:
+        - alert: LonghornVolumeSnapshotCountHigh
+          expr: count by (volume) (longhorn_snapshot_actual_size_bytes) > 40
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Longhorn volume {% raw %}{{ $labels.volume }}{% endraw %} has too many snapshots"
+            description: >-
+              Longhorn volume {% raw %}{{ $labels.volume }}{% endraw %} has {% raw %}{{ $value }}{% endraw %} snapshots,
+              which is well above the expected steady state (~25 for the default
+              hourly recurring job with retain 24). This often indicates snapshots
+              that are no longer being pruned by retention (for example, snapshots
+              left behind by a renamed or deleted recurring job). The volume's
+              snapshot-max-count cap is {{ longhorn_snapshot_max_count }}; once reached, Longhorn stops creating
+              new snapshots and recurring snapshot jobs and replica rebuilds may
+              be affected. Investigate and remove stale snapshots.
+        - alert: LonghornVolumeSnapshotCountCritical
+          expr: count by (volume) (longhorn_snapshot_actual_size_bytes) > {{ longhorn_snapshot_max_count - 2 }}
+          for: 1h
+          labels:
+            severity: critical
+          annotations:
+            summary: "Longhorn volume {% raw %}{{ $labels.volume }}{% endraw %} is at the snapshot cap"
+            description: >-
+              Longhorn volume {% raw %}{{ $labels.volume }}{% endraw %} has {% raw %}{{ $value }}{% endraw %} snapshots and
+              is at or near the snapshot-max-count cap of {{ longhorn_snapshot_max_count }}. Once the cap is
+              reached, Longhorn stops creating new snapshots, so recurring
+              snapshot data protection silently stops and replica rebuilds may be
+              affected. Remove stale snapshots now to restore headroom.

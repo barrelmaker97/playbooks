@@ -10,6 +10,7 @@ defaultSettings:
   defaultDataLocality: best-effort
   defaultReplicaCount: "{'v1':'2','v2':'2'}"
   replicaAutoBalance: least-effort
+  snapshotMaxCount: "{{ longhorn_snapshot_max_count }}"
   storageMinimalAvailablePercentage: "10"
 ingress:
   enabled: true

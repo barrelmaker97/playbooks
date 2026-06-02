@@ -358,6 +358,11 @@
     namespace: monitoring
     definition: "{{ lookup('file', 'files/alertmanagerconfig.yaml') | from_yaml }}"
 
+- name: Create Longhorn Snapshot Alerts
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'prometheusrule-longhorn-snapshots.yaml.j2') | from_yaml }}"
+
 - name: Create Discord Webhook URL Secret
   kubernetes.core.k8s:
     state: present
