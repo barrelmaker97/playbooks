@@ -14,6 +14,12 @@ node_names:
   - node1-poseidon
   - node2-poseidon
   - node3-poseidon
+# etcd Prometheus scrape targets. Kubernetes Endpoints objects require literal
+# IPs (hostnames are rejected), so these must be kept in sync with the nodes.
+node_ips:
+  - 192.168.15.41
+  - 192.168.15.42
+  - 192.168.15.43
 ntp_server: 192.168.15.1
 talos_config_dir: /home/barrelmaker/.talos
 talos_version: "1.13.3"
