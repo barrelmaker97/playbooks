@@ -24,3 +24,16 @@ spec:
               snapshot-max-count cap is 50; once reached, Longhorn stops creating
               new snapshots and recurring snapshot jobs and replica rebuilds may
               be affected. Investigate and remove stale snapshots.
+        - alert: LonghornVolumeSnapshotCountCritical
+          expr: count by (volume) (longhorn_snapshot_actual_size_bytes) > 48
+          for: 1h
+          labels:
+            severity: critical
+          annotations:
+            summary: "Longhorn volume {{ $labels.volume }} is at the snapshot cap"
+            description: >-
+              Longhorn volume {{ $labels.volume }} has {{ $value }} snapshots and
+              is at or near the snapshot-max-count cap of 50. Once the cap is
+              reached, Longhorn stops creating new snapshots, so recurring
+              snapshot data protection silently stops and replica rebuilds may be
+              affected. Remove stale snapshots now to restore headroom.
