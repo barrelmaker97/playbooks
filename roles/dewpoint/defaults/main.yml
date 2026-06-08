@@ -1,0 +1,6 @@
+---
+# Port on which the dewpoint exporter serves metrics.
+dewpoint_bind_port: 9185
+# Optional allowlist of Govee H5075 MAC addresses to export. When empty, every
+# discovered sensor in range is exported. Example: "A4:C1:38:7A:93:C3".
+dewpoint_address: ""
