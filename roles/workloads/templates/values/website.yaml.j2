@@ -33,19 +33,24 @@ securityContext:
       - ALL
 
 ingress:
+  enabled: false
+
+httpRoute:
   enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-  hosts:
-    - host: barrelmaker.dev
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: website-tls
-      hosts:
-        - barrelmaker.dev
+  parentRefs:
+    - name: "{{ gateway_name }}"
+      namespace: "{{ gateway_namespace }}"
+      sectionName: https-website
+  hostnames:
+    - "{{ external_domain }}"
+  filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+{% for header in gateway_response_headers %}
+          - name: {{ header.name }}
+            value: "{{ header.value }}"
+{% endfor %}
 
 resources:
   requests:

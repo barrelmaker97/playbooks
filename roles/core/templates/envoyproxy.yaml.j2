@@ -1,0 +1,18 @@
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: envoy-proxy-config
+  namespace: {{ gateway_namespace }}
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        replicas: 2
+      envoyService:
+        annotations:
+          metallb.io/loadBalancerIPs: "{{ gateway_ip }}"
+  telemetry:
+    metrics:
+      prometheus: {}

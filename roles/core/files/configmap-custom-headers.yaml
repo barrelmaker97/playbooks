@@ -1,9 +1,0 @@
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: custom-headers
-  namespace: ingress-nginx
-data:
-  Referrer-Policy: same-origin
-  X-Content-Type-Options: nosniff

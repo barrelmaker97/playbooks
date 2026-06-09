@@ -1,5 +1,10 @@
 ---
-baseDomain: barrelmaker.dev
-externalName: soteria
-ingressClass: nginx
-issuerName: letsencrypt-prod
+baseDomain: "{{ external_domain }}"
+ingress:
+  enabled: false
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: "{{ gateway_name }}"
+      namespace: "{{ gateway_namespace }}"
+      sectionName: https-dotfiles

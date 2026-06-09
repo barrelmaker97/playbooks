@@ -12,7 +12,11 @@ defaultSettings:
   replicaAutoBalance: least-effort
   snapshotMaxCount: "{{ longhorn_snapshot_max_count }}"
   storageMinimalAvailablePercentage: "10"
-ingress:
+httproute:
   enabled: true
-  ingressClassName: nginx
-  host: "longhorn.{{ cluster_domain }}"
+  parentRefs:
+    - name: "{{ gateway_name }}"
+      namespace: "{{ gateway_namespace }}"
+      sectionName: http
+  hostnames:
+    - "longhorn.{{ cluster_domain }}"

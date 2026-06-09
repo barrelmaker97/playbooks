@@ -75,6 +75,45 @@ talosctl -n node1-poseidon.lan upgrade-k8s --dry-run
 talosctl -n node1-poseidon.lan upgrade-k8s
 ```
 
+# Gateway API Cutover (ingress-nginx removal)
+The core role deploys Envoy Gateway (Gateway API) which replaces the retired
+ingress-nginx controller. The router forwards ports 80/443 to `192.168.15.60`,
+which ingress-nginx holds until cutover. To migrate without downtime:
+
+1. Run the playbooks with `gateway_ip: 192.168.15.65` (transition IP). Both
+   ingress-nginx and the gateway will serve all hosts side by side.
+2. Seed the gateway's TLS secrets from the existing ones so the HTTPS
+   listeners are valid immediately (cert-manager adopts and renews them later):
+   ```bash
+   for s in website-tls:barrelmaker:website-tls \
+            dotfiles-ingress-tls:barrelmaker:dotfiles-tls \
+            jellyfin-tls:barrelmaker:jellyfin-tls \
+            niucraft-dynmap-tls:barrelmaker:niucraft-tls \
+            obscura-tls:barrelmaker:obscura-tls \
+            dev-obscura-tls:barrelmaker:devscura-tls \
+            grafana-tls:monitoring:grafana-tls; do
+     IFS=: read -r old ns new <<< "$s"
+     kubectl get secret "$old" -n "$ns" -o json \
+       | jq 'del(.metadata) | .metadata = {name: "'"$new"'", namespace: "envoy-gateway-system"}' \
+       | kubectl apply -f -
+   done
+   ```
+3. Validate every host against the gateway, e.g.:
+   ```bash
+   curl -sI --resolve barrelmaker.dev:443:192.168.15.65 https://barrelmaker.dev
+   ```
+4. Cutover (a few seconds of downtime while MetalLB reassigns the IP):
+   ```bash
+   helm uninstall ingress-nginx -n ingress-nginx
+   ```
+   Then set `gateway_ip: 192.168.15.60` in `group_vars/all.yaml` and re-run
+   the core playbook. Old Ingress resources are removed by the workload chart
+   upgrades; certificate renewals are validated through the gateway
+   (`gatewayHTTPRoute` solver) from this point on.
+5. Verify external reachability and certificate issuance, then clean up:
+   orphaned `*-tls` secrets in the `barrelmaker`/`monitoring` namespaces and
+   the empty `ingress-nginx` namespace.
+
 # License
 
 Copyright (c) 2026 Nolan Cooper
