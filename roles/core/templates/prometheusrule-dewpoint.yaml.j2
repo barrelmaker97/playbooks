@@ -6,6 +6,28 @@ metadata:
   namespace: monitoring
 spec:
   groups:
+    - name: dewpoint-derived
+      # Psychrometric quantities derived from temperature and relative humidity
+      # using the Magnus formula. Rules within a group evaluate in order, so
+      # later rules may reference the recording rules defined above them.
+      rules:
+        - record: dewpoint:saturation_vapour_pressure_kpa
+          expr: >-
+            0.6108 * exp(17.27 * max by (address, name) (dewpoint_temperature_celsius)
+            / (max by (address, name) (dewpoint_temperature_celsius) + 237.3))
+        - record: dewpoint:vpd_kpa
+          expr: >-
+            dewpoint:saturation_vapour_pressure_kpa
+            * (1 - max by (address, name) (dewpoint_humidity_percent) / 100)
+        - record: dewpoint:magnus_alpha
+          expr: >-
+            ln(max by (address, name) (dewpoint_humidity_percent) / 100)
+            + 17.27 * max by (address, name) (dewpoint_temperature_celsius)
+            / (max by (address, name) (dewpoint_temperature_celsius) + 237.3)
+        - record: dewpoint:dew_point_celsius
+          expr: 237.3 * dewpoint:magnus_alpha / (17.27 - dewpoint:magnus_alpha)
+        - record: dewpoint:dew_point_fahrenheit
+          expr: dewpoint:dew_point_celsius * 9 / 5 + 32
     - name: dewpoint
       rules:
         - alert: DewpointSensorStale
