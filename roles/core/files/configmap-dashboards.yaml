@@ -13304,7 +13304,7 @@ data:
           },
           "gridPos": {
             "h": 5,
-            "w": 6,
+            "w": 4,
             "x": 0,
             "y": 0
           },
@@ -13377,8 +13377,8 @@ data:
           },
           "gridPos": {
             "h": 5,
-            "w": 6,
-            "x": 6,
+            "w": 4,
+            "x": 4,
             "y": 0
           },
           "id": 2,
@@ -13422,6 +13422,156 @@ data:
               "color": {
                 "mode": "thresholds"
               },
+              "unit": "fahrenheit",
+              "decimals": 1,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 50
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 61
+                  },
+                  {
+                    "color": "orange",
+                    "value": 64
+                  },
+                  {
+                    "color": "red",
+                    "value": 68
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 4,
+            "x": 8,
+            "y": 0
+          },
+          "id": 3,
+          "options": {
+            "colorMode": "background_solid",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "textMode": "value_and_name",
+            "wideLayout": true,
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "pluginVersion": "11.3.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "max by (address, name) (dewpoint:dew_point_fahrenheit)",
+              "legendFormat": "{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Dew Point",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "unit": "pressurekpa",
+              "decimals": 2,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 0.4
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1.6
+                  },
+                  {
+                    "color": "orange",
+                    "value": 2.0
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 4,
+            "x": 12,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "colorMode": "background_solid",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "textMode": "value_and_name",
+            "wideLayout": true,
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "pluginVersion": "11.3.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "max by (address, name) (dewpoint:vpd_kpa)",
+              "legendFormat": "{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "VPD",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
               "unit": "percent",
               "min": 0,
               "max": 100,
@@ -13452,11 +13602,11 @@ data:
           },
           "gridPos": {
             "h": 5,
-            "w": 6,
-            "x": 12,
+            "w": 4,
+            "x": 16,
             "y": 0
           },
-          "id": 3,
+          "id": 5,
           "options": {
             "orientation": "auto",
             "showThresholdLabels": false,
@@ -13518,11 +13668,11 @@ data:
           },
           "gridPos": {
             "h": 5,
-            "w": 6,
-            "x": 18,
+            "w": 4,
+            "x": 20,
             "y": 0
           },
-          "id": 4,
+          "id": 6,
           "options": {
             "colorMode": "background_solid",
             "graphMode": "none",
@@ -13617,12 +13767,12 @@ data:
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 8,
             "w": 12,
             "x": 0,
             "y": 5
           },
-          "id": 5,
+          "id": 7,
           "options": {
             "legend": {
               "calcs": [
@@ -13713,12 +13863,12 @@ data:
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 8,
             "w": 12,
             "x": 12,
             "y": 5
           },
-          "id": 6,
+          "id": 8,
           "options": {
             "legend": {
               "calcs": [
@@ -13747,6 +13897,202 @@ data:
             }
           ],
           "title": "Humidity",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "unit": "fahrenheit",
+              "decimals": 1,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "fillOpacity": 18,
+                "gradientMode": "scheme",
+                "showPoints": "never",
+                "spanNulls": true,
+                "pointSize": 5,
+                "axisPlacement": "auto",
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "axisColorMode": "text"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 50
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 61
+                  },
+                  {
+                    "color": "orange",
+                    "value": 64
+                  },
+                  {
+                    "color": "red",
+                    "value": 68
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 13
+          },
+          "id": 9,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull",
+                "min",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "max by (address, name) (dewpoint:dew_point_fahrenheit)",
+              "legendFormat": "{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Dew Point",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "unit": "pressurekpa",
+              "decimals": 2,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "fillOpacity": 18,
+                "gradientMode": "scheme",
+                "showPoints": "never",
+                "spanNulls": true,
+                "pointSize": 5,
+                "axisPlacement": "auto",
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "axisColorMode": "text"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 0.4
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1.6
+                  },
+                  {
+                    "color": "orange",
+                    "value": 2.0
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 13
+          },
+          "id": 10,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull",
+                "min",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "max by (address, name) (dewpoint:vpd_kpa)",
+              "legendFormat": "{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Vapor Pressure Deficit",
           "type": "timeseries"
         },
         {
@@ -13788,12 +14134,12 @@ data:
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h": 7,
             "w": 24,
             "x": 0,
-            "y": 14
+            "y": 21
           },
-          "id": 7,
+          "id": 11,
           "options": {
             "legend": {
               "calcs": [
@@ -13843,5 +14189,5 @@ data:
       "timezone": "browser",
       "title": "Dewpoint",
       "uid": "dewpoint",
-      "version": 2
+      "version": 3
     }
