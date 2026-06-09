@@ -49,11 +49,10 @@ email_address: nolancooper97@gmail.com
 metallb_ip_range: 192.168.15.60-192.168.15.69
 
 # Gateway API configuration
-# IP for the Envoy Gateway LoadBalancer service. The router forwards ports
-# 80/443 to .60, which ingress-nginx currently holds. Run with the transition
-# IP (.65) until cutover; then uninstall ingress-nginx, switch this to .60,
-# and re-run the core playbook.
-gateway_ip: 192.168.15.65
+# IP for the Envoy Gateway LoadBalancer service; the router forwards ports
+# 80/443 here. ingress-nginx must be uninstalled before MetalLB can assign
+# this IP to the gateway (see the cutover runbook in the README).
+gateway_ip: 192.168.15.60
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
 # One HTTPS listener (and cert-manager-managed certificate '<name>-tls') is

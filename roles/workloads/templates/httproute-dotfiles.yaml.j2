@@ -1,0 +1,26 @@
+---
+# Serves https://dotfiles.{{ external_domain }} as a redirect to the updot
+# script, replacing the retired ingress chart's rewrite-target hack.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: dotfiles
+  namespace: {{ workload_namespace }}
+spec:
+  parentRefs:
+    - name: "{{ gateway_name }}"
+      namespace: "{{ gateway_namespace }}"
+      sectionName: https-dotfiles
+  hostnames:
+    - "dotfiles.{{ external_domain }}"
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            hostname: raw.githubusercontent.com
+            port: 443
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /barrelmaker97/dotfiles/master/bin/updot
+            statusCode: 302
