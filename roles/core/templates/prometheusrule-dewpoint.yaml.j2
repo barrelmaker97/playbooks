@@ -1,0 +1,35 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: dewpoint
+  namespace: monitoring
+spec:
+  groups:
+    - name: dewpoint
+      rules:
+        - alert: DewpointSensorStale
+          expr: time() - max by (address, name) (dewpoint_last_seen_timestamp_seconds) > 300
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Govee sensor {% raw %}{{ $labels.name }}{% endraw %} has stopped broadcasting"
+            description: >-
+              No dewpoint exporter has received a broadcast from Govee sensor
+              {% raw %}{{ $labels.name }}{% endraw %} ({% raw %}{{ $labels.address }}{% endraw %}) in over
+              5 minutes. The H5075 broadcasts roughly every 2 seconds, so this
+              usually means the sensor is out of range of every Pi, an app has
+              opened a Bluetooth connection (which suppresses broadcasts), or the
+              battery has died.
+        - alert: DewpointSensorBatteryLow
+          expr: max by (address, name) (dewpoint_battery_percent) < 15
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "Govee sensor {% raw %}{{ $labels.name }}{% endraw %} battery is low"
+            description: >-
+              Govee sensor {% raw %}{{ $labels.name }}{% endraw %} ({% raw %}{{ $labels.address }}{% endraw %})
+              battery is at {% raw %}{{ $value }}{% endraw %}%. Replace the coin cell
+              soon; once it dies the sensor stops broadcasting and readings are lost.

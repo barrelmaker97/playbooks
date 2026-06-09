@@ -363,6 +363,11 @@
     state: present
     definition: "{{ lookup('template', 'prometheusrule-longhorn-snapshots.yaml.j2') | from_yaml }}"
 
+- name: Create Dewpoint Sensor Alerts
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'prometheusrule-dewpoint.yaml.j2') | from_yaml }}"
+
 - name: Create Discord Webhook URL Secret
   kubernetes.core.k8s:
     state: present
