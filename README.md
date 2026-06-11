@@ -75,54 +75,6 @@ talosctl -n node1-poseidon.lan upgrade-k8s --dry-run
 talosctl -n node1-poseidon.lan upgrade-k8s
 ```
 
-# Gateway API Cutover (ingress-nginx removal)
-The core role deploys Envoy Gateway (Gateway API), which replaces the retired
-ingress-nginx controller. The gateway and its Let's Encrypt certificates are
-already live and validated on a temporary IP; the router forwards ports 80/443
-to `192.168.15.60` (`gateway_ip`), which ingress-nginx holds until cutover.
-Workload chart upgrades replace Ingresses with HTTPRoutes, so the switch
-happens in one short window (a few minutes of external downtime):
-
-1. Release the updated charts and merge this branch.
-2. Free up the load balancer IP (external downtime starts):
-   ```bash
-   helm uninstall ingress-nginx -n ingress-nginx
-   helm uninstall ingress -n barrelmaker  # legacy dotfiles redirect chart
-   kubectl delete namespace ingress-nginx
-   ```
-3. Apply everything (gateway takes over the IP, issuers switch to the
-   `gatewayHTTPRoute` solver, charts swap Ingresses for HTTPRoutes):
-   ```bash
-   ansible-playbook core.yaml
-   ansible-playbook workloads.yaml
-   ```
-4. Verify external reachability of every host and confirm the ACME solver
-   works through the gateway with a throwaway staging certificate:
-   ```bash
-   kubectl apply -f - <<'EOF'
-   apiVersion: cert-manager.io/v1
-   kind: Certificate
-   metadata:
-     name: solver-test
-     namespace: envoy-gateway-system
-   spec:
-     secretName: solver-test-tls
-     dnsNames: [barrelmaker.dev]
-     issuerRef: {name: letsencrypt-staging, kind: ClusterIssuer}
-   EOF
-   kubectl wait --for=condition=Ready certificate/solver-test \
-     -n envoy-gateway-system --timeout=180s
-   kubectl delete certificate solver-test -n envoy-gateway-system
-   kubectl delete secret solver-test-tls -n envoy-gateway-system
-   ```
-5. Remove orphaned TLS secrets left behind by the deleted Ingresses
-   (certificates now live in `envoy-gateway-system`):
-   ```bash
-   kubectl delete secret -n barrelmaker website-tls dotfiles-ingress-tls \
-     jellyfin-tls niucraft-dynmap-tls obscura-tls dev-obscura-tls
-   kubectl delete secret -n monitoring grafana-tls
-   ```
-
 # License
 
 Copyright (c) 2026 Nolan Cooper
