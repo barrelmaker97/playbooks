@@ -20,20 +20,22 @@ dynmap:
       capabilities:
         drop:
           - ALL
-  ingress:
+  httpRoute:
     enabled: true
-    className: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-    hosts:
-      - host: niucraft.barrelmaker.dev
-        paths:
-          - path: /
-            pathType: Prefix
-    tls:
-      - secretName: niucraft-dynmap-tls
-        hosts:
-          - niucraft.barrelmaker.dev
+    parentRefs:
+      - name: "{{ gateway_name }}"
+        namespace: "{{ gateway_namespace }}"
+        sectionName: https-niucraft
+    hostnames:
+      - "niucraft.{{ external_domain }}"
+    filters:
+      - type: ResponseHeaderModifier
+        responseHeaderModifier:
+          set:
+{% for header in gateway_response_headers %}
+            - name: {{ header.name }}
+              value: "{{ header.value }}"
+{% endfor %}
 
 metrics:
   enabled: true

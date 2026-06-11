@@ -21,20 +21,22 @@ securityContext:
     drop:
       - ALL
 
-ingress:
+httpRoute:
   enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-  hosts:
-    - host: jellyfin.barrelmaker.dev
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: jellyfin-tls
-      hosts:
-        - jellyfin.barrelmaker.dev
+  parentRefs:
+    - name: "{{ gateway_name }}"
+      namespace: "{{ gateway_namespace }}"
+      sectionName: https-jellyfin
+  hostnames:
+    - "jellyfin.{{ external_domain }}"
+  filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+{% for header in gateway_response_headers %}
+          - name: {{ header.name }}
+            value: "{{ header.value }}"
+{% endfor %}
 
 resources:
   requests:

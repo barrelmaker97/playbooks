@@ -33,7 +33,7 @@ nut_password: hunter2
 # Service versions
 cert_manager_version: "1.20.2"
 trust_manager_version: "0.22.1"
-ingress_nginx_version: "4.15.1"
+envoy_gateway_version: "v1.8.1"  # OCI chart tags are v-prefixed
 metrics_server_version: "3.13.0"
 metallb_version: "0.16.1"
 prometheus_crds_version: "28.0.0"
@@ -47,6 +47,37 @@ dewpoint_version: "0.1.2"
 # Service configuration
 email_address: nolancooper97@gmail.com
 metallb_ip_range: 192.168.15.60-192.168.15.69
+
+# Gateway API configuration
+# IP for the Envoy Gateway LoadBalancer service; the router forwards ports
+# 80/443 here.
+gateway_ip: 192.168.15.60
+gateway_name: poseidon
+gateway_namespace: envoy-gateway-system
+# One HTTPS listener (and cert-manager-managed certificate '<name>-tls') is
+# created per entry. Routes attach via sectionName "https-<name>".
+gateway_https_listeners:
+  - { name: website, hostname: "{{ external_domain }}" }
+  - { name: dotfiles, hostname: "dotfiles.{{ external_domain }}" }
+  - { name: jellyfin, hostname: "jellyfin.{{ external_domain }}" }
+  - { name: niucraft, hostname: "niucraft.{{ external_domain }}" }
+  - { name: obscura, hostname: "obscura.{{ external_domain }}" }
+  - { name: devscura, hostname: "dev.obscura.{{ external_domain }}" }
+  - { name: grafana, hostname: "grafana.{{ external_domain }}" }
+# Local LAN HTTPS listeners (using the internal-ca ClusterIssuer)
+gateway_local_https_listeners:
+  - { name: longhorn, hostname: "longhorn.{{ cluster_domain }}" }
+  - { name: prometheus, hostname: "prometheus.{{ cluster_domain }}" }
+  - { name: alertmanager, hostname: "alertmanager.{{ cluster_domain }}" }
+
+# Security headers added to responses on external HTTPS routes
+gateway_response_headers:
+  - name: Strict-Transport-Security
+    value: "max-age=63072000; includeSubDomains; preload"
+  - name: Referrer-Policy
+    value: "same-origin"
+  - name: X-Content-Type-Options
+    value: "nosniff"
 
 # Longhorn configuration
 # Hard cap on snapshots per volume (backpressure: blocks new snapshots once

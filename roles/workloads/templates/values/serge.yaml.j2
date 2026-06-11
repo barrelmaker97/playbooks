@@ -13,14 +13,14 @@ securityContext:
     drop:
       - ALL
 
-ingress:
+httpRoute:
   enabled: true
-  className: nginx
-  hosts:
-    - host: chat.poseidon.lan
-      paths:
-        - path: /
-          pathType: Prefix
+  parentRefs:
+    - name: "{{ gateway_name }}"
+      namespace: "{{ gateway_namespace }}"
+      sectionName: http
+  hostnames:
+    - "chat.{{ cluster_domain }}"
 
 resources:
   requests:

@@ -11,7 +11,6 @@
     helm_repos:
       grafana: https://grafana.github.io/helm-charts
       grafana-community: https://grafana-community.github.io/helm-charts
-      ingress-nginx: https://kubernetes.github.io/ingress-nginx
       jetstack: https://charts.jetstack.io
       longhorn: https://charts.longhorn.io
       metallb: https://metallb.github.io/metallb
@@ -147,41 +146,109 @@
     state: present
     definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
 
-- name: Deploy Ingress Nginx
+- name: Deploy Envoy Gateway
   ansible.builtin.include_role:
     name: helm
     tasks_from: deploy
   vars:
-    helm_chart_name: ingress-nginx
-    helm_chart_ref: ingress-nginx/ingress-nginx
-    helm_chart_version: "{{ ingress_nginx_version }}"
-    helm_chart_namespace: ingress-nginx
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/ingress-nginx.yaml.j2"
+    helm_chart_name: envoy-gateway
+    helm_chart_ref: oci://docker.io/envoyproxy/gateway-helm
+    helm_chart_version: "{{ envoy_gateway_version }}"
+    helm_chart_namespace: "{{ gateway_namespace }}"
 
-- name: Set Nginx Ingress Controller Custom Headers
+- name: Create Envoy Proxy Config
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('file', 'files/configmap-custom-headers.yaml') | from_yaml }}"
+    template: envoyproxy.yaml.j2
 
-- name: Set Nginx Ingress Controller Config
+- name: Create Gateway Class
   kubernetes.core.k8s:
     state: present
     definition:
-      apiVersion: v1
-      kind: ConfigMap
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: GatewayClass
       metadata:
-        name: ingress-nginx-controller
-        namespace: ingress-nginx
-      data:
-        add-headers: "ingress-nginx/custom-headers"
-        annotation-value-word-blocklist: "load_module,lua_package,_by_lua,location,root,proxy_pass,serviceaccount,{,}"
-        enable-brotli: "true"
-        hsts-max-age: "63072000"
-        hsts-preload: "true"
-        ssl-reject-handshake: "true"
-        ssl-session-cache: "true"
-        ssl-session-cache-size: "10m"
-        ssl-session-tickets: "true"
+        name: envoy
+      spec:
+        controllerName: gateway.envoyproxy.io/gatewayclass-controller
+        parametersRef:
+          group: gateway.envoyproxy.io
+          kind: EnvoyProxy
+          name: envoy-proxy-config
+          namespace: "{{ gateway_namespace }}"
+
+- name: Create Gateway
+  kubernetes.core.k8s:
+    state: present
+    template: gateway.yaml.j2
+
+- name: Create HTTPS Redirect Route
+  kubernetes.core.k8s:
+    state: present
+    template: httproute-https-redirect.yaml.j2
+
+- name: Create LAN TLS Certificates
+  kubernetes.core.k8s:
+    state: present
+    template: certificates-lan.yaml.j2
+
+- name: Create Public TLS Certificates
+  kubernetes.core.k8s:
+    state: present
+    template: certificates-public.yaml.j2
+
+- name: Create Basic Auth Secrets
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('community.sops.sops', 'files/secret-basic-auth.sops.yaml') | from_yaml | combine({'metadata': {'namespace': item}}, recursive=True) }}"
+  loop:
+    - longhorn-system
+    - monitoring
+
+- name: Create LAN Security Policies
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'securitypolicies-lan.yaml.j2') | from_yaml }}"
+  loop:
+    - { name: longhorn-auth, namespace: longhorn-system, route_name: longhorn-httproute }
+    - { name: prometheus-auth, namespace: monitoring, route_name: kube-prometheus-stack-prometheus }
+    - { name: alertmanager-auth, namespace: monitoring, route_name: kube-prometheus-stack-alertmanager }
+
+- name: Enable Response Compression
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: gateway.envoyproxy.io/v1alpha1
+      kind: BackendTrafficPolicy
+      metadata:
+        name: compression
+        namespace: "{{ gateway_namespace }}"
+      spec:
+        targetRefs:
+          - group: gateway.networking.k8s.io
+            kind: Gateway
+            name: "{{ gateway_name }}"
+        compression:
+          - type: Brotli
+          - type: Gzip
+
+- name: Create Envoy Proxy Pod Monitor
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PodMonitor
+      metadata:
+        name: envoy-proxy
+        namespace: "{{ gateway_namespace }}"
+      spec:
+        selector:
+          matchLabels:
+            app.kubernetes.io/component: proxy
+            app.kubernetes.io/managed-by: envoy-gateway
+        podMetricsEndpoints:
+          - port: metrics
+            path: /stats/prometheus
 
 - name: Deploy Cert Manager
   ansible.builtin.include_role:
@@ -351,6 +418,11 @@
     helm_chart_version: "{{ kube_prometheus_stack_version }}"
     helm_chart_namespace: monitoring
     helm_chart_values_template: "{{ core_role_path }}/templates/values/kube-prometheus-stack.yaml.j2"
+
+- name: Create Grafana Route
+  kubernetes.core.k8s:
+    state: present
+    template: httproute-grafana.yaml.j2
 
 - name: Create Alert Manager Config
   kubernetes.core.k8s:

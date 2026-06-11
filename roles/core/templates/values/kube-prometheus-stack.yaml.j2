@@ -25,11 +25,15 @@ alertmanager:
           resources:
             requests:
               storage: 10Gi
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - "alertmanager.{{ cluster_domain }}"
+  route:
+    main:
+      enabled: true
+      parentRefs:
+        - name: "{{ gateway_name }}"
+          namespace: "{{ gateway_namespace }}"
+          sectionName: https-alertmanager
+      hostnames:
+        - "alertmanager.{{ cluster_domain }}"
 grafana:
   admin:
     existingSecret: grafana-admin-credentials
@@ -94,28 +98,22 @@ grafana:
         style-src 'self' 'unsafe-inline' blob:;
         worker-src 'self' blob:;
         """
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-    hosts:
-      - "grafana.{{ external_domain }}"
-    tls:
-      - secretName: grafana-tls
-        hosts:
-          - "grafana.{{ external_domain }}"
 prometheus:
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - "prometheus.{{ cluster_domain }}"
+  route:
+    main:
+      enabled: true
+      parentRefs:
+        - name: "{{ gateway_name }}"
+          namespace: "{{ gateway_namespace }}"
+          sectionName: https-prometheus
+      hostnames:
+        - "prometheus.{{ cluster_domain }}"
   prometheusSpec:
     enableRemoteWriteReceiver: true
     retention: 30d
     ruleSelectorNilUsesHelmValues: false
     serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
     additionalScrapeConfigsSecret:
       enabled: true
       name: additional-scrape-configs
