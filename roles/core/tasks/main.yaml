@@ -195,10 +195,10 @@
 - name: Create Basic Auth Secrets
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'secret-basic-auth.yaml.j2') | from_yaml }}"
+    definition: "{{ lookup('community.sops.sops', 'files/secret-basic-auth.sops.yaml') | from_yaml | combine({'metadata': {'namespace': item}}) }}"
   loop:
-    - { name: internal-ui-basic-auth, namespace: longhorn-system }
-    - { name: internal-ui-basic-auth, namespace: monitoring }
+    - longhorn-system
+    - monitoring
 
 - name: Create LAN Security Policies
   kubernetes.core.k8s:
