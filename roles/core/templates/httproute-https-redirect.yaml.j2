@@ -15,6 +15,9 @@ spec:
 {% for listener in gateway_https_listeners %}
     - {{ listener.hostname }}
 {% endfor %}
+{% for listener in gateway_local_https_listeners %}
+    - {{ listener.hostname }}
+{% endfor %}
   rules:
     - filters:
         - type: RequestRedirect

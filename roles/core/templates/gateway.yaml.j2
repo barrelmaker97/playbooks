@@ -28,3 +28,16 @@ spec:
         namespaces:
           from: All
 {% endfor %}
+{% for listener in gateway_local_https_listeners %}
+    - name: https-{{ listener.name }}
+      protocol: HTTPS
+      port: 443
+      hostname: {{ listener.hostname }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ listener.name }}-lan-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+{% endfor %}

@@ -187,6 +187,28 @@
     state: present
     template: httproute-https-redirect.yaml.j2
 
+- name: Create LAN TLS Certificates
+  kubernetes.core.k8s:
+    state: present
+    template: certificates-lan.yaml.j2
+
+- name: Create Basic Auth Secrets
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'secret-basic-auth.yaml.j2') | from_yaml }}"
+  loop:
+    - { name: internal-ui-basic-auth, namespace: longhorn-system }
+    - { name: internal-ui-basic-auth, namespace: monitoring }
+
+- name: Create LAN Security Policies
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'securitypolicies-lan.yaml.j2') | from_yaml }}"
+  loop:
+    - { name: longhorn-auth, namespace: longhorn-system, route_name: longhorn-httproute }
+    - { name: prometheus-auth, namespace: monitoring, route_name: kube-prometheus-stack-prometheus }
+    - { name: alertmanager-auth, namespace: monitoring, route_name: kube-prometheus-stack-alertmanager }
+
 - name: Enable Response Compression
   kubernetes.core.k8s:
     state: present

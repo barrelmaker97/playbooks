@@ -65,6 +65,17 @@ gateway_https_listeners:
   - { name: obscura, hostname: "obscura.{{ external_domain }}" }
   - { name: devscura, hostname: "dev.obscura.{{ external_domain }}" }
   - { name: grafana, hostname: "grafana.{{ external_domain }}" }
+# Local LAN HTTPS listeners (using the internal-ca ClusterIssuer)
+gateway_local_https_listeners:
+  - { name: longhorn, hostname: "longhorn.{{ cluster_domain }}" }
+  - { name: prometheus, hostname: "prometheus.{{ cluster_domain }}" }
+  - { name: alertmanager, hostname: "alertmanager.{{ cluster_domain }}" }
+
+# Basic auth credentials in htpasswd format for LAN-facing UIs.
+# The default hash below is for user "admin" with password "admin" (bcrypt: admin:$2y$05$Lw2.N25zI1.512684.Ua..X9I081735y208753239145612345678).
+# Generate your own using: htpasswd -Bnb myuser mypassword
+internal_ui_htpasswd: "admin:$2y$05$Lw2.N25zI1.512684.Ua..X9I081735y208753239145612345678"
+
 # Security headers added to responses on external HTTPS routes (replaces the
 # ingress-nginx global add-headers / HSTS controller config)
 gateway_response_headers:

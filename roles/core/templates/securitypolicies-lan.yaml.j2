@@ -1,0 +1,14 @@
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: {{ item.name }}
+  namespace: {{ item.namespace }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: {{ item.route_name }}
+  basicAuth:
+    users:
+      name: internal-ui-basic-auth

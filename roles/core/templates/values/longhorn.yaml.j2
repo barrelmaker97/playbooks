@@ -17,6 +17,6 @@ httproute:
   parentRefs:
     - name: "{{ gateway_name }}"
       namespace: "{{ gateway_namespace }}"
-      sectionName: http
+      sectionName: https-longhorn
   hostnames:
     - "longhorn.{{ cluster_domain }}"
