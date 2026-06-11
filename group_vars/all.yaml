@@ -50,8 +50,7 @@ metallb_ip_range: 192.168.15.60-192.168.15.69
 
 # Gateway API configuration
 # IP for the Envoy Gateway LoadBalancer service; the router forwards ports
-# 80/443 here. ingress-nginx must be uninstalled before MetalLB can assign
-# this IP to the gateway (see the cutover runbook in the README).
+# 80/443 here.
 gateway_ip: 192.168.15.60
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
@@ -71,8 +70,7 @@ gateway_local_https_listeners:
   - { name: prometheus, hostname: "prometheus.{{ cluster_domain }}" }
   - { name: alertmanager, hostname: "alertmanager.{{ cluster_domain }}" }
 
-# Security headers added to responses on external HTTPS routes (replaces the
-# ingress-nginx global add-headers / HSTS controller config)
+# Security headers added to responses on external HTTPS routes
 gateway_response_headers:
   - name: Strict-Transport-Security
     value: "max-age=63072000; includeSubDomains; preload"
