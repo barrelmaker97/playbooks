@@ -4,8 +4,6 @@ kind: Gateway
 metadata:
   name: {{ gateway_name }}
   namespace: {{ gateway_namespace }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   gatewayClassName: envoy
   listeners:

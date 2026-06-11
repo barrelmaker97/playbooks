@@ -1,0 +1,18 @@
+---
+# Public Let's Encrypt certificates managed explicitly to bypass gateway-shim's
+# lack of per-listener issuer overrides.
+{% for listener in gateway_https_listeners %}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ listener.name }}-tls
+  namespace: {{ gateway_namespace }}
+spec:
+  secretName: {{ listener.name }}-tls
+  dnsNames:
+    - "{{ listener.hostname }}"
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+---
+{% endfor %}

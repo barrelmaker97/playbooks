@@ -192,10 +192,15 @@
     state: present
     template: certificates-lan.yaml.j2
 
+- name: Create Public TLS Certificates
+  kubernetes.core.k8s:
+    state: present
+    template: certificates-public.yaml.j2
+
 - name: Create Basic Auth Secrets
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('community.sops.sops', 'files/secret-basic-auth.sops.yaml') | from_yaml | combine({'metadata': {'namespace': item}}) }}"
+    definition: "{{ lookup('community.sops.sops', 'files/secret-basic-auth.sops.yaml') | from_yaml | combine({'metadata': {'namespace': item}}, recursive=True) }}"
   loop:
     - longhorn-system
     - monitoring
