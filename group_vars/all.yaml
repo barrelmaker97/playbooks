@@ -34,7 +34,7 @@ nut_password: hunter2
 cert_manager_version: "1.20.2"
 trust_manager_version: "0.22.1"
 envoy_gateway_version: "v1.8.1"  # OCI chart tags are v-prefixed
-metrics_server_version: "3.13.0"
+metrics_server_version: "3.13.1"
 metallb_version: "0.16.1"
 prometheus_crds_version: "28.0.0"
 kube_prometheus_stack_version: "82.13.0"
