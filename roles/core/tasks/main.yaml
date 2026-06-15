@@ -82,7 +82,7 @@
         namespace: longhorn-system
       spec:
         concurrency: 1
-        cron: 0 * * * ?
+        cron: 15 * * * ?
         groups:
           - default
         labels: {}
