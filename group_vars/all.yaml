@@ -22,7 +22,7 @@ node_ips:
   - 192.168.15.43
 ntp_server: 192.168.15.1
 talos_config_dir: /home/barrelmaker/.talos
-talos_version: "1.13.3"
+talos_version: "1.13.4"
 workload_namespace: barrelmaker
 
 # NUT connection
