@@ -5,6 +5,11 @@
 # covered by the same Let's Encrypt cert), to prevent HTTP/2 connection
 # coalescing routing requests to the wrong listener. Setting ALPN explicitly
 # acknowledges the overlap and restores h2 multiplexing.
+#
+# Also advertises the X25519MLKEM768 post-quantum hybrid key-exchange group
+# alongside the classic curves, so PQC-capable clients (current Chrome,
+# Firefox, etc.) negotiate quantum-resistant session keys while older clients
+# fall back to X25519/P-256 transparently.
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: ClientTrafficPolicy
 metadata:
@@ -19,3 +24,7 @@ spec:
     alpnProtocols:
       - h2
       - http/1.1
+    ecdhCurves:
+      - X25519MLKEM768
+      - X25519
+      - P-256
