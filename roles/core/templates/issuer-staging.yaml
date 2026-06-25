@@ -12,9 +12,11 @@ spec:
       name: letsencrypt-staging-key
     profile: tlsserver
     solvers:
-      - http01:
-          gatewayHTTPRoute:
-            parentRefs:
-              - name: "{{ gateway_name }}"
-                namespace: "{{ gateway_namespace }}"
-                kind: Gateway
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token
+        selector:
+          dnsZones:
+            - "{{ external_domain }}"

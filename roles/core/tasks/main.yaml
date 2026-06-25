@@ -335,6 +335,12 @@
           configMap:
             key: ca-certificates.crt
 
+- name: Create Cloudflare API Token Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: cert-manager
+    definition: "{{ lookup('community.sops.sops', 'files/secret-cloudflare-api-token.sops.yaml') | from_yaml }}"
+
 - name: Create Production Issuer
   kubernetes.core.k8s:
     state: present

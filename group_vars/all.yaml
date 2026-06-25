@@ -54,8 +54,9 @@ metallb_ip_range: 192.168.15.60-192.168.15.69
 gateway_ip: 192.168.15.60
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
-# One HTTPS listener (and cert-manager-managed certificate '<name>-tls') is
-# created per entry. Routes attach via sectionName "https-<name>".
+# One HTTPS listener is created per entry. Routes attach via sectionName
+# "https-<name>". All public listeners terminate TLS with the shared wildcard
+# certificate secret (see public_wildcard_secret).
 gateway_https_listeners:
   - { name: website, hostname: "{{ external_domain }}" }
   - { name: dotfiles, hostname: "dotfiles.{{ external_domain }}" }
