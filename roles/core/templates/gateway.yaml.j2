@@ -13,29 +13,36 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-{% for listener in gateway_https_listeners %}
-    - name: https-{{ listener.name }}
+    - name: https-lan-wildcard
       protocol: HTTPS
       port: 443
-      hostname: {{ listener.hostname }}
+      hostname: "*.{{ cluster_domain }}"
       tls:
         mode: Terminate
         certificateRefs:
-          - name: {{ listener.name }}-tls
+          - name: wildcard-lan-tls
       allowedRoutes:
         namespaces:
           from: All
-{% endfor %}
-{% for listener in gateway_local_https_listeners %}
-    - name: https-{{ listener.name }}
+    - name: https-apex
       protocol: HTTPS
       port: 443
-      hostname: {{ listener.hostname }}
+      hostname: {{ external_domain }}
       tls:
         mode: Terminate
         certificateRefs:
-          - name: {{ listener.name }}-lan-tls
+          - name: wildcard-public-tls
       allowedRoutes:
         namespaces:
           from: All
-{% endfor %}
+    - name: https-wildcard
+      protocol: HTTPS
+      port: 443
+      hostname: "*.{{ external_domain }}"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: wildcard-public-tls
+      allowedRoutes:
+        namespaces:
+          from: All

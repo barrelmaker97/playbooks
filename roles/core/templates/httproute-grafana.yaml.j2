@@ -10,7 +10,7 @@ spec:
   parentRefs:
     - name: {{ gateway_name }}
       namespace: {{ gateway_namespace }}
-      sectionName: https-grafana
+      sectionName: https-wildcard
   hostnames:
     - "grafana.{{ external_domain }}"
   rules:

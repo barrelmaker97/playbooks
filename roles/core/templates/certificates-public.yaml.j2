@@ -1,18 +1,20 @@
 ---
-# Public Let's Encrypt certificates managed explicitly to bypass gateway-shim's
-# lack of per-listener issuer overrides.
-{% for listener in gateway_https_listeners %}
+# Single wildcard Certificate covering the apex and all subdomains of the
+# external domain. Issued via DNS-01 (Cloudflare) so it can be used for hosts
+# that are not publicly routable on port 80. Every public HTTPS listener on
+# the Gateway references the resulting secret.
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ listener.name }}-tls
+  name: wildcard-public
   namespace: {{ gateway_namespace }}
 spec:
-  secretName: {{ listener.name }}-tls
-  dnsNames:
-    - "{{ listener.hostname }}"
+  secretName: wildcard-public-tls
+  privateKey:
+    rotationPolicy: Always
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
----
-{% endfor %}
+  dnsNames:
+    - "{{ external_domain }}"
+    - "*.{{ external_domain }}"

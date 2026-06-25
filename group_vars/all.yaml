@@ -54,21 +54,6 @@ metallb_ip_range: 192.168.15.60-192.168.15.69
 gateway_ip: 192.168.15.60
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
-# One HTTPS listener (and cert-manager-managed certificate '<name>-tls') is
-# created per entry. Routes attach via sectionName "https-<name>".
-gateway_https_listeners:
-  - { name: website, hostname: "{{ external_domain }}" }
-  - { name: dotfiles, hostname: "dotfiles.{{ external_domain }}" }
-  - { name: jellyfin, hostname: "jellyfin.{{ external_domain }}" }
-  - { name: niucraft, hostname: "niucraft.{{ external_domain }}" }
-  - { name: obscura, hostname: "obscura.{{ external_domain }}" }
-  - { name: devscura, hostname: "dev.obscura.{{ external_domain }}" }
-  - { name: grafana, hostname: "grafana.{{ external_domain }}" }
-# Local LAN HTTPS listeners (using the internal-ca ClusterIssuer)
-gateway_local_https_listeners:
-  - { name: longhorn, hostname: "longhorn.{{ cluster_domain }}" }
-  - { name: prometheus, hostname: "prometheus.{{ cluster_domain }}" }
-  - { name: alertmanager, hostname: "alertmanager.{{ cluster_domain }}" }
 
 # Security headers added to responses on external HTTPS routes
 gateway_response_headers:
