@@ -31,7 +31,7 @@ alertmanager:
       parentRefs:
         - name: "{{ gateway_name }}"
           namespace: "{{ gateway_namespace }}"
-          sectionName: https-alertmanager
+          sectionName: https-lan-wildcard
       hostnames:
         - "alertmanager.{{ cluster_domain }}"
 grafana:
@@ -105,7 +105,7 @@ prometheus:
       parentRefs:
         - name: "{{ gateway_name }}"
           namespace: "{{ gateway_namespace }}"
-          sectionName: https-prometheus
+          sectionName: https-lan-wildcard
       hostnames:
         - "prometheus.{{ cluster_domain }}"
   prometheusSpec:

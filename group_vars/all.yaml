@@ -54,13 +54,6 @@ metallb_ip_range: 192.168.15.60-192.168.15.69
 gateway_ip: 192.168.15.60
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
-# Local LAN HTTPS listeners (using the internal-ca ClusterIssuer). One
-# HTTPS listener (and matching '<name>-lan-tls' Certificate) is created per
-# entry; routes attach via sectionName "https-<name>".
-gateway_local_https_listeners:
-  - { name: longhorn, hostname: "longhorn.{{ cluster_domain }}" }
-  - { name: prometheus, hostname: "prometheus.{{ cluster_domain }}" }
-  - { name: alertmanager, hostname: "alertmanager.{{ cluster_domain }}" }
 
 # Security headers added to responses on external HTTPS routes
 gateway_response_headers:
