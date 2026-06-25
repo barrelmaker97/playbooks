@@ -182,6 +182,11 @@
     state: present
     template: gateway.yaml.j2
 
+- name: Create Gateway Client Traffic Policy
+  kubernetes.core.k8s:
+    state: present
+    template: clienttrafficpolicy.yaml.j2
+
 - name: Create HTTPS Redirect Route
   kubernetes.core.k8s:
     state: present
