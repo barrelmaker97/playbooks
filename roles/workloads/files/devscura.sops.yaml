@@ -85,7 +85,7 @@ httpRoute:
           namespace: envoy-gateway-system
           sectionName: https-wildcard
     hostnames:
-        - dev.obscura.barrelmaker.dev
+        - devscura.barrelmaker.dev
     filters:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
@@ -114,6 +114,6 @@ sops:
             -----END AGE ENCRYPTED FILE-----
           recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^credentialsJson|.*[Pp]assword$)
-    lastmodified: "2026-06-25T01:10:50Z"
-    mac: ENC[AES256_GCM,data:2IwLMxGGbg9uMCAgZflXbqp0tePDuAMTyfLjHGgY6dT4XnAM0TL88W0njToKdVkS9oI2RHL1oOVm5DcMlwfQFLToMLc7u6shSECBH757zJKTKB5xzNO4qhc4NyUcFdNLXUL1/S181AWsulJXvONyn22dlXbvfJVUGINV3ZT2yL4=,iv:cb1aT1I1HSZjE/zzRWsDZaI4kbI71HVY+uBx0K0f3bo=,tag:XEix31wmfmDDGEzNrxfHoQ==,type:str]
+    lastmodified: "2026-06-25T02:26:12Z"
+    mac: ENC[AES256_GCM,data:rd26h47LU09Ay8UridzgtGeZJOHLvx+lYc1b75mjGzIhjPUApq/CGSf1fQFOKx9hr//dbSg2l0LdZXps+XxD9tpXbc3TgJ6UfKpFhJjbL0p2dfouqLiAg4RU69JHVG6txTTtbq6uqWyJtuYDumEDGEAUpQ2LH7kkDyWySqsDewg=,iv:jVIwyjRxSEoZPJf8pZvYW4/hclmoUsak7ruVWlm4BiE=,tag:CNjJgxnRTPp4nA+OLWeejw==,type:str]
     version: 3.13.1
