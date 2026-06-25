@@ -2,7 +2,7 @@
 # Manually managed internal certificates for local LAN routes, since
 # Let's Encrypt cannot issue certificates for non-public domains (*.lan).
 # These are issued by our internal self-signed CA and reside in the
-# envoy-gateway-system namespace, preventing gateway-shim from overwriting them.
+# envoy-gateway-system namespace alongside the public wildcard cert.
 {% for listener in gateway_local_https_listeners %}
 apiVersion: cert-manager.io/v1
 kind: Certificate

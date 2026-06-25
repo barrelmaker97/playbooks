@@ -1,7 +1,5 @@
 ---
-# Redirect external hostnames from HTTP to HTTPS. Internal (.lan) hosts are
-# served plain HTTP and ACME challenge routes take precedence over this
-# catch-all rule by path specificity.
+# Redirect every hostname served by the Gateway from HTTP to HTTPS.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
