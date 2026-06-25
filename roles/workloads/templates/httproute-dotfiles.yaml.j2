@@ -10,7 +10,7 @@ spec:
   parentRefs:
     - name: "{{ gateway_name }}"
       namespace: "{{ gateway_namespace }}"
-      sectionName: https-dotfiles
+      sectionName: https-wildcard
   hostnames:
     - "dotfiles.{{ external_domain }}"
   rules:
