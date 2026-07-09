@@ -22,7 +22,7 @@ node_ips:
   - 192.168.15.43
 ntp_server: 192.168.15.1
 talos_config_dir: /home/barrelmaker/.talos
-talos_version: "1.13.4"
+talos_version: "1.13.5"
 workload_namespace: barrelmaker
 
 # NUT connection
@@ -49,8 +49,7 @@ email_address: nolancooper97@gmail.com
 metallb_ip_range: 192.168.15.60-192.168.15.69
 
 # Gateway API configuration
-# IP for the Envoy Gateway LoadBalancer service; the router forwards ports
-# 80/443 here.
+# IP for the Envoy Gateway LoadBalancer service
 gateway_ip: 192.168.15.60
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
@@ -65,8 +64,8 @@ gateway_response_headers:
     value: "nosniff"
 
 # Longhorn configuration
-# Hard cap on snapshots per volume (backpressure: blocks new snapshots once
-# reached). The critical snapshot alert fires just below this value.
+# Hard cap on snapshots per volume, blocks new snapshots once
+# reached. Alert fires just below this value.
 longhorn_snapshot_max_count: 50
 
 # Templated variables
