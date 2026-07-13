@@ -31,7 +31,7 @@ nut_user: remoteuser
 nut_password: hunter2
 
 # Service versions
-cert_manager_version: "1.20.2"
+cert_manager_version: "1.21.0"
 trust_manager_version: "0.24.0"
 envoy_gateway_version: "v1.8.1"  # OCI chart tags are v-prefixed
 metrics_server_version: "3.13.1"
