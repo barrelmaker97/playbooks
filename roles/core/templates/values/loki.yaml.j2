@@ -26,8 +26,11 @@ singleBinary:
   replicas: 1
   persistence:
     enabled: true
+    enableStatefulSetAutoDeletePVC: false
     storageClass: longhorn
     size: 10Gi
+    whenDeleted: Retain
+    whenScaled: Retain
 # These flags are required to disable the default S3 requirements in 6.x
 backend:
   replicas: 0
