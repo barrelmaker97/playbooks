@@ -7,6 +7,7 @@ metrics:
 defaultSettings:
   allowVolumeCreationWithDegradedAvailability: false
   backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
+  concurrentReplicaRebuildPerNodeLimit: "1"
   defaultDataLocality: best-effort
   defaultReplicaCount: "2"
   replicaAutoBalance: least-effort
