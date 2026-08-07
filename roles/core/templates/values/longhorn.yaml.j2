@@ -9,6 +9,7 @@ defaultSettings:
   backupTarget: "nfs://{{ nas_domain }}:/volume1/longhorn-backupstore"
   concurrentReplicaRebuildPerNodeLimit: "1"
   defaultDataLocality: best-effort
+  defaultDataPath: /var/mnt/longhorn
   defaultReplicaCount: "2"
   replicaAutoBalance: least-effort
   snapshotMaxCount: "{{ longhorn_snapshot_max_count }}"
