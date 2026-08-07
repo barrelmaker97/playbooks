@@ -37,13 +37,24 @@ machine:
           - {{ ntp_server }}
   kubelet:
     extraMounts:
-      - destination: /var/lib/longhorn
+      - destination: /var/mnt/longhorn
         type: bind
-        source: /var/lib/longhorn
+        source: /var/mnt/longhorn
         options:
           - bind
           - rshared
           - rw
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: longhorn
+provisioning:
+  diskSelector:
+    match: 'disk.transport == "sata" && !disk.rotational && !system_disk && disk.size > 450u * GB'
+  grow: true
+  minSize: 450GB
+filesystem:
+  type: xfs
 ---
 apiVersion: v1alpha1
 kind: ExtensionServiceConfig
