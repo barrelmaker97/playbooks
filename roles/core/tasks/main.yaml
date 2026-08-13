@@ -71,6 +71,22 @@
         disableRevisionCounter: "true"
         fsType: ext4
 
+- name: Create Longhorn Monitoring Storage Class
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: longhorn-monitoring
+      provisioner: driver.longhorn.io
+      allowVolumeExpansion: true
+      reclaimPolicy: Retain
+      volumeBindingMode: Immediate
+      parameters:
+        recurringJobSelector: "[]"
+        fsType: ext4
+
 - name: Create Default Recurring Snapshot
   kubernetes.core.k8s:
     state: present
