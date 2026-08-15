@@ -27,21 +27,6 @@ Individual playbooks can be run in a similar manner:
 ```bash
 ansible-playbook setup.yaml
 ```
-
-# Prometheus Storage Migration
-Prometheus TSDB data uses the `longhorn-monitoring` StorageClass and is excluded
-from recurring Longhorn snapshots and backups. Alertmanager and other Longhorn
-volumes continue to use the default recurring jobs.
-
-Changing a StorageClass does not migrate an existing PVC. After applying the
-playbooks, schedule a maintenance window and recreate the existing Prometheus
-PVC if it still uses `longhorn`, accepting the loss of its rebuildable metrics.
-Until it is recreated, remove the `default` recurring-job group assignment from
-the corresponding Longhorn volume. Verify afterward that the new Prometheus PVC
-uses `longhorn-monitoring`, has no recurring-job assignments, and that a
-non-Prometheus Longhorn volume still receives the default snapshot and backup
-jobs.
-
 # IP Plan
 | Name       | Address       | Hostname           |
 |------------|---------------|--------------------|

@@ -52,6 +52,7 @@
     helm_chart_name: "{{ item.key }}"
     helm_chart_ref: "{{ item.value.ref }}"
     helm_chart_version: "{{ item.value.version | default('latest') }}"
+    helm_chart_timeout: "{{ item.value.timeout | default('5m') }}"
     helm_chart_namespace: "{{ workload_namespace }}"
     helm_chart_values_template: "{{ workloads_role_path }}/templates/values/{{ item.key }}.yaml.j2"
     helm_chart_sops_file: "{{ workloads_role_path }}/files/{{ item.key }}.sops.yaml"
@@ -60,12 +61,12 @@
       jellyfin: { ref: barrelmaker/jellyfin }
       niucraft: { ref: barrelmaker/minecraft }
       pistachio: { ref: barrelmaker/pistachio }
-      satisfactory: { ref: barrelmaker/satisfactory }
+      satisfactory: { ref: barrelmaker/satisfactory, timeout: 10m }
       website: { ref: barrelmaker/website }
       factorio: { ref: barrelmaker/factorio }
       loch: { ref: barrelmaker/factorio }
-      obscura: { ref: barrelmaker/obscura, version: 0.12.1 }
-      devscura: { ref: barrelmaker/obscura, version: 0.12.1 }
+      obscura: { ref: barrelmaker/obscura, version: 0.12.1, timeout: 10m }
+      devscura: { ref: barrelmaker/obscura, version: 0.12.1, timeout: 10m }
       # serge: { ref: barrelmaker/serge }
       # gmod: { ref: barrelmaker/gmod }
       # valheim: { ref: barrelmaker/valheim }

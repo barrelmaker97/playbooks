@@ -4,7 +4,7 @@ public: false
 metrics: true
 password: ENC[AES256_GCM,data:+TYDz0gvj3a/bQ==,iv:35Sts08Fv4Q4O6UOaHDgA64kM0aWYBBRTkf5nJzf5TE=,tag:BqLZ4Rh2jO7nx2erdbp6og==,type:str]
 persistence:
-    storageClassName: longhorn
+    storageClassName: longhorn-protected
     size: 10Gi
 podSecurityContext:
     seccompProfile:
@@ -23,13 +23,8 @@ resources:
     limits:
         memory: 4000Mi
 sops:
-    kms: []
-    gcp_kms: []
-    azure_kv: []
-    hc_vault: []
     age:
-        - recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
-          enc: |
+        - enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
             YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAydkJKQ0FEZTFCWlpnVmsw
             bFRNck0xOTZacE1WSWNDSXV3ZE5QVm9EYjFRCklnRnJyZ0FPcEZjbzg0M3U2UmVm
@@ -37,8 +32,8 @@ sops:
             emI5RmdsZVdDZCsyS1RmLy9pclRpc0kKpqbAKtCkYDdb/EbWzoTH3DWrHYKm9ecH
             t/OQs3p2XbUabXmfinUQBH3E0yz723UYirkJ/ndVYdHNT7OdybtxFw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-03-30T18:28:18Z"
-    mac: ENC[AES256_GCM,data:YnvnWv5ntTMpubHgOHRf9Due1J7mSNsMs3/uaIOS3kaDvb1rCUFJjl8l2WMRsMpAadteka6ijIrsoyxMRoL9e7S2iCMBksGnTSnv4DCXEvFTUk92FhFABldVu6gRZj9HPRy9NGR3s+XaVpcc1AklYf0WMpWneW5Ww3uNkxTa/xo=,iv:kKgehmv8N+seSS8csTUvMEH7KNntyVM/3YQEwWslJuQ=,tag:BfTIJAbw5Gb5/0C2sMFu7w==,type:str]
-    pgp: []
+          recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^certs|^trustdinfo|^password)
+    lastmodified: "2026-08-14T04:42:32Z"
+    mac: ENC[AES256_GCM,data:9t0qgYmEQHxK7Pqt18B3FiYP3JH07PRU6LgS7vc7C5H2iXPq3kULG/cm70vLt9uTvYTJZW5M1tfmmMQPcJwNqZ9P5jsrCBH4NdlYcXqoZr4LBc9EZC98hp4s4JV9wL51hrHKmDYqunPyUH57st001iKunbvMwBpgSEv327fT1tQ=,iv:HrkwlDhVKkHhNOhY6mz8RtzPdLuVe7RzUnaQNPvZnFA=,tag:glyjSkbfauOJd1v7aFzcgQ==,type:str]
     version: 3.9.4

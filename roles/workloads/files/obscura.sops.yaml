@@ -22,7 +22,7 @@ postgresql:
                 memory: 512Mi
         persistence:
             enabled: true
-            storageClass: longhorn
+            storageClass: longhorn-protected
             size: 8Gi
     auth:
         password: ENC[AES256_GCM,data:xudHUUtGKVXl8e5yMj8kylOjuw==,iv:7GS3frg7cy9Ush748tQhvQvr9KTNQwCK5ZQLPDMX4DQ=,tag:657bPX0kFadViaMqBaVk9A==,type:str]
@@ -44,7 +44,7 @@ postgresql:
 minio:
     persistence:
         enabled: true
-        storageClass: longhorn
+        storageClass: longhorn-protected
         size: 10Gi
     resources:
         requests:
@@ -114,6 +114,6 @@ sops:
             -----END AGE ENCRYPTED FILE-----
           recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^credentialsJson|.*[Pp]assword$)
-    lastmodified: "2026-06-25T01:10:50Z"
-    mac: ENC[AES256_GCM,data:vT0moq35N81MQphAAgxOhk3jafeV4Vjfw3rok/BKKLY+gHu2mtJvggB4hOVyt66YSAILS4cs9PPCOivzEQnWybxnTkhzF7mMIh5OQKnKHU5m5LssWsYBXtYLRHZ/QrVggAW4ehQAI7mbgdChMm5VGN8zKY9DtylSv/ZFssHtiHw=,iv:6pe3Ufo2gCLv3bKPwAIB9ngnU/SIOx6CYfA+DEMs0NI=,tag:iJEXdO3bSvgaeAjZh81UKg==,type:str]
+    lastmodified: "2026-08-14T11:44:41Z"
+    mac: ENC[AES256_GCM,data:4hj9AdNVBTusoJbego7LGyganOF397zFp2ouHFStAJ73psa1mc0wR1wqoOzwL2u6rqMi1ZJoPJd4NiysGUDMvznuxO6Km7L/8fHYTjimhpBOLmhNZ+fJBUmjs45HR9y7lkf40d3CEehCdoZgzLqEaHdd5cuXsz2Hv/lqUTNqtbk=,iv:Ldi5kdk+ayttGemvKUTFYlYx+0STOzjMWsOaL7Zymeg=,tag:xp1r4j01Q1fYl2FONNR0bw==,type:str]
     version: 3.13.1
