@@ -19,7 +19,7 @@ alertmanager:
     storage:
       volumeClaimTemplate:
         spec:
-          storageClassName: longhorn
+          storageClassName: longhorn-protected
           accessModes:
             - ReadWriteOnce
           resources:
@@ -121,9 +121,9 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
-          storageClassName: longhorn
+          storageClassName: longhorn-monitoring
           accessModes:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 20Gi
+              storage: 30Gi

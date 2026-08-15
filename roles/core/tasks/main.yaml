@@ -68,10 +68,55 @@
         dataEngine: v1
         dataLocality: strict-local
         numberOfReplicas: "1"
+        recurringJobSelector: >-
+          [{"name":"protected","isGroup":true}]
         disableRevisionCounter: "true"
         fsType: ext4
 
-- name: Create Default Recurring Snapshot
+- name: Create Longhorn Protected Storage Class
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: longhorn-protected
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "true"
+      provisioner: driver.longhorn.io
+      allowVolumeExpansion: true
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+      parameters:
+        backupTargetName: default
+        dataEngine: v1
+        dataLocality: best-effort
+        disableRevisionCounter: "true"
+        fromBackup: ""
+        fsType: ext4
+        numberOfReplicas: "2"
+        recurringJobSelector: >-
+          [{"name":"protected","isGroup":true}]
+        staleReplicaTimeout: "30"
+        unmapMarkSnapChainRemoved: ignored
+
+- name: Create Longhorn Monitoring Storage Class
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: longhorn-monitoring
+      provisioner: driver.longhorn.io
+      allowVolumeExpansion: true
+      reclaimPolicy: Retain
+      volumeBindingMode: Immediate
+      parameters:
+        recurringJobSelector: "[]"
+        fsType: ext4
+
+- name: Create Protected Recurring Snapshot
   kubernetes.core.k8s:
     state: present
     definition:
@@ -84,14 +129,14 @@
         concurrency: 1
         cron: 15 * * * ?
         groups:
-          - default
+          - protected
         labels: {}
         name: default-snapshotter
         parameters: {}
         retain: 24
         task: snapshot
 
-- name: Create Default Recurring Backup
+- name: Create Protected Recurring Backup
   kubernetes.core.k8s:
     state: present
     definition:
@@ -104,7 +149,7 @@
         concurrency: 1
         cron: 0 12 * * ?
         groups:
-          - default
+          - protected
         labels: {}
         name: default-backup
         parameters:
