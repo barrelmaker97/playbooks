@@ -38,7 +38,6 @@ postgresql:
                 memory: 256Mi
         serviceMonitor:
             enabled: true
-            namespace: barrelmaker
             labels:
                 release: prometheus-stack
 minio:
@@ -57,7 +56,6 @@ minio:
         serviceMonitor:
             enabled: true
             includeNode: true
-            namespace: barrelmaker
             additionalLabels:
                 release: prometheus-stack
 podSecurityContext:
@@ -114,6 +112,6 @@ sops:
             -----END AGE ENCRYPTED FILE-----
           recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^credentialsJson|.*[Pp]assword$)
-    lastmodified: "2026-08-14T11:44:41Z"
-    mac: ENC[AES256_GCM,data:xgykboPED121DFd3Id8xjcQHKbD+5DFaQEovOgJNaF2iieBnUVRcMUhsZfnDAVLpC1Nx9cw8koWCz8hgiXZ/IKtCG4E+p6d4dJ938U4oP2S6DHtmtWzqp7sjmZ3vAHGMZD1PVTX3J94mku1iLz46onnFynw1FMItEm3D2pGzGc8=,iv:KumRzfIPjx/2sEsNVHVGRWlI+ZsLc8XI8QUZFa0aOIw=,tag:oiPSwasTX45V9d7bFCxMKQ==,type:str]
+    lastmodified: "2026-08-29T14:30:45Z"
+    mac: ENC[AES256_GCM,data:AUfVvkAxGTi9eW4aOwDLz3Umuo/C0wWNsf3n4E/ql7m4+j2Rdp+4KLmiPYARfD4QNoqUFiVA7MZGrX753B9qVZCNu7dVjRelSWYRBVkyshQido96H+KFJGWaG/4uonDKdjF64t/BgAZuwArx5Xab/mcQfKsB6par5EWU1NKsmwE=,iv:aqwktqYHqwdZVPdcRarFiRUKxBu3CCdF1zKE7L4qbnM=,tag:0wsRwD4ytU7apjOf3KUhdg==,type:str]
     version: 3.13.1

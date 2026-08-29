@@ -2,5 +2,7 @@
 - name: Deploy workloads
   hosts: localhost
   gather_facts: false
+  vars_files:
+    - vars/workloads.yaml
   roles:
     - workloads

@@ -1,0 +1,63 @@
+---
+workloads_namespaces:
+  barrelmaker:
+    labels: {}
+    requests_cpu: "10"
+    requests_memory: 30Gi
+  obscura:
+    labels:
+      pod-security.kubernetes.io/enforce: baseline
+      pod-security.kubernetes.io/audit: restricted
+      pod-security.kubernetes.io/warn: restricted
+    requests_cpu: "2"
+    requests_memory: 4Gi
+  obscura-dev:
+    labels:
+      pod-security.kubernetes.io/enforce: baseline
+      pod-security.kubernetes.io/audit: restricted
+      pod-security.kubernetes.io/warn: restricted
+    requests_cpu: "2"
+    requests_memory: 4Gi
+
+workloads_helm_releases:
+  jellyfin:
+    ref: barrelmaker/jellyfin
+    namespace: barrelmaker
+  niucraft:
+    ref: barrelmaker/minecraft
+    namespace: barrelmaker
+  pistachio:
+    ref: barrelmaker/pistachio
+    namespace: barrelmaker
+  satisfactory:
+    ref: barrelmaker/satisfactory
+    namespace: barrelmaker
+    timeout: 10m
+  website:
+    ref: barrelmaker/website
+    namespace: barrelmaker
+  factorio:
+    ref: barrelmaker/factorio
+    namespace: barrelmaker
+  loch:
+    ref: barrelmaker/factorio
+    namespace: barrelmaker
+  obscura:
+    ref: barrelmaker/obscura
+    version: 0.12.2
+    namespace: obscura
+    timeout: 10m
+  devscura:
+    ref: barrelmaker/obscura
+    version: 0.12.2
+    namespace: obscura-dev
+    timeout: 10m
+  # serge:
+  #   ref: barrelmaker/serge
+  #   namespace: barrelmaker
+  # gmod:
+  #   ref: barrelmaker/gmod
+  #   namespace: barrelmaker
+  # valheim:
+  #   ref: barrelmaker/valheim
+  #   namespace: barrelmaker
