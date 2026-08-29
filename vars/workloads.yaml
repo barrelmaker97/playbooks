@@ -46,12 +46,10 @@ workloads_helm_releases:
     ref: barrelmaker/obscura
     version: 0.12.2
     namespace: obscura
-    timeout: 10m
   devscura:
     ref: barrelmaker/obscura
     version: 0.12.2
     namespace: obscura-dev
-    timeout: 10m
   # serge:
   #   ref: barrelmaker/serge
   #   namespace: barrelmaker
