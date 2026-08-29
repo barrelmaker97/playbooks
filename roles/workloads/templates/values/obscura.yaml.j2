@@ -1,0 +1,81 @@
+---
+replicaCount: 3
+
+obscura:
+  database:
+    existingSecret:
+      name: obscura-postgres-app
+      key: uri
+  telemetry:
+    otlpEndpoint: http://otel.monitoring.svc.cluster.local:4317
+    logFormat: json
+  server:
+    trustedProxies: 10.244.0.0/16
+  fcm:
+    projectId: obscura-af88b
+
+postgresql:
+  enabled: false
+
+minio:
+  persistence:
+    enabled: true
+    storageClass: longhorn-protected
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+  metrics:
+    serviceMonitor:
+      enabled: true
+      includeNode: true
+      additionalLabels:
+        release: prometheus-stack
+
+podSecurityContext:
+  fsGroup: 10001
+  runAsGroup: 10001
+  runAsUser: 10001
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    memory: 256Mi
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: "{{ gateway_name }}"
+      namespace: "{{ gateway_namespace }}"
+      sectionName: https-wildcard
+  hostnames:
+    - "obscura.{{ external_domain }}"
+  filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+{% for header in gateway_response_headers %}
+          - name: {{ header.name }}
+            value: "{{ header.value }}"
+{% endfor %}
+
+securityPolicy:
+  cors:
+    enabled: true
+    allowOrigins:
+      - https://*.obscura-client-web.pages.dev
+      - https://obscura-client-web.pages.dev

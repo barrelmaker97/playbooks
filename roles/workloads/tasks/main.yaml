@@ -12,6 +12,21 @@
     loop_var: workload_release
     label: "{{ workload_release.key }}"
 
+- name: Validate PostgreSQL Cluster Namespaces
+  ansible.builtin.assert:
+    that:
+      - postgresql_cluster.value.namespace is defined
+      - >-
+        (postgresql_cluster.value.namespace | default(""))
+        in workloads_namespaces
+    fail_msg: >-
+      PostgreSQL cluster {{ postgresql_cluster.key }} references an undeclared
+      workload namespace.
+  loop: "{{ workloads_postgresql_clusters | dict2items }}"
+  loop_control:
+    loop_var: postgresql_cluster
+    label: "{{ postgresql_cluster.key }}"
+
 - name: Create Workload Namespaces
   kubernetes.core.k8s:
     state: present
@@ -48,6 +63,41 @@
     label: "{{ workload_namespace_entry.key }}"
   vars:
     workload_namespace_name: "{{ workload_namespace_entry.key }}"
+
+- name: Create PostgreSQL Clusters
+  kubernetes.core.k8s:
+    state: present
+    template: cluster-postgresql.yaml.j2
+  loop: "{{ workloads_postgresql_clusters | dict2items }}"
+  loop_control:
+    loop_var: postgresql_cluster
+    label: "{{ postgresql_cluster.key }}"
+
+- name: Create PostgreSQL Pod Monitors
+  kubernetes.core.k8s:
+    state: present
+    template: podmonitor-postgresql.yaml.j2
+  loop: "{{ workloads_postgresql_clusters | dict2items }}"
+  loop_control:
+    loop_var: postgresql_cluster
+    label: "{{ postgresql_cluster.key }}"
+
+- name: Wait for PostgreSQL Clusters
+  kubernetes.core.k8s_info:
+    api_version: postgresql.cnpg.io/v1
+    kind: Cluster
+    name: "{{ postgresql_cluster.key }}"
+    namespace: "{{ postgresql_cluster.value.namespace }}"
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_sleep: 10
+    wait_timeout: 900
+  loop: "{{ workloads_postgresql_clusters | dict2items }}"
+  loop_control:
+    loop_var: postgresql_cluster
+    label: "{{ postgresql_cluster.key }}"
 
 - name: Set workload role path
   ansible.builtin.set_fact:
