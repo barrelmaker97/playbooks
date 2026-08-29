@@ -1,29 +1,53 @@
 ---
-- name: Create User Namespace
+- name: Validate Helm Release Namespaces
+  ansible.builtin.assert:
+    that:
+      - workload_release.value.namespace is defined
+      - (workload_release.value.namespace | default("")) in workloads_namespaces
+    fail_msg: >-
+      Helm release {{ workload_release.key }} references an undeclared workload
+      namespace.
+  loop: "{{ workloads_helm_releases | dict2items }}"
+  loop_control:
+    loop_var: workload_release
+    label: "{{ workload_release.key }}"
+
+- name: Create Workload Namespaces
   kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: v1
       kind: Namespace
       metadata:
-        name: "{{ workload_namespace }}"
+        name: "{{ workload_namespace_entry.key }}"
+        labels: "{{ workload_namespace_entry.value.labels }}"
+  loop: "{{ workloads_namespaces | dict2items }}"
+  loop_control:
+    loop_var: workload_namespace_entry
+    label: "{{ workload_namespace_entry.key }}"
 
-- name: Set Namespace in kubectl context
-  changed_when: true
-  ansible.builtin.command: >
-    kubectl config set-context
-    --current
-    "--namespace={{ workload_namespace }}"
-
-- name: Create User Resource Quota
+- name: Create Workload Resource Quotas
   kubernetes.core.k8s:
     state: present
-    template: resourcequota-user.yaml
+    template: resourcequota-workload.yaml
+  loop: "{{ workloads_namespaces | dict2items }}"
+  loop_control:
+    loop_var: workload_namespace_entry
+    label: "{{ workload_namespace_entry.key }}"
+  vars:
+    workload_namespace_config: "{{ workload_namespace_entry.value }}"
+    workload_namespace_name: "{{ workload_namespace_entry.key }}"
 
-- name: Create User Limit Range
+- name: Create Workload Limit Ranges
   kubernetes.core.k8s:
     state: present
-    template: limitrange-user.yaml
+    template: limitrange-workload.yaml
+  loop: "{{ workloads_namespaces | dict2items }}"
+  loop_control:
+    loop_var: workload_namespace_entry
+    label: "{{ workload_namespace_entry.key }}"
+  vars:
+    workload_namespace_name: "{{ workload_namespace_entry.key }}"
 
 - name: Set workload role path
   ansible.builtin.set_fact:
@@ -31,9 +55,7 @@
 
 - name: Create Jellyfin Media Persistent Volume
   kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_fileglob:
-    - templates/pv-jellyfin-media.yaml
+    template: pv-jellyfin-media.yaml
 
 - name: Setup Helm
   ansible.builtin.include_role:
@@ -47,29 +69,20 @@
   ansible.builtin.include_role:
     name: helm
     tasks_from: deploy
-  loop: "{{ helm_charts | dict2items }}"
+  loop: "{{ workloads_helm_releases | dict2items }}"
+  loop_control:
+    loop_var: workload_release
+    label: "{{ workload_release.key }}"
   vars:
-    helm_chart_name: "{{ item.key }}"
-    helm_chart_ref: "{{ item.value.ref }}"
-    helm_chart_version: "{{ item.value.version | default('latest') }}"
-    helm_chart_timeout: "{{ item.value.timeout | default('5m') }}"
-    helm_chart_namespace: "{{ workload_namespace }}"
-    helm_chart_values_template: "{{ workloads_role_path }}/templates/values/{{ item.key }}.yaml.j2"
-    helm_chart_sops_file: "{{ workloads_role_path }}/files/{{ item.key }}.sops.yaml"
-    # To pin a version, add it to the dictionary: { ref: repository/chart, version: 1.2.3 }
-    helm_charts:
-      jellyfin: { ref: barrelmaker/jellyfin }
-      niucraft: { ref: barrelmaker/minecraft }
-      pistachio: { ref: barrelmaker/pistachio }
-      satisfactory: { ref: barrelmaker/satisfactory, timeout: 10m }
-      website: { ref: barrelmaker/website }
-      factorio: { ref: barrelmaker/factorio }
-      loch: { ref: barrelmaker/factorio }
-      obscura: { ref: barrelmaker/obscura, version: 0.12.1, timeout: 10m }
-      devscura: { ref: barrelmaker/obscura, version: 0.12.1, timeout: 10m }
-      # serge: { ref: barrelmaker/serge }
-      # gmod: { ref: barrelmaker/gmod }
-      # valheim: { ref: barrelmaker/valheim }
+    helm_chart_name: "{{ workload_release.key }}"
+    helm_chart_ref: "{{ workload_release.value.ref }}"
+    helm_chart_version: "{{ workload_release.value.version | default('latest') }}"
+    helm_chart_timeout: "{{ workload_release.value.timeout | default('5m') }}"
+    helm_chart_namespace: "{{ workload_release.value.namespace }}"
+    helm_chart_values_template: >-
+      {{ workloads_role_path }}/templates/values/{{ workload_release.key }}.yaml.j2
+    helm_chart_sops_file: >-
+      {{ workloads_role_path }}/files/{{ workload_release.key }}.sops.yaml
 
 - name: Create Dotfiles Redirect Route
   kubernetes.core.k8s:

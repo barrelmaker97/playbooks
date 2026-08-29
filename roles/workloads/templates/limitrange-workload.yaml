@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: "{{ workload_namespace }}-default"
-  namespace: "{{ workload_namespace }}"
+  name: "{{ workload_namespace_name }}-default"
+  namespace: "{{ workload_namespace_name }}"
 spec:
   limits:
     - type: Container
