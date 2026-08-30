@@ -31,6 +31,10 @@ workloads_postgresql_clusters:
     database: obscura
     owner: obscura
     storage_size: 8Gi
+    synchronous:
+      method: any
+      number: 1
+      data_durability: required
     resources:
       requests:
         cpu: 200m
@@ -62,10 +66,6 @@ workloads_helm_releases:
   pistachio:
     ref: barrelmaker/pistachio
     namespace: barrelmaker
-  satisfactory:
-    ref: barrelmaker/satisfactory
-    namespace: barrelmaker
-    timeout: 10m
   website:
     ref: barrelmaker/website
     namespace: barrelmaker
@@ -92,3 +92,7 @@ workloads_helm_releases:
   # valheim:
   #   ref: barrelmaker/valheim
   #   namespace: barrelmaker
+  # satisfactory:
+  #   ref: barrelmaker/satisfactory
+  #   namespace: barrelmaker
+  #   timeout: 10m

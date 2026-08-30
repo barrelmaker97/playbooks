@@ -22,5 +22,12 @@ spec:
     enablePodAntiAffinity: true
     podAntiAffinityType: required
     topologyKey: kubernetes.io/hostname
+{% if postgresql_cluster.value.synchronous is defined %}
+  postgresql:
+    synchronous:
+      method: {{ postgresql_cluster.value.synchronous.method }}
+      number: {{ postgresql_cluster.value.synchronous.number }}
+      dataDurability: {{ postgresql_cluster.value.synchronous.data_durability }}
+{% endif %}
   resources:
 {{ postgresql_cluster.value.resources | to_nice_yaml(indent=2) | indent(4, true) }}
