@@ -22,12 +22,24 @@ spec:
     enablePodAntiAffinity: true
     podAntiAffinityType: required
     topologyKey: kubernetes.io/hostname
-{% if cloudnative_pg_cluster.synchronous is defined %}
+{% if cloudnative_pg_cluster.synchronous is defined or cloudnative_pg_cluster.parameters is defined or cloudnative_pg_cluster.pg_hba is defined %}
   postgresql:
+{% if cloudnative_pg_cluster.parameters is defined %}
+    parameters:
+{{ cloudnative_pg_cluster.parameters | to_nice_yaml(indent=2) | indent(6, true) }}
+{% endif %}
+{% if cloudnative_pg_cluster.pg_hba is defined %}
+    pg_hba:
+{% for rule in cloudnative_pg_cluster.pg_hba %}
+      - "{{ rule }}"
+{% endfor %}
+{% endif %}
+{% if cloudnative_pg_cluster.synchronous is defined %}
     synchronous:
       method: {{ cloudnative_pg_cluster.synchronous.method }}
       number: {{ cloudnative_pg_cluster.synchronous.number }}
       dataDurability: {{ cloudnative_pg_cluster.synchronous.data_durability }}
+{% endif %}
 {% endif %}
   resources:
 {{ cloudnative_pg_cluster.resources | to_nice_yaml(indent=2) | indent(4, true) }}

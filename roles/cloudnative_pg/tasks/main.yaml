@@ -20,6 +20,15 @@
       - cloudnative_pg_cluster.storage_size | default("") | length > 0
       - cloudnative_pg_cluster.resources is mapping
       - >-
+        cloudnative_pg_cluster.parameters is not defined
+        or cloudnative_pg_cluster.parameters is mapping
+      - >-
+        cloudnative_pg_cluster.pg_hba is not defined
+        or (
+          cloudnative_pg_cluster.pg_hba is sequence
+          and cloudnative_pg_cluster.pg_hba is not string
+        )
+      - >-
         (cloudnative_pg_cluster.availability_alert_severity | default(""))
         in ["warning", "critical"]
     fail_msg: >-
