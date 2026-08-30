@@ -136,7 +136,7 @@
   vars:
     helm_chart_name: cloudnative-pg
     helm_chart_ref: cloudnative-pg/cloudnative-pg
-    helm_chart_version: "{{ cloudnative_pg_version }}"
+    helm_chart_version: "{{ cloudnative_pg_chart_version }}"
     helm_chart_namespace: cnpg-system
     helm_chart_values_template: "{{ core_role_path }}/templates/values/cloudnative-pg.yaml.j2"
 
@@ -208,7 +208,8 @@
 - name: Create IP Address Pool
   kubernetes.core.k8s:
     state: present
-    template: ipaddresspool-metallb.yaml
+    definition: >-
+      {{ lookup('template', 'ipaddresspool-metallb.yaml') | from_yaml }}
 
 - name: Advertise Load Balanced IP
   kubernetes.core.k8s:
@@ -228,7 +229,7 @@
 - name: Create Envoy Proxy Config
   kubernetes.core.k8s:
     state: present
-    template: envoyproxy.yaml.j2
+    definition: "{{ lookup('template', 'envoyproxy.yaml.j2') | from_yaml }}"
 
 - name: Create Gateway Class
   kubernetes.core.k8s:
@@ -249,27 +250,30 @@
 - name: Create Gateway
   kubernetes.core.k8s:
     state: present
-    template: gateway.yaml.j2
+    definition: "{{ lookup('template', 'gateway.yaml.j2') | from_yaml }}"
 
 - name: Create Gateway Client Traffic Policy
   kubernetes.core.k8s:
     state: present
-    template: clienttrafficpolicy.yaml.j2
+    definition: >-
+      {{ lookup('template', 'clienttrafficpolicy.yaml.j2') | from_yaml }}
 
 - name: Create HTTPS Redirect Route
   kubernetes.core.k8s:
     state: present
-    template: httproute-https-redirect.yaml.j2
+    definition: >-
+      {{ lookup('template', 'httproute-https-redirect.yaml.j2') | from_yaml }}
 
 - name: Create LAN TLS Certificates
   kubernetes.core.k8s:
     state: present
-    template: certificates-lan.yaml.j2
+    definition: "{{ lookup('template', 'certificates-lan.yaml.j2') | from_yaml }}"
 
 - name: Create Public TLS Certificates
   kubernetes.core.k8s:
     state: present
-    template: certificates-public.yaml.j2
+    definition: >-
+      {{ lookup('template', 'certificates-public.yaml.j2') | from_yaml }}
 
 - name: Create Basic Auth Secrets
   kubernetes.core.k8s:
@@ -418,12 +422,12 @@
 - name: Create Production Issuer
   kubernetes.core.k8s:
     state: present
-    template: issuer-prod.yaml
+    definition: "{{ lookup('template', 'issuer-prod.yaml') | from_yaml }}"
 
 - name: Create Staging Issuer
   kubernetes.core.k8s:
     state: present
-    template: issuer-staging.yaml
+    definition: "{{ lookup('template', 'issuer-staging.yaml') | from_yaml }}"
 
 - name: Create Monitoring Namespace
   kubernetes.core.k8s:
@@ -502,7 +506,8 @@
 - name: Create Grafana Route
   kubernetes.core.k8s:
     state: present
-    template: httproute-grafana.yaml.j2
+    definition: >-
+      {{ lookup('template', 'httproute-grafana.yaml.j2') | from_yaml }}
 
 - name: Create Alert Manager Config
   kubernetes.core.k8s:

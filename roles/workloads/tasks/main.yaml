@@ -44,7 +44,8 @@
 - name: Create Workload Resource Quotas
   kubernetes.core.k8s:
     state: present
-    template: resourcequota-workload.yaml
+    definition: >-
+      {{ lookup('template', 'resourcequota-workload.yaml') | from_yaml }}
   loop: "{{ workloads_namespaces | dict2items }}"
   loop_control:
     loop_var: workload_namespace_entry
@@ -56,7 +57,8 @@
 - name: Create Workload Limit Ranges
   kubernetes.core.k8s:
     state: present
-    template: limitrange-workload.yaml
+    definition: >-
+      {{ lookup('template', 'limitrange-workload.yaml') | from_yaml }}
   loop: "{{ workloads_namespaces | dict2items }}"
   loop_control:
     loop_var: workload_namespace_entry
@@ -67,7 +69,8 @@
 - name: Create PostgreSQL Clusters
   kubernetes.core.k8s:
     state: present
-    template: cluster-postgresql.yaml.j2
+    definition: >-
+      {{ lookup('template', 'cluster-postgresql.yaml.j2') | from_yaml }}
   loop: "{{ workloads_postgresql_clusters | dict2items }}"
   loop_control:
     loop_var: postgresql_cluster
@@ -76,7 +79,8 @@
 - name: Create PostgreSQL Pod Monitors
   kubernetes.core.k8s:
     state: present
-    template: podmonitor-postgresql.yaml.j2
+    definition: >-
+      {{ lookup('template', 'podmonitor-postgresql.yaml.j2') | from_yaml }}
   loop: "{{ workloads_postgresql_clusters | dict2items }}"
   loop_control:
     loop_var: postgresql_cluster
@@ -105,7 +109,7 @@
 
 - name: Create Jellyfin Media Persistent Volume
   kubernetes.core.k8s:
-    template: pv-jellyfin-media.yaml
+    definition: "{{ lookup('template', 'pv-jellyfin-media.yaml') | from_yaml }}"
 
 - name: Setup Helm
   ansible.builtin.include_role:
@@ -137,4 +141,5 @@
 - name: Create Dotfiles Redirect Route
   kubernetes.core.k8s:
     state: present
-    template: httproute-dotfiles.yaml.j2
+    definition: >-
+      {{ lookup('template', 'httproute-dotfiles.yaml.j2') | from_yaml }}
