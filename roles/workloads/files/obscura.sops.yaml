@@ -1,105 +1,10 @@
-replicaCount: 3
 obscura:
     auth:
         jwtSecret: ENC[AES256_GCM,data:7kbaHEOaCDRs44+A5IYLVwo=,iv:xLMHFgCNvKtagLnd0nsHK0/tncfaPxHPrCVduFen1B0=,tag:LGTmHmpdTjYeUSLqDKnnmQ==,type:str]
-    telemetry:
-        otlpEndpoint: http://otel.monitoring.svc.cluster.local:4317
-        logFormat: json
-    server:
-        trustedProxies: 10.244.0.0/16
     fcm:
-        projectId: obscura-af88b
         credentialsJson: ENC[AES256_GCM,data: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,iv:UoXDBcKLgeeEgXjp4mZitXwydS62EIJQSxMrhMyc8eI=,tag:bW5lAdLAvC7LQSVyeIAeWQ==,type:str]
-postgresql:
-    enabled: true
-    primary:
-        resourcesPreset: none
-        resources:
-            requests:
-                cpu: 100m
-                memory: 256Mi
-            limits:
-                memory: 512Mi
-        persistence:
-            enabled: true
-            storageClass: longhorn-protected
-            size: 8Gi
-    auth:
-        password: ENC[AES256_GCM,data:xudHUUtGKVXl8e5yMj8kylOjuw==,iv:7GS3frg7cy9Ush748tQhvQvr9KTNQwCK5ZQLPDMX4DQ=,tag:657bPX0kFadViaMqBaVk9A==,type:str]
-        postgresPassword: ENC[AES256_GCM,data:se25800iSgcg86pWDS9aym7srQO/Sunm,iv:bcbCL4Y344ZizA183746PnZn1+gjEXb2ud4e98+sMmI=,tag:DwJ0r9UhG25CfgtlTIy1fA==,type:str]
-    metrics:
-        enabled: true
-        resourcesPreset: none
-        resources:
-            requests:
-                cpu: 100m
-                memory: 128Mi
-            limits:
-                memory: 256Mi
-        serviceMonitor:
-            enabled: true
-            labels:
-                release: prometheus-stack
 minio:
-    persistence:
-        enabled: true
-        storageClass: longhorn-protected
-        size: 10Gi
-    resources:
-        requests:
-            cpu: 100m
-            memory: 256Mi
-        limits:
-            memory: 512Mi
     rootPassword: ENC[AES256_GCM,data:hSqeSxUBIKfLdc9/KtYQAoSdlg==,iv:YElxKDVGHeOmoImbx0Cs5Ln1+Hp5uksLnfVvfdJNbM0=,tag:TQGf5Tm7lPkprQifcuirWA==,type:str]
-    metrics:
-        serviceMonitor:
-            enabled: true
-            includeNode: true
-            additionalLabels:
-                release: prometheus-stack
-podSecurityContext:
-    fsGroup: 10001
-    runAsGroup: 10001
-    runAsUser: 10001
-    runAsNonRoot: true
-    seccompProfile:
-        type: RuntimeDefault
-resources:
-    requests:
-        cpu: 100m
-        memory: 128Mi
-    limits:
-        memory: 256Mi
-securityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-        drop:
-            - ALL
-httpRoute:
-    enabled: true
-    parentRefs:
-        - name: poseidon
-          namespace: envoy-gateway-system
-          sectionName: https-wildcard
-    hostnames:
-        - obscura.barrelmaker.dev
-    filters:
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            set:
-                - name: Strict-Transport-Security
-                  value: max-age=63072000; includeSubDomains; preload
-                - name: Referrer-Policy
-                  value: same-origin
-                - name: X-Content-Type-Options
-                  value: nosniff
-securityPolicy:
-    cors:
-        enabled: true
-        allowOrigins:
-            - https://*.obscura-client-web.pages.dev
-            - https://obscura-client-web.pages.dev
 sops:
     age:
         - enc: |
@@ -112,6 +17,6 @@ sops:
             -----END AGE ENCRYPTED FILE-----
           recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^credentialsJson|.*[Pp]assword$)
-    lastmodified: "2026-08-29T14:30:45Z"
-    mac: ENC[AES256_GCM,data:GFO8Rc7OLfGOWwp+DFzBWQRR/EJbNdCKk/CSbMhJt7e27l5pgU/SvI5/mzfQvIki0ODbIvVi87pFQDYEZaxasu7QLAgTP59pth2qsTyFH843rdAO1j2M6OWP4ZKSavazjU6bUCDYS/pYcn1h/VC7l8GukFSpaAVRwP6RiggjM6g=,iv:9WC5XL+K1m87oS8jwTbMxqmGvEgWDog1B61N6aIYwNo=,tag:EnmfSA3/UzqUCaQ37vYQSA==,type:str]
+    lastmodified: "2026-08-29T23:26:15Z"
+    mac: ENC[AES256_GCM,data:sSXrpM1gpN0ISyKO8kKUQ4a3bhGHOx0kGOSwllj75kmjHUVtqO8C5EBNx0GDIZhebWeT3MgIsfF1djsSfUPu0b5FKC5OaXLmXzBa/DMKP8kPY3aBJZJL3ojfCkRq2Ws76M7a6J51sJxTzPXMDg1Ev6ChgL6tto9Vml1eb39ASlg=,iv:ZyhFnAFYeNQ8BBFJ2bCOBF5QZtY2L2+EhgIT45T//fo=,tag:sgrVcOV/+uHe1pLGag27FA==,type:str]
     version: 3.13.1

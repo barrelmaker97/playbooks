@@ -19,6 +19,43 @@ workloads_namespaces:
     requests_cpu: "2"
     requests_memory: 4Gi
 
+workloads_postgresql_image: >-
+  ghcr.io/cloudnative-pg/postgresql:18.4-standard-trixie@sha256:ebf3919504d7523a63e8e2fee9b051211de714644b36469275558c624afd50ec
+
+workloads_postgresql_clusters:
+  obscura-postgres:
+    namespace: obscura
+    description: Production PostgreSQL cluster for Obscura
+    instances: 3
+    enable_pdb: true
+    database: obscura
+    owner: obscura
+    storage_size: 8Gi
+    synchronous:
+      method: any
+      number: 1
+      data_durability: required
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+  devscura-postgres:
+    namespace: obscura-dev
+    description: Development PostgreSQL cluster for Obscura
+    instances: 1
+    enable_pdb: false
+    database: obscura
+    owner: obscura
+    storage_size: 8Gi
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+
 workloads_helm_releases:
   jellyfin:
     ref: barrelmaker/jellyfin
@@ -29,10 +66,6 @@ workloads_helm_releases:
   pistachio:
     ref: barrelmaker/pistachio
     namespace: barrelmaker
-  satisfactory:
-    ref: barrelmaker/satisfactory
-    namespace: barrelmaker
-    timeout: 10m
   website:
     ref: barrelmaker/website
     namespace: barrelmaker
@@ -59,3 +92,7 @@ workloads_helm_releases:
   # valheim:
   #   ref: barrelmaker/valheim
   #   namespace: barrelmaker
+  # satisfactory:
+  #   ref: barrelmaker/satisfactory
+  #   namespace: barrelmaker
+  #   timeout: 10m

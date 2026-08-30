@@ -9,6 +9,7 @@
     tasks_from: setup
   vars:
     helm_repos:
+      cloudnative-pg: https://cloudnative-pg.github.io/charts
       grafana: https://grafana.github.io/helm-charts
       grafana-community: https://grafana-community.github.io/helm-charts
       jetstack: https://charts.jetstack.io
@@ -52,26 +53,25 @@
     helm_chart_namespace: longhorn-system
     helm_chart_values_template: "{{ core_role_path }}/templates/values/longhorn.yaml.j2"
 
-- name: Create Longhorn Local Storage Class
+- name: Create CloudNativePG Local Storage Class
   kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: storage.k8s.io/v1
       kind: StorageClass
       metadata:
-        name: longhorn-local
+        name: longhorn-cnpg-local
       provisioner: driver.longhorn.io
       allowVolumeExpansion: true
       reclaimPolicy: Retain
-      volumeBindingMode: Immediate
+      volumeBindingMode: WaitForFirstConsumer
       parameters:
         dataEngine: v1
         dataLocality: strict-local
-        numberOfReplicas: "1"
-        recurringJobSelector: >-
-          [{"name":"protected","isGroup":true}]
         disableRevisionCounter: "true"
         fsType: ext4
+        numberOfReplicas: "1"
+        recurringJobSelector: "[]"
 
 - name: Create Longhorn Protected Storage Class
   kubernetes.core.k8s:
@@ -115,6 +115,30 @@
       parameters:
         recurringJobSelector: "[]"
         fsType: ext4
+
+- name: Create CloudNativePG Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: cnpg-system
+        labels:
+          pod-security.kubernetes.io/enforce: restricted
+          pod-security.kubernetes.io/audit: restricted
+          pod-security.kubernetes.io/warn: restricted
+
+- name: Deploy CloudNativePG
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: cloudnative-pg
+    helm_chart_ref: cloudnative-pg/cloudnative-pg
+    helm_chart_version: "{{ cloudnative_pg_version }}"
+    helm_chart_namespace: cnpg-system
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/cloudnative-pg.yaml.j2"
 
 - name: Create Protected Recurring Snapshot
   kubernetes.core.k8s:
