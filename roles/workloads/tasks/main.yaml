@@ -12,20 +12,20 @@
     loop_var: workload_release
     label: "{{ workload_release.key }}"
 
-- name: Validate PostgreSQL Cluster Namespaces
+- name: Validate CloudNativePG Cluster Namespaces
   ansible.builtin.assert:
     that:
-      - postgresql_cluster.value.namespace is defined
+      - workload_postgresql_cluster.value.namespace is defined
       - >-
-        (postgresql_cluster.value.namespace | default(""))
+        (workload_postgresql_cluster.value.namespace | default(""))
         in workloads_namespaces
     fail_msg: >-
-      PostgreSQL cluster {{ postgresql_cluster.key }} references an undeclared
-      workload namespace.
+      CloudNativePG cluster {{ workload_postgresql_cluster.key }} references an
+      undeclared workload namespace.
   loop: "{{ workloads_postgresql_clusters | dict2items }}"
   loop_control:
-    loop_var: postgresql_cluster
-    label: "{{ postgresql_cluster.key }}"
+    loop_var: workload_postgresql_cluster
+    label: "{{ workload_postgresql_cluster.key }}"
 
 - name: Create Workload Namespaces
   kubernetes.core.k8s:
@@ -66,42 +66,17 @@
   vars:
     workload_namespace_name: "{{ workload_namespace_entry.key }}"
 
-- name: Create PostgreSQL Clusters
-  kubernetes.core.k8s:
-    state: present
-    definition: >-
-      {{ lookup('template', 'cluster-postgresql.yaml.j2') | from_yaml }}
+- name: Deploy PostgreSQL Clusters
+  ansible.builtin.include_role:
+    name: cloudnative_pg
   loop: "{{ workloads_postgresql_clusters | dict2items }}"
   loop_control:
-    loop_var: postgresql_cluster
-    label: "{{ postgresql_cluster.key }}"
-
-- name: Create PostgreSQL Pod Monitors
-  kubernetes.core.k8s:
-    state: present
-    definition: >-
-      {{ lookup('template', 'podmonitor-postgresql.yaml.j2') | from_yaml }}
-  loop: "{{ workloads_postgresql_clusters | dict2items }}"
-  loop_control:
-    loop_var: postgresql_cluster
-    label: "{{ postgresql_cluster.key }}"
-
-- name: Wait for PostgreSQL Clusters
-  kubernetes.core.k8s_info:
-    api_version: postgresql.cnpg.io/v1
-    kind: Cluster
-    name: "{{ postgresql_cluster.key }}"
-    namespace: "{{ postgresql_cluster.value.namespace }}"
-    wait: true
-    wait_condition:
-      type: Ready
-      status: "True"
-    wait_sleep: 10
-    wait_timeout: 900
-  loop: "{{ workloads_postgresql_clusters | dict2items }}"
-  loop_control:
-    loop_var: postgresql_cluster
-    label: "{{ postgresql_cluster.key }}"
+    loop_var: workload_postgresql_cluster
+    label: "{{ workload_postgresql_cluster.key }}"
+  vars:
+    cloudnative_pg_cluster_name: "{{ workload_postgresql_cluster.key }}"
+    cloudnative_pg_cluster: "{{ workload_postgresql_cluster.value }}"
+    cloudnative_pg_image: "{{ workloads_postgresql_image }}"
 
 - name: Set workload role path
   ansible.builtin.set_fact:

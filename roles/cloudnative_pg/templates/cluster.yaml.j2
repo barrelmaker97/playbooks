@@ -1,0 +1,33 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: "{{ cloudnative_pg_cluster_name }}"
+  namespace: "{{ cloudnative_pg_cluster.namespace }}"
+spec:
+  description: "{{ cloudnative_pg_cluster.description }}"
+  instances: {{ cloudnative_pg_cluster.instances }}
+  imageName: "{{ cloudnative_pg_image }}"
+  enablePDB: {{ cloudnative_pg_cluster.enable_pdb | bool | lower }}
+  enableSuperuserAccess: false
+  bootstrap:
+    initdb:
+      database: "{{ cloudnative_pg_cluster.database }}"
+      owner: "{{ cloudnative_pg_cluster.owner }}"
+      dataChecksums: true
+  storage:
+    storageClass: longhorn-cnpg-local
+    size: "{{ cloudnative_pg_cluster.storage_size }}"
+  affinity:
+    enablePodAntiAffinity: true
+    podAntiAffinityType: required
+    topologyKey: kubernetes.io/hostname
+{% if cloudnative_pg_cluster.synchronous is defined %}
+  postgresql:
+    synchronous:
+      method: {{ cloudnative_pg_cluster.synchronous.method }}
+      number: {{ cloudnative_pg_cluster.synchronous.number }}
+      dataDurability: {{ cloudnative_pg_cluster.synchronous.data_durability }}
+{% endif %}
+  resources:
+{{ cloudnative_pg_cluster.resources | to_nice_yaml(indent=2) | indent(4, true) }}
