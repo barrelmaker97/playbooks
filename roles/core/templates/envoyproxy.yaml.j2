@@ -15,6 +15,24 @@ spec:
             requests:
               cpu: 100m
               memory: 256Mi
+        pod:
+          topologySpreadConstraints:
+            - maxSkew: 1
+              minDomains: 2
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: proxy
+                  app.kubernetes.io/managed-by: envoy-gateway
+                  app.kubernetes.io/name: envoy
+                  gateway.envoyproxy.io/owning-gateway-name: "{{ gateway_name }}"
+                  gateway.envoyproxy.io/owning-gateway-namespace: "{{ gateway_namespace }}"
+              matchLabelKeys:
+                - pod-template-hash
+      envoyPDB:
+        name: "{{ gateway_name }}-envoy-proxy"
+        maxUnavailable: 1
       envoyService:
         annotations:
           metallb.io/loadBalancerIPs: "{{ gateway_ip }}"

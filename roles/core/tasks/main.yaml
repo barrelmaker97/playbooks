@@ -225,6 +225,7 @@
     helm_chart_ref: oci://docker.io/envoyproxy/gateway-helm
     helm_chart_version: "{{ envoy_gateway_version }}"
     helm_chart_namespace: "{{ gateway_namespace }}"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/envoy-gateway.yaml.j2"
 
 - name: Create Envoy Proxy Config
   kubernetes.core.k8s:
