@@ -1,6 +1,22 @@
 ---
 replicaCount: 3
 
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+topologySpreadConstraints:
+  - maxSkew: 1
+    minDomains: 3
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: obscura
+        app.kubernetes.io/instance: obscura
+    matchLabelKeys:
+      - pod-template-hash
+
 obscura:
   database:
     existingSecret:

@@ -18,6 +18,22 @@ gitSync:
 
 replicaCount: 2 # For faster failover
 
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+topologySpreadConstraints:
+  - maxSkew: 1
+    minDomains: 2
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: website
+        app.kubernetes.io/instance: website
+    matchLabelKeys:
+      - pod-template-hash
+
 podSecurityContext:
   seccompProfile:
     type: RuntimeDefault
