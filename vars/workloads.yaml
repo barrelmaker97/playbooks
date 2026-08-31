@@ -31,10 +31,17 @@ workloads_postgresql_clusters:
     database: obscura
     owner: obscura
     storage_size: 8Gi
+    availability_alert_severity: critical
     synchronous:
       method: any
       number: 1
       data_durability: required
+    parameters:
+      idle_in_transaction_session_timeout: 5min
+      track_io_timing: "on"
+      track_wal_io_timing: "on"
+    pg_hba:
+      - hostnossl all all all reject
     resources:
       requests:
         cpu: 200m
@@ -49,6 +56,13 @@ workloads_postgresql_clusters:
     database: obscura
     owner: obscura
     storage_size: 8Gi
+    availability_alert_severity: warning
+    parameters:
+      idle_in_transaction_session_timeout: 5min
+      track_io_timing: "on"
+      track_wal_io_timing: "on"
+    pg_hba:
+      - hostnossl all all all reject
     resources:
       requests:
         cpu: 200m

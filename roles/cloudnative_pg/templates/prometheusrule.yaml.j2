@@ -1,0 +1,195 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: "{{ cloudnative_pg_cluster_name }}"
+  namespace: "{{ cloudnative_pg_cluster.namespace }}"
+spec:
+  groups:
+    - name: "{{ cloudnative_pg_cluster_name }}.availability"
+      rules:
+        - alert: CloudNativePGInstancesNotReady
+          expr: >-
+            (
+              count(
+                up{
+                  job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+                } == 1
+              )
+              or vector(0)
+            ) < {{ cloudnative_pg_cluster.instances }}
+          for: 2m
+          labels:
+            severity: "{{ cloudnative_pg_cluster.availability_alert_severity }}"
+            cnpg_cluster: "{{ cloudnative_pg_cluster_name }}"
+            job: "{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            namespace: "{{ cloudnative_pg_cluster.namespace }}"
+          annotations:
+            summary: >-
+              CloudNativePG cluster {{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}
+              has unavailable instances
+            description: >-
+              Fewer than {{ cloudnative_pg_cluster.instances }} PostgreSQL
+              instances have healthy Prometheus scrape targets.
+
+        - alert: CloudNativePGPostgresDown
+          expr: >-
+            cnpg_collector_up{
+              job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            } == 0
+          for: 1m
+          labels:
+            severity: "{{ cloudnative_pg_cluster.availability_alert_severity }}"
+            cnpg_cluster: "{{ cloudnative_pg_cluster_name }}"
+            job: "{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            namespace: "{{ cloudnative_pg_cluster.namespace }}"
+          annotations:
+            summary: >-
+              PostgreSQL is unavailable on {% raw %}{{ $labels.pod }}{% endraw %}
+            description: >-
+              The CloudNativePG collector cannot connect to PostgreSQL on
+              {% raw %}{{ $labels.pod }}{% endraw %}.
+
+{% if cloudnative_pg_cluster.instances | int > 1 %}
+        - alert: CloudNativePGReplicaNotStreaming
+          expr: >-
+            cnpg_pg_replication_in_recovery{
+              job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            }
+            >
+            cnpg_pg_replication_is_wal_receiver_up{
+              job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            }
+          for: 2m
+          labels:
+            severity: "{{ cloudnative_pg_cluster.availability_alert_severity }}"
+            cnpg_cluster: "{{ cloudnative_pg_cluster_name }}"
+            job: "{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            namespace: "{{ cloudnative_pg_cluster.namespace }}"
+          annotations:
+            summary: >-
+              PostgreSQL replica {% raw %}{{ $labels.pod }}{% endraw %} is not streaming
+            description: >-
+              The replica is in recovery but its WAL receiver is not running.
+
+        - alert: CloudNativePGReplicationLagHigh
+          expr: >-
+            cnpg_pg_replication_lag{
+              job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            } > 300
+          for: 2m
+          labels:
+            severity: warning
+            cnpg_cluster: "{{ cloudnative_pg_cluster_name }}"
+            job: "{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            namespace: "{{ cloudnative_pg_cluster.namespace }}"
+          annotations:
+            summary: >-
+              PostgreSQL replica {% raw %}{{ $labels.pod }}{% endraw %} is over five minutes behind
+            description: >-
+              Replication lag has remained above 300 seconds for two minutes.
+{% endif %}
+
+{% if cloudnative_pg_cluster.synchronous is defined %}
+        - alert: CloudNativePGSynchronousReplicasUnavailable
+          expr: >-
+            cnpg_collector_sync_replicas{
+              job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}",
+              value="observed"
+            }
+            < ignoring(value)
+            cnpg_collector_sync_replicas{
+              job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}",
+              value="expected"
+            }
+          for: 1m
+          labels:
+            severity: critical
+            cnpg_cluster: "{{ cloudnative_pg_cluster_name }}"
+            job: "{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            namespace: "{{ cloudnative_pg_cluster.namespace }}"
+          annotations:
+            summary: >-
+              CloudNativePG cluster {{ cloudnative_pg_cluster_name }} lacks synchronous replicas
+            description: >-
+              Fewer synchronous replicas are available than required; commits
+              may block to preserve data durability.
+{% endif %}
+
+    - name: "{{ cloudnative_pg_cluster_name }}.operations"
+      rules:
+        - alert: CloudNativePGLongRunningTransaction
+          expr: >-
+            cnpg_backends_max_tx_duration_seconds{
+              job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            } > 300
+          for: 1m
+          labels:
+            severity: warning
+            cnpg_cluster: "{{ cloudnative_pg_cluster_name }}"
+            job: "{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            namespace: "{{ cloudnative_pg_cluster.namespace }}"
+          annotations:
+            summary: >-
+              PostgreSQL transaction on {% raw %}{{ $labels.pod }}{% endraw %} exceeds five minutes
+            description: >-
+              A transaction has remained open for more than 300 seconds.
+
+        - alert: CloudNativePGDatabaseXIDAgeHigh
+          expr: >-
+            max by (namespace, job, datname) (
+              cnpg_pg_database_xid_age{
+                job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+              }
+            ) > 300000000
+          for: 5m
+          labels:
+            severity: warning
+            cnpg_cluster: "{{ cloudnative_pg_cluster_name }}"
+            job: "{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            namespace: "{{ cloudnative_pg_cluster.namespace }}"
+          annotations:
+            summary: >-
+              PostgreSQL database {% raw %}{{ $labels.datname }}{% endraw %} has high transaction ID age
+            description: >-
+              Transaction ID age has exceeded 300 million and requires vacuum
+              investigation.
+
+        - alert: CloudNativePGDeadlocksDetected
+          expr: >-
+            sum by (namespace, job, datname) (
+              increase(
+                cnpg_pg_stat_database_deadlocks{
+                  job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}",
+                  datname!=""
+                }[10m]
+              )
+            ) > 0
+          labels:
+            severity: warning
+            cnpg_cluster: "{{ cloudnative_pg_cluster_name }}"
+            job: "{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            namespace: "{{ cloudnative_pg_cluster.namespace }}"
+          annotations:
+            summary: >-
+              PostgreSQL deadlocks detected in {% raw %}{{ $labels.datname }}{% endraw %}
+            description: >-
+              One or more deadlocks occurred during the last ten minutes.
+
+        - alert: CloudNativePGMetricsCollectionError
+          expr: >-
+            cnpg_collector_last_collection_error{
+              job="{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            } == 1
+          for: 2m
+          labels:
+            severity: warning
+            cnpg_cluster: "{{ cloudnative_pg_cluster_name }}"
+            job: "{{ cloudnative_pg_cluster.namespace }}/{{ cloudnative_pg_cluster_name }}"
+            namespace: "{{ cloudnative_pg_cluster.namespace }}"
+          annotations:
+            summary: >-
+              CloudNativePG metrics collection failed on {% raw %}{{ $labels.pod }}{% endraw %}
+            description: >-
+              The PostgreSQL metrics collector has reported an error for two
+              minutes.

@@ -38,15 +38,29 @@
 - name: Create User CSR Object
   kubernetes.core.k8s:
     state: present
-    template: csr-user.yaml.j2
+    definition: "{{ lookup('template', 'csr-user.yaml.j2') | from_yaml }}"
   vars:
-    user_csr_base64: "{{ lookup('file', '{{ user_csr }}') | b64encode }}"
+    user_csr_base64: "{{ lookup('file', user_csr) | b64encode }}"
 
 - name: Install kubectl locally
   become: true
   community.general.snap:
     name: kubectl
     classic: true
+
+- name: Download CloudNativePG kubectl Plugin
+  become: true
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v{{ kubectl_cnpg_version }}/{{ user_kubectl_cnpg_package }}
+    dest: "{{ user_kubectl_cnpg_package_path }}"
+    checksum: "{{ user_kubectl_cnpg_checksums[user_kubectl_cnpg_architecture] }}"
+    mode: "0644"
+
+- name: Install CloudNativePG kubectl Plugin
+  become: true
+  ansible.builtin.apt:
+    deb: "{{ user_kubectl_cnpg_package_path }}"
 
 - name: Approve User CSR
   ansible.builtin.command: kubectl certificate approve {{ cluster_user }}
@@ -82,7 +96,8 @@
 - name: Create User Cluster Role Binding
   kubernetes.core.k8s:
     state: present
-    template: clusterrolebinding-user.yaml
+    definition: >-
+      {{ lookup('template', 'clusterrolebinding-user.yaml') | from_yaml }}
 
 - name: Create User Kubeconfig
   ansible.builtin.template:
