@@ -1,5 +1,20 @@
+controller:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 96Mi
+    limits:
+      memory: 192Mi
 speaker:
   ignoreExcludeLB: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
+frrk8s:
+  enabled: false
 prometheus:
   namespace: monitoring
   rbacPrometheus: false

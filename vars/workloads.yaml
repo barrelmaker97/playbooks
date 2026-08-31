@@ -79,9 +79,11 @@ workloads_helm_releases:
     namespace: barrelmaker
   pistachio:
     ref: barrelmaker/pistachio
+    version: 0.3.1
     namespace: barrelmaker
   website:
     ref: barrelmaker/website
+    version: 0.6.2
     namespace: barrelmaker
   factorio:
     ref: barrelmaker/factorio
@@ -91,11 +93,11 @@ workloads_helm_releases:
     namespace: barrelmaker
   obscura:
     ref: barrelmaker/obscura
-    version: 0.12.2
+    version: 0.12.3
     namespace: obscura
   devscura:
     ref: barrelmaker/obscura
-    version: 0.12.2
+    version: 0.12.3
     namespace: obscura-dev
   # serge:
   #   ref: barrelmaker/serge

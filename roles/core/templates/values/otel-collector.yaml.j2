@@ -4,6 +4,12 @@ image:
 command:
   name: "otelcol-contrib"
 mode: deployment
+resources:
+  requests:
+    cpu: 10m
+    memory: 192Mi
+  limits:
+    memory: 384Mi
 config:
   receivers:
     otlp:

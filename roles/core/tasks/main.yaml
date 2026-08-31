@@ -225,6 +225,7 @@
     helm_chart_ref: oci://docker.io/envoyproxy/gateway-helm
     helm_chart_version: "{{ envoy_gateway_version }}"
     helm_chart_namespace: "{{ gateway_namespace }}"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/envoy-gateway.yaml.j2"
 
 - name: Create Envoy Proxy Config
   kubernetes.core.k8s:
@@ -441,6 +442,22 @@
           pod-security.kubernetes.io/enforce: privileged
           pod-security.kubernetes.io/audit: privileged
           pod-security.kubernetes.io/warn: privileged
+
+- name: Create Monitoring Limit Range
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: LimitRange
+      metadata:
+        name: monitoring-default
+        namespace: monitoring
+      spec:
+        limits:
+          - type: Container
+            defaultRequest:
+              cpu: 10m
+              memory: 64Mi
 
 - name: Create Grafana Admin Credentials Secret
   kubernetes.core.k8s:
