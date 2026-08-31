@@ -12,6 +12,7 @@ defaultSettings:
   defaultDataLocality: best-effort
   defaultDataPath: /var/mnt/longhorn
   defaultReplicaCount: "2"
+  nodeDrainPolicy: allow-if-replica-is-stopped
   replicaAutoBalance: least-effort
   snapshotMaxCount: "{{ longhorn_snapshot_max_count }}"
   storageMinimalAvailablePercentage: "10"
