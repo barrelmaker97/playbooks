@@ -443,6 +443,22 @@
           pod-security.kubernetes.io/audit: privileged
           pod-security.kubernetes.io/warn: privileged
 
+- name: Create Monitoring Limit Range
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: LimitRange
+      metadata:
+        name: monitoring-default
+        namespace: monitoring
+      spec:
+        limits:
+          - type: Container
+            defaultRequest:
+              cpu: 10m
+              memory: 64Mi
+
 - name: Create Grafana Admin Credentials Secret
   kubernetes.core.k8s:
     state: present
