@@ -15,7 +15,7 @@ argument_specs:
         it for every host, including the DNS servers this role never touches -
         so it is deliberately not declared as an option below.
     options:
-      user_cluster_user:
+      user_name:
         description:
           - Username. Becomes the certificate common name, the CSR object name
             and the kubeconfig context user.

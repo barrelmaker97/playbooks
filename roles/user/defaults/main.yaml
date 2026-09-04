@@ -4,7 +4,7 @@
 
 # Kubernetes username: the certificate common name, the CSR object name, and
 # the kubeconfig context user
-user_cluster_user: barrelmaker
+user_name: barrelmaker
 
 # Requested lifetime of the signed client certificate
 user_cert_expiration_seconds: 2592000  # 30 days

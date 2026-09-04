@@ -469,7 +469,7 @@
   kubernetes.core.k8s:
     state: present
     namespace: monitoring
-    definition: "{{ lookup('file', 'files/secret-additional-scrape-config.yaml') | from_yaml }}"
+    definition: "{{ lookup('file', 'files/additional-scrape-configs.yaml') | from_yaml }}"
 
 - name: Create Dashboards ConfigMap
   kubernetes.core.k8s:
