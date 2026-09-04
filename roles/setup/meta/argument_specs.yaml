@@ -1,0 +1,71 @@
+---
+argument_specs:
+  main:
+    short_description: Generate Talos machine configuration
+    description:
+      - Installs age and sops, requests a Talos Factory schematic, then renders
+        a control plane machine config per node and merges the generated
+        talosconfig into the local Talos client configuration.
+      - >-
+        Requires the min and distribution fact subsets, which the calling
+        playbook gathers on behalf of community.sops.install.
+    options:
+      talos_config_dir:
+        description: Directory the generated machine configs are written to.
+        type: path
+        required: true
+      talos_version:
+        description: Talos version, used for the installer image and ISO link.
+        type: str
+        required: true
+      node_names:
+        description: Control plane node hostnames, one machine config each.
+        type: list
+        elements: str
+        required: true
+      cluster_host:
+        description: Short cluster name passed to talosctl gen config.
+        type: str
+        required: true
+      cluster_domain:
+        description: Domain the API server endpoint is published under.
+        type: str
+        required: true
+      cluster_port:
+        description: API server port.
+        type: int
+        required: true
+      cluster_vip:
+        description: Shared virtual IP the control plane nodes advertise.
+        type: str
+        required: true
+      local_domain:
+        description: LAN domain suffix appended to node hostnames.
+        type: str
+        required: true
+      install_disk:
+        description: Device Talos installs itself onto.
+        type: str
+        required: true
+      interface_name:
+        description: Network interface carrying the virtual IP.
+        type: str
+        required: true
+      ntp_server:
+        description: NTP server the nodes sync against.
+        type: str
+        required: true
+      nut_host:
+        description: NUT server the nut-client extension monitors, as user@host.
+        type: str
+        required: true
+      nut_user:
+        description: NUT username.
+        type: str
+        required: true
+      nut_password:
+        description:
+          - NUT password. Currently held in plaintext in group_vars/all.yaml,
+            unlike every other credential in this repository.
+        type: str
+        required: true

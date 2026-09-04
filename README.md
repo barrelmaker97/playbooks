@@ -14,7 +14,7 @@ The age key file is expected to be at `~/.config/sops/age/keys.txt`.
 # Prerequisites
 The `setup.yaml` playbook depends on `talosctl` to generate artifacts for cluster setup
 and will also be needed for bootstrapping after the playbook is complete. It can be installed
-using [this guide](https://www.talos.dev/v1.9/talos-guides/install/talosctl/). Be sure to install
+using [this guide](https://www.talos.dev/v1.13/talos-guides/install/talosctl/). Be sure to install
 the version that matches the version of Talos to be used for the cluster.
 
 # Running Playbooks
@@ -27,13 +27,40 @@ Individual playbooks can be run in a similar manner:
 ```bash
 ansible-playbook setup.yaml
 ```
+
+| Playbook         | Targets       | In `site.yaml` | Purpose                                                        |
+|------------------|---------------|----------------|----------------------------------------------------------------|
+| `setup.yaml`     | localhost     | yes            | Generate Talos machine configs for the control plane nodes      |
+| `user.yaml`      | localhost     | yes            | Create the cluster user, sign its cert, write a kubeconfig      |
+| `core.yaml`      | localhost     | yes            | Storage, networking, certificates and the monitoring stack      |
+| `workloads.yaml` | localhost     | yes            | Namespaces, PostgreSQL clusters and application Helm releases   |
+| `dns.yaml`       | `dns_servers` | no             | unbound, Pi-hole and keepalived on the DNS pair                 |
+| `dewpoint.yaml`  | `dns_servers` | no             | The dewpoint Govee sensor Prometheus exporter                   |
+
+`dns.yaml` and `dewpoint.yaml` run against the hosts in `inventory.yaml` rather
+than localhost, and are deliberately not part of `site.yaml` so that a full
+cluster run never touches the DNS servers. Both support role tags:
+
+```bash
+ansible-playbook dns.yaml --tags pihole
+```
 # IP Plan
-| Name       | Address       | Hostname           |
-|------------|---------------|--------------------|
-| Virtual IP | 192.168.15.40 | kube.poseidon.lan  |
-| Node 1     | 192.168.15.41 | node1-poseidon.lan |
-| Node 2     | 192.168.15.42 | node2-poseidon.lan |
-| Node 3     | 192.168.15.43 | node3-poseidon.lan |
+### Cluster
+| Name         | Address                     | Hostname           |
+|--------------|-----------------------------|--------------------|
+| Virtual IP   | 192.168.15.40               | kube.poseidon.lan  |
+| Node 1       | 192.168.15.41               | node1-poseidon.lan |
+| Node 2       | 192.168.15.42               | node2-poseidon.lan |
+| Node 3       | 192.168.15.43               | node3-poseidon.lan |
+| MetalLB pool | 192.168.15.60-192.168.15.69 |                    |
+| Gateway      | 192.168.15.60               | poseidon.lan       |
+
+### DNS
+| Name       | Address       | Hostname   | Role   |
+|------------|---------------|------------|--------|
+| Virtual IP | 192.168.15.80 |            |        |
+| Castor     | 192.168.15.70 | castor.lan | MASTER |
+| Pollux     | 192.168.15.30 | pollux.lan | BACKUP |
 
 # Cluster Bootstrap
 ```bash
@@ -79,15 +106,15 @@ talosctl -n node1-poseidon.lan upgrade-k8s
 
 Copyright (c) 2026 Nolan Cooper
 
-This chart collection is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
+These playbooks are free software: you can redistribute them and/or modify
+them under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-This chart collection is distributed in the hope that it will be useful,
+They are distributed in the hope that they will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this chart collection.  If not, see <https://www.gnu.org/licenses/>.
+along with these playbooks.  If not, see <https://www.gnu.org/licenses/>.

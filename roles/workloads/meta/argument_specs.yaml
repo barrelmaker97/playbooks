@@ -1,0 +1,53 @@
+---
+argument_specs:
+  main:
+    short_description: Deploy application namespaces, databases and Helm releases
+    description:
+      - Creates the workload namespaces with their quotas and limit ranges,
+        deploys a CloudNativePG cluster per entry in
+        workloads_postgresql_clusters, then deploys the Helm releases.
+      - >-
+        The three mappings below are keyed by caller-defined names, so their
+        contents cannot be validated with suboptions here. The per-cluster
+        schema is enforced by roles/cloudnative_pg, and the namespace
+        cross-references are checked by asserts in tasks/main.yaml.
+    options:
+      workloads_namespaces:
+        description:
+          - Namespaces to create, keyed by name. Each value carries labels plus
+            the requests_cpu and requests_memory quota for that namespace.
+        type: dict
+        required: true
+      workloads_postgresql_image:
+        description:
+          - Digest-pinned PostgreSQL image shared by every cluster below.
+        type: str
+        required: true
+      workloads_postgresql_clusters:
+        description:
+          - CloudNativePG clusters to deploy, keyed by cluster name. Each value
+            is passed through to the cloudnative_pg role, which validates it.
+        type: dict
+        required: true
+      workloads_helm_releases:
+        description:
+          - Helm releases to deploy, keyed by release name. Each value needs a
+            ref and a namespace, and may set version and timeout.
+        type: dict
+        required: true
+      nas_domain:
+        description: Host serving the NFS share backing the Jellyfin media volume.
+        type: str
+        required: true
+      external_domain:
+        description: Public domain used by the dotfiles redirect route.
+        type: str
+        required: true
+      gateway_name:
+        description: Gateway the dotfiles route attaches to.
+        type: str
+        required: true
+      gateway_namespace:
+        description: Namespace of that Gateway.
+        type: str
+        required: true

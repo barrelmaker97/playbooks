@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Nolan Cooper
+  description: Deploy application namespaces, PostgreSQL clusters and Helm releases.
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions: [all]
+    - name: Ubuntu
+      versions: [all]
+  galaxy_tags: [kubernetes, helm]
+
+# Intentionally empty. The helm and cloudnative_pg roles are pulled in with
+# include_role + tasks_from at the point they are needed; declaring them here
+# would make Ansible run a tasks/main entry point that these roles do not have.
+dependencies: []

@@ -1,5 +1,11 @@
 ---
 - name: Setup for cluster creation
   hosts: localhost
+  # community.sops.install inspects the OS to pick an install method and needs
+  # architecture, distribution, distribution_major_version, distribution_version
+  # and os_family. distribution_version is not in the min subset, so pull in the
+  # distribution subset as well. Nothing else in this playbook reads facts.
+  gather_facts: true
+  gather_subset: [min, distribution]
   roles:
     - setup

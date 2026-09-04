@@ -97,10 +97,10 @@
   kubernetes.core.k8s:
     state: present
     definition: >-
-      {{ lookup('template', 'clusterrolebinding-user.yaml') | from_yaml }}
+      {{ lookup('template', 'clusterrolebinding-user.yaml.j2') | from_yaml }}
 
 - name: Create User Kubeconfig
   ansible.builtin.template:
-    src: user-kubeconfig.yaml
+    src: user-kubeconfig.yaml.j2
     dest: "{{ user_kube_dir }}/config"
     mode: "0600"

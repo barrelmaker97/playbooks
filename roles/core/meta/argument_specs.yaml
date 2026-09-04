@@ -1,0 +1,124 @@
+---
+argument_specs:
+  main:
+    short_description: Deploy cluster-wide core services
+    description:
+      - Deploys storage (Longhorn and its storage classes), the CloudNativePG
+        operator, networking (MetalLB and Envoy Gateway), certificates
+        (cert-manager, trust-manager and the issuers) and the monitoring stack.
+      - All values come from group_vars/all.yaml.
+    options:
+      # Cluster identity
+      cluster_domain:
+        description: Internal domain the LAN wildcard certificate and routes use.
+        type: str
+        required: true
+      external_domain:
+        description: Public domain served by the Gateway's HTTPS listeners.
+        type: str
+        required: true
+      nas_domain:
+        description: Host serving the NFS share used as the Longhorn backup target.
+        type: str
+        required: true
+      email_address:
+        description: Contact address registered with the ACME issuers.
+        type: str
+        required: true
+      node_ips:
+        description:
+          - Literal node IPs scraped for etcd metrics. Kubernetes Endpoints
+            reject hostnames, so these must track the nodes by hand.
+        type: list
+        elements: str
+        required: true
+
+      # Gateway
+      gateway_name:
+        description: Name of the Gateway object.
+        type: str
+        required: true
+      gateway_namespace:
+        description: Namespace holding the Gateway and its certificates.
+        type: str
+        required: true
+      gateway_ip:
+        description: LoadBalancer address requested from MetalLB for the Gateway.
+        type: str
+        required: true
+      gateway_response_headers:
+        description: Security headers set on external HTTPS responses.
+        type: list
+        elements: dict
+        required: true
+        options:
+          name:
+            description: Header name.
+            type: str
+            required: true
+          value:
+            description: Header value.
+            type: str
+            required: true
+
+      # Storage
+      metallb_ip_range:
+        description: Address range MetalLB allocates LoadBalancer IPs from.
+        type: str
+        required: true
+      longhorn_snapshot_max_count:
+        description:
+          - Hard cap on snapshots per volume. The snapshot alert fires just
+            below this value.
+        type: int
+        required: true
+
+      # Chart versions
+      prometheus_crds_version:
+        description: Version of the prometheus-operator-crds chart.
+        type: str
+        required: true
+      longhorn_version:
+        description: Version of the Longhorn chart.
+        type: str
+        required: true
+      cloudnative_pg_chart_version:
+        description: Version of the CloudNativePG operator chart.
+        type: str
+        required: true
+      metallb_version:
+        description: Version of the MetalLB chart.
+        type: str
+        required: true
+      envoy_gateway_version:
+        description: Version of the Envoy Gateway chart. OCI tags are v-prefixed.
+        type: str
+        required: true
+      cert_manager_version:
+        description: Version of the cert-manager chart.
+        type: str
+        required: true
+      trust_manager_version:
+        description: Version of the trust-manager chart.
+        type: str
+        required: true
+      loki_version:
+        description: Version of the Loki chart.
+        type: str
+        required: true
+      tempo_version:
+        description: Version of the Tempo chart.
+        type: str
+        required: true
+      otel_collector_version:
+        description: Version of the OpenTelemetry Collector chart.
+        type: str
+        required: true
+      kube_prometheus_stack_version:
+        description: Version of the kube-prometheus-stack chart.
+        type: str
+        required: true
+      metrics_server_version:
+        description: Version of the metrics-server chart.
+        type: str
+        required: true

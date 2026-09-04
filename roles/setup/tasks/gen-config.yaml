@@ -1,6 +1,7 @@
+---
 - name: Template machine config patch for {{ item }}
   ansible.builtin.template:
-    src: controlplane-patch.yaml
+    src: controlplane-patch.yaml.j2
     dest: "{{ talos_config_dir }}/patch.yaml"
     mode: "0644"
   vars:

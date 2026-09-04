@@ -1,0 +1,102 @@
+---
+argument_specs:
+  main:
+    short_description: Deploy a CloudNativePG cluster
+    description:
+      - Creates a CloudNativePG Cluster along with a PodMonitor and a
+        PrometheusRule, then waits for the cluster to report Ready.
+      - >-
+        Note that cloudnative_pg_cluster is validated with suboptions, which
+        means any key added to a cluster definition in vars/workloads.yaml must
+        also be declared here or validation will reject it.
+    options:
+      cloudnative_pg_cluster_name:
+        description:
+          - Name of the Cluster object. Also used as the PodMonitor name and as
+            the prefix for the generated alert group names.
+        type: str
+        required: true
+      cloudnative_pg_image:
+        description:
+          - Fully qualified PostgreSQL container image, pinned by digest.
+        type: str
+        required: true
+      cloudnative_pg_cluster:
+        description:
+          - The cluster definition, supplied by the caller as one value of
+            workloads_postgresql_clusters.
+        type: dict
+        required: true
+        options:
+          namespace:
+            description: Namespace the Cluster and its monitoring objects go into.
+            type: str
+            required: true
+          description:
+            description: Human readable description recorded on the Cluster.
+            type: str
+            required: true
+          instances:
+            description: Number of PostgreSQL instances. Drives the replica alerts.
+            type: int
+            required: true
+          enable_pdb:
+            description:
+              - Whether CloudNativePG should create a PodDisruptionBudget.
+                Meaningless for single instance clusters.
+            type: bool
+            required: true
+          database:
+            description: Name of the database created during bootstrap.
+            type: str
+            required: true
+          owner:
+            description: Role that owns the bootstrapped database.
+            type: str
+            required: true
+          storage_size:
+            description: Size of the per-instance volume, for example 8Gi.
+            type: str
+            required: true
+          availability_alert_severity:
+            description:
+              - Severity attached to the instance availability alerts. Production
+                clusters page as critical, development clusters only warn.
+            type: str
+            required: true
+            choices: [warning, critical]
+          resources:
+            description:
+              - Container resource requests and limits, rendered verbatim into
+                the Cluster spec.
+            type: dict
+            required: true
+          parameters:
+            description: Extra postgresql.conf parameters, rendered verbatim.
+            type: dict
+          pg_hba:
+            description: Additional pg_hba.conf rules, applied before the defaults.
+            type: list
+            elements: str
+          synchronous:
+            description:
+              - Synchronous replication settings. Omit for clusters that should
+                replicate asynchronously.
+            type: dict
+            options:
+              method:
+                description: How CloudNativePG selects synchronous standbys.
+                type: str
+                required: true
+                choices: [any, first]
+              number:
+                description: Number of synchronous standbys required.
+                type: int
+                required: true
+              data_durability:
+                description:
+                  - Whether commits must block when synchronous standbys are
+                    unavailable.
+                type: str
+                required: true
+                choices: [required, preferred]

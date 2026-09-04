@@ -1,0 +1,12 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure the unbound recursive resolver
+    description:
+      - Installs unbound, downloads the root hints, and copies every .conf file
+        from files/ into /etc/unbound/unbound.conf.d.
+      - >-
+        Takes no arguments. Configuration is held in the files/ directory rather
+        than in variables, and handlers are flushed before subsequent roles run
+        so Pi-hole finds a working upstream resolver on port 5335.
+    options: {}

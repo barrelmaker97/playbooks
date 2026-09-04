@@ -1,5 +1,9 @@
 ---
 - name: Create cluster user
   hosts: localhost
+  # roles/user/vars/main.yaml reads ansible_facts.env.HOME and
+  # ansible_facts.architecture, both of which the min subset provides.
+  gather_facts: true
+  gather_subset: [min]
   roles:
     - user

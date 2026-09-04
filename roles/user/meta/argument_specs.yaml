@@ -1,0 +1,48 @@
+---
+argument_specs:
+  main:
+    short_description: Create a cluster user and write its kubeconfig
+    description:
+      - Generates a private key and CSR, submits and approves a
+        CertificateSigningRequest, binds the user to cluster-admin, installs
+        kubectl and the CloudNativePG plugin, and writes a kubeconfig.
+      - >-
+        Reads ansible_facts.env.HOME and ansible_facts.architecture, so the
+        calling playbook must gather at least the min subset.
+    options:
+      cluster_user:
+        description:
+          - Username. Becomes the certificate common name, the CSR object name
+            and the kubeconfig context user.
+        type: str
+        required: true
+      cluster_host:
+        description: Short cluster name used for the kubeconfig cluster entry.
+        type: str
+        required: true
+      cluster_domain:
+        description: Domain the API server is reachable at.
+        type: str
+        required: true
+      cluster_port:
+        description: API server port.
+        type: int
+        required: true
+      cluster_vip:
+        description: Virtual IP talosctl targets to fetch the admin kubeconfig.
+        type: str
+        required: true
+      cert_expiration_seconds:
+        description: Requested lifetime of the signed client certificate.
+        type: int
+        required: true
+      kubectl_cnpg_version:
+        description:
+          - Version of the CloudNativePG kubectl plugin to install. Changing it
+            requires updating user_kubectl_cnpg_checksums in vars/main.yaml.
+        type: str
+        required: true
+      ansible_user:
+        description: Local account that ends up owning the kubeconfig directory.
+        type: str
+        required: true

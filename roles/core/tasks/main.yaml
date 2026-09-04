@@ -209,7 +209,7 @@
   kubernetes.core.k8s:
     state: present
     definition: >-
-      {{ lookup('template', 'ipaddresspool-metallb.yaml') | from_yaml }}
+      {{ lookup('template', 'ipaddresspool-metallb.yaml.j2') | from_yaml }}
 
 - name: Advertise Load Balanced IP
   kubernetes.core.k8s:
@@ -423,12 +423,12 @@
 - name: Create Production Issuer
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'issuer-prod.yaml') | from_yaml }}"
+    definition: "{{ lookup('template', 'issuer-prod.yaml.j2') | from_yaml }}"
 
 - name: Create Staging Issuer
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'issuer-staging.yaml') | from_yaml }}"
+    definition: "{{ lookup('template', 'issuer-staging.yaml.j2') | from_yaml }}"
 
 - name: Create Monitoring Namespace
   kubernetes.core.k8s:
