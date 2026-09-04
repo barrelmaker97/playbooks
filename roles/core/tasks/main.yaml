@@ -214,7 +214,7 @@
 - name: Advertise Load Balanced IP
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('file', 'files/L2Advertisement-metallb.yaml') | from_yaml }}"
+    definition: "{{ lookup('file', 'files/l2advertisement-metallb.yaml') | from_yaml }}"
 
 - name: Deploy Envoy Gateway
   ansible.builtin.include_role:
@@ -414,6 +414,9 @@
           configMap:
             key: ca-certificates.crt
 
+# sops-encrypted manifests set namespace on the task rather than in metadata:
+# the MAC covers the whole document, so metadata cannot be edited without
+# re-encrypting. Plain manifests carry their own namespace.
 - name: Create Cloudflare API Token Secret
   kubernetes.core.k8s:
     state: present
@@ -468,7 +471,6 @@
 - name: Create Additional Prometheus Scrape Config Secret
   kubernetes.core.k8s:
     state: present
-    namespace: monitoring
     definition: "{{ lookup('file', 'files/additional-scrape-configs.yaml') | from_yaml }}"
 
 - name: Create Dashboards ConfigMap
@@ -529,7 +531,6 @@
 - name: Create Alert Manager Config
   kubernetes.core.k8s:
     state: present
-    namespace: monitoring
     definition: "{{ lookup('file', 'files/alertmanagerconfig.yaml') | from_yaml }}"
 
 - name: Create Longhorn Snapshot Alerts

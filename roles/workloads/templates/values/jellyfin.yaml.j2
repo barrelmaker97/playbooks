@@ -34,7 +34,7 @@ httpRoute:
       responseHeaderModifier:
         set:
 {% for header in gateway_response_headers %}
-          - name: {{ header.name }}
+          - name: "{{ header.name }}"
             value: "{{ header.value }}"
 {% endfor %}
 

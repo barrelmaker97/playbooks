@@ -15,26 +15,26 @@ cluster:
 
 machine:
   certSANs:
-    - {{ node_hostname }}.{{ local_domain }}
+    - "{{ node_hostname }}.{{ local_domain }}"
   install:
     image: factory.talos.dev/installer/{{ setup_factory_response.json.id }}:v{{ talos_version }}
-    disk: {{ install_disk }}
+    disk: "{{ install_disk }}"
     wipe: false
   network:
     interfaces:
-      - interface: {{ interface_name }}
+      - interface: "{{ interface_name }}"
         dhcp: true
         vip:
-          ip: {{ cluster_vip }}
+          ip: "{{ cluster_vip }}"
     extraHostEntries:
-      - ip: {{ cluster_vip }}
+      - ip: "{{ cluster_vip }}"
         aliases:
           - kube.{{ cluster_domain }}
   time:
       disabled: false
       bootTimeout: 2m0s
       servers:
-          - {{ ntp_server }}
+          - "{{ ntp_server }}"
   kubelet:
     extraMounts:
       - destination: /var/mnt/longhorn
@@ -73,4 +73,4 @@ timeout: 2m
 apiVersion: v1alpha1
 kind: HostnameConfig
 auto: off
-hostname: {{ node_hostname }}
+hostname: "{{ node_hostname }}"

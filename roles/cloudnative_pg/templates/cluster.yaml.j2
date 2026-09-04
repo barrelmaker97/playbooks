@@ -36,9 +36,9 @@ spec:
 {% endif %}
 {% if cloudnative_pg_cluster.synchronous is defined %}
     synchronous:
-      method: {{ cloudnative_pg_cluster.synchronous.method }}
+      method: "{{ cloudnative_pg_cluster.synchronous.method }}"
       number: {{ cloudnative_pg_cluster.synchronous.number }}
-      dataDurability: {{ cloudnative_pg_cluster.synchronous.data_durability }}
+      dataDurability: "{{ cloudnative_pg_cluster.synchronous.data_durability }}"
 {% endif %}
 {% endif %}
   resources:
