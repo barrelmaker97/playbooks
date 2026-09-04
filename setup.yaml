@@ -1,5 +1,11 @@
 ---
 - name: Setup for cluster creation
   hosts: localhost
+  # community.sops.install needs distribution_version for OS detection, which
+  # min does not include. Nothing else here reads facts.
+  gather_facts: true
+  gather_subset: [min, distribution]
+  vars_files:
+    - vars/setup.yaml
   roles:
     - setup

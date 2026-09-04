@@ -2,10 +2,10 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: "{{ cluster_user }}-cluster-admin"
+  name: "{{ user_name }}-cluster-admin"
 subjects:
   - kind: User
-    name: "{{ cluster_user }}"
+    name: "{{ user_name }}"
     apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole

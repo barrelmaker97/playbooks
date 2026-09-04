@@ -1,6 +1,8 @@
 ---
-- name: Setup for cluster creation
-  import_playbook: setup.yaml
+# setup.yaml is deliberately absent. It is a one-time bootstrap that mints a
+# fresh Talos admin certificate and merges it as a new client context, so
+# including it here accumulated a context per site.yaml run. Run it by hand
+# when building or rebuilding the cluster.
 - name: Create cluster user
   import_playbook: user.yaml
 - name: Deploy core services

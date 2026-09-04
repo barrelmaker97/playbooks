@@ -1,0 +1,25 @@
+---
+argument_specs:
+  main:
+    short_description: Install the dewpoint Govee sensor exporter
+    description:
+      - Installs the dewpoint .deb from GitHub releases when the installed
+        version differs, then configures it through a systemd drop-in.
+    options:
+      dewpoint_version:
+        description:
+          - Release to install. Compared against the installed package version
+            to decide whether to download and reinstall.
+        type: str
+        required: true
+      dewpoint_bind_port:
+        description:
+          - Port the exporter serves metrics on. Defaults to 9185 via
+            defaults/main.yml.
+        type: int
+      dewpoint_address:
+        description:
+          - Optional allowlist of Govee H5075 MAC addresses to export. Empty
+            exports every sensor in range. Defaults to an empty string via
+            defaults/main.yml.
+        type: str

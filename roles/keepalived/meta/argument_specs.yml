@@ -1,0 +1,36 @@
+---
+argument_specs:
+  main:
+    short_description: Configure keepalived VRRP failover
+    description:
+      - Installs keepalived, deploys the Pi-hole health check script and writes
+        a VRRP configuration that floats a virtual IP between the DNS servers.
+      - Per-host values come from inventory.yaml.
+    options:
+      keepalived_state:
+        description:
+          - Initial VRRP state for this host. Exactly one host should be MASTER.
+        type: str
+        required: true
+        choices: [MASTER, BACKUP]
+      keepalived_priority:
+        description:
+          - VRRP priority. Higher wins the election. The health check subtracts
+            60 on failure, so the gap between hosts must exceed that for
+            failover to actually take place.
+        type: int
+        required: true
+      keepalived_vip:
+        description: Virtual IP shared by the DNS servers.
+        type: str
+        required: true
+      keepalived_interface:
+        description: Interface the virtual IP is advertised on.
+        type: str
+        required: true
+      keepalived_router_id:
+        description:
+          - VRRP virtual router ID. Must match across the hosts in this group
+            and not collide with another VRRP group on the same network.
+        type: int
+        required: true

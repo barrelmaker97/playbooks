@@ -1,0 +1,60 @@
+---
+argument_specs:
+  setup:
+    short_description: Install Helm and register chart repositories
+    description:
+      - Installs the Helm snap and the helm-diff plugin, then adds and updates
+        any repositories the caller asks for. Safe to call more than once per
+        run; repository additions are cumulative.
+    options:
+      helm_repos:
+        description:
+          - Chart repositories to register, as a mapping of repository name to
+            URL. OCI references do not need registering and should be passed
+            straight to the deploy entry point.
+        type: dict
+
+  deploy:
+    short_description: Diff a Helm release and upgrade it only when it changed
+    description:
+      - Runs helm diff first and only performs an upgrade when the diff reports
+        changes, so an unchanged release is not reported as changed.
+      - >-
+        Defaults listed below are applied inline in tasks/deploy.yaml rather
+        than injected by argument validation, which does not define values for
+        options the caller omitted.
+    options:
+      helm_chart_name:
+        description: Helm release name.
+        type: str
+        required: true
+      helm_chart_ref:
+        description:
+          - Chart reference, either repo/chart for a registered repository or a
+            full oci:// URL.
+        type: str
+        required: true
+      helm_chart_namespace:
+        description: Namespace to deploy the release into. Created if absent.
+        type: str
+        required: true
+      helm_chart_version:
+        description:
+          - Chart version to pin. The literal string latest skips the --version
+            flag entirely and takes whatever the repository currently offers.
+        type: str
+        required: true
+      helm_chart_timeout:
+        description: Timeout passed to helm upgrade. Defaults to 5m.
+        type: str
+      helm_chart_values_template:
+        description:
+          - Absolute path to a Jinja values template. Rendered and passed as
+            --values when the file exists; silently skipped when it does not,
+            which is how releases that need no values are handled.
+        type: path
+      helm_chart_sops_file:
+        description:
+          - Absolute path to a sops-encrypted values file. Decrypted and passed
+            as an additional --values when the file exists.
+        type: path

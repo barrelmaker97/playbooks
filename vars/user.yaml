@@ -1,0 +1,15 @@
+---
+# Read by user.yaml. Values shared with other playbooks live in
+# group_vars/all.yaml instead.
+
+# Kubernetes username: the certificate common name, the CSR object name, and
+# the kubeconfig context user. Keeps its user_ prefix because a bare "name"
+# would say nothing.
+user_name: barrelmaker
+
+# Requested lifetime of the signed client certificate
+cert_expiration_seconds: 2592000  # 30 days
+
+# Changing this requires updating user_kubectl_cnpg_checksums in
+# roles/user/vars/main.yaml
+kubectl_cnpg_version: "1.30.0"

@@ -1,0 +1,73 @@
+---
+argument_specs:
+  main:
+    short_description: Install Pi-hole and manage its configuration
+    description:
+      - Installs Pi-hole unattended when absent, applies configuration through
+        pihole-FTL, then reconciles groups, clients, adlists and domain rules
+        against the Pi-hole API. Unmanaged entries are removed.
+      - Defaults for every option below are supplied by defaults/main.yml.
+    options:
+      pihole_config:
+        description:
+          - pihole-FTL configuration keys and values. Values must be strings,
+            because pihole-FTL --config takes literal CLI arguments.
+        type: dict
+      pihole_groups:
+        description:
+          - Groups to maintain. The built-in Default group is never removed.
+        type: list
+        elements: dict
+        options:
+          name:
+            description: Group name.
+            type: str
+            required: true
+          comment:
+            description: Optional comment. Defaults to "Managed by Ansible".
+            type: str
+      pihole_clients:
+        description: Clients to maintain, each assigned to one or more groups.
+        type: list
+        elements: dict
+        options:
+          client:
+            description: Client identifier, typically a MAC or IP address.
+            type: str
+            required: true
+          comment:
+            description: Optional comment describing the client.
+            type: str
+          groups:
+            description: Group names this client belongs to. Must already exist.
+            type: list
+            elements: str
+            required: true
+      pihole_adlists:
+        description:
+          - Blocklist URLs. Any adlist present in Pi-hole but absent here is
+            removed, and gravity is updated when the set changes.
+        type: list
+        elements: str
+      pihole_domains:
+        description:
+          - Domain rules, grouped into the four allow/deny and exact/regex
+            buckets that the role iterates over.
+        type: dict
+        options:
+          deny_exact:
+            description: Exactly matched domains to block.
+            type: list
+            elements: dict
+          deny_regex:
+            description: Regex patterns to block.
+            type: list
+            elements: dict
+          allow_exact:
+            description: Exactly matched domains to allow.
+            type: list
+            elements: dict
+          allow_regex:
+            description: Regex patterns to allow.
+            type: list
+            elements: dict

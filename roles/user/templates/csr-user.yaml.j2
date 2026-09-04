@@ -1,9 +1,8 @@
-# vim: ft=yaml
 ---
 apiVersion: certificates.k8s.io/v1
 kind: CertificateSigningRequest
 metadata:
-  name: "{{ cluster_user }}"
+  name: "{{ user_name }}"
 spec:
   request: "{{ user_csr_base64 }}"
   signerName: kubernetes.io/kube-apiserver-client

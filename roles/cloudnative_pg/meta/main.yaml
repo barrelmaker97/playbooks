@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Nolan Cooper
+  description: Deploy a CloudNativePG cluster with its PodMonitor and alert rules.
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions: [all]
+    - name: Ubuntu
+      versions: [all]
+  galaxy_tags: [database, postgresql, kubernetes]
+
+dependencies: []

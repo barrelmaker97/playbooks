@@ -1,8 +1,8 @@
 ---
 user_kube_dir: "{{ ansible_facts['env']['HOME'] }}/.kube"
-user_key: "{{ user_kube_dir }}/{{ cluster_user }}.key"
-user_csr: "{{ user_kube_dir }}/{{ cluster_user }}.csr"
-user_crt: "{{ user_kube_dir }}/{{ cluster_user }}.crt"
+user_key: "{{ user_kube_dir }}/{{ user_name }}.key"
+user_csr: "{{ user_kube_dir }}/{{ user_name }}.csr"
+user_crt: "{{ user_kube_dir }}/{{ user_name }}.crt"
 user_api_crt: "{{ user_kube_dir }}/cluster.crt"
 user_kubectl_cnpg_architectures:
   aarch64: arm64

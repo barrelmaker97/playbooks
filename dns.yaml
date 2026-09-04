@@ -2,7 +2,9 @@
 - name: Deploy DNS Stack
   hosts: dns_servers
   become: true
+  # These roles read no facts; min just keeps remote gathering cheap.
   gather_facts: true
+  gather_subset: [min]
   roles:
     - role: unbound
       tags: [unbound]

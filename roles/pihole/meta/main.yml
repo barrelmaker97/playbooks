@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Nolan Cooper
+  description: Install Pi-hole and manage its config, groups, clients, adlists and domain rules.
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions: [all]
+    - name: Ubuntu
+      versions: [all]
+  galaxy_tags: [dns, adblock]
+
+dependencies: []

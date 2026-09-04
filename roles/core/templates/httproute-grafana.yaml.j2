@@ -8,8 +8,8 @@ metadata:
   namespace: monitoring
 spec:
   parentRefs:
-    - name: {{ gateway_name }}
-      namespace: {{ gateway_namespace }}
+    - name: "{{ gateway_name }}"
+      namespace: "{{ gateway_namespace }}"
       sectionName: https-wildcard
   hostnames:
     - "grafana.{{ external_domain }}"
@@ -23,7 +23,7 @@ spec:
           responseHeaderModifier:
             set:
 {% for header in gateway_response_headers %}
-              - name: {{ header.name }}
+              - name: "{{ header.name }}"
                 value: "{{ header.value }}"
 {% endfor %}
       backendRefs:

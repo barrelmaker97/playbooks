@@ -99,9 +99,6 @@ workloads_helm_releases:
     ref: barrelmaker/obscura
     version: 0.12.3
     namespace: obscura-dev
-  # serge:
-  #   ref: barrelmaker/serge
-  #   namespace: barrelmaker
   # gmod:
   #   ref: barrelmaker/gmod
   #   namespace: barrelmaker

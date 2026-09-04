@@ -2,7 +2,11 @@
 - name: Deploy dewpoint sensor exporter
   hosts: dns_servers
   become: true
+  # These roles read no facts; min just keeps remote gathering cheap.
   gather_facts: true
+  gather_subset: [min]
+  vars_files:
+    - vars/dewpoint.yaml
   roles:
     - role: dewpoint
       tags: [dewpoint]

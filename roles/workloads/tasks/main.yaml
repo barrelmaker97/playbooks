@@ -45,7 +45,7 @@
   kubernetes.core.k8s:
     state: present
     definition: >-
-      {{ lookup('template', 'resourcequota-workload.yaml') | from_yaml }}
+      {{ lookup('template', 'resourcequota-workload.yaml.j2') | from_yaml }}
   loop: "{{ workloads_namespaces | dict2items }}"
   loop_control:
     loop_var: workload_namespace_entry
@@ -58,7 +58,7 @@
   kubernetes.core.k8s:
     state: present
     definition: >-
-      {{ lookup('template', 'limitrange-workload.yaml') | from_yaml }}
+      {{ lookup('template', 'limitrange-workload.yaml.j2') | from_yaml }}
   loop: "{{ workloads_namespaces | dict2items }}"
   loop_control:
     loop_var: workload_namespace_entry
@@ -84,7 +84,8 @@
 
 - name: Create Jellyfin Media Persistent Volume
   kubernetes.core.k8s:
-    definition: "{{ lookup('template', 'pv-jellyfin-media.yaml') | from_yaml }}"
+    state: present
+    definition: "{{ lookup('template', 'pv-jellyfin-media.yaml.j2') | from_yaml }}"
 
 - name: Setup Helm
   ansible.builtin.include_role:

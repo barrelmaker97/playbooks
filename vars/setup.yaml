@@ -1,0 +1,17 @@
+---
+# Read by setup.yaml. Values shared with other playbooks live in
+# group_vars/all.yaml instead.
+talos_version: "1.13.8"
+talos_config_dir: /home/barrelmaker/.talos
+
+# Rendered into the control plane machine config patch
+install_disk: /dev/nvme0n1
+interface_name: enp86s0
+ntp_server: 192.168.15.1
+
+# NUT connection for the nut-client extension. nut_password is stored in
+# plaintext, unlike every other credential in this repository, which are
+# sops-encrypted.
+nut_host: ups@192.168.15.30
+nut_user: remoteuser
+nut_password: hunter2

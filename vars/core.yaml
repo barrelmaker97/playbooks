@@ -1,0 +1,28 @@
+---
+# Read by core.yaml. Values shared with other playbooks live in
+# group_vars/all.yaml instead.
+
+# Chart versions
+prometheus_crds_version: "28.0.0"
+longhorn_version: "1.12.1"
+cloudnative_pg_chart_version: "0.29.0"
+metallb_version: "0.16.1"
+envoy_gateway_version: "v1.8.1"  # OCI chart tags are v-prefixed
+cert_manager_version: "1.21.1"
+trust_manager_version: "0.24.0"
+loki_version: "6.53.0"
+tempo_version: "1.26.5"
+otel_collector_version: "0.145.0"
+kube_prometheus_stack_version: "82.13.0"
+metrics_server_version: "3.13.1"
+
+# Contact address registered with the ACME issuers
+email_address: nolancooper97@gmail.com
+
+metallb_ip_range: 192.168.15.60-192.168.15.69
+# IP for the Envoy Gateway LoadBalancer service, allocated from the range above
+gateway_ip: 192.168.15.60
+
+# Hard cap on snapshots per volume; blocks new snapshots once reached. The
+# alert in prometheusrule-longhorn-snapshots fires just below this value.
+longhorn_snapshot_max_count: 50

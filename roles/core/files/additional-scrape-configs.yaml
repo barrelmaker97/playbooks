@@ -3,6 +3,7 @@ kind: Secret
 type: Opaque
 metadata:
   name: additional-scrape-configs
+  namespace: monitoring
 stringData:
   prometheus-additional.yaml: |
     - job_name: "nodes"

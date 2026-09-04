@@ -22,3 +22,13 @@ jobs:
           pipx inject --include-apps ansible ansible-lint
       - name: Lint
         run: ansible-lint
+      - name: Syntax check
+        # inventory.yaml is the only top-level yaml that is not a playbook.
+        # Written as an if rather than "[ ... ] && continue", which would abort
+        # the whole loop under the default bash -e when the test is false.
+        run: |
+          for playbook in *.yaml; do
+            if [ "$playbook" = "inventory.yaml" ]; then continue; fi
+            echo "== $playbook"
+            ansible-playbook --syntax-check "$playbook"
+          done
