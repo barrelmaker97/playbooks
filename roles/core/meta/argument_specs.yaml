@@ -6,7 +6,15 @@ argument_specs:
       - Deploys storage (Longhorn and its storage classes), the CloudNativePG
         operator, networking (MetalLB and Envoy Gateway), certificates
         (cert-manager, trust-manager and the issuers) and the monitoring stack.
-      - All values come from group_vars/all.yaml.
+      - >-
+        Chart versions and the role's own tunables are defaulted in
+        defaults/main.yaml. Identity and topology values shared with other
+        roles come from group_vars/all.yaml, which outranks those defaults.
+      - >-
+        Everything below stays required on purpose - a default satisfies the
+        requirement, so validation fires only if one is deleted, which surfaces
+        as a clear error at role entry rather than an undefined variable deep
+        inside a template.
     options:
       # Cluster identity
       cluster_domain:
@@ -21,7 +29,7 @@ argument_specs:
         description: Host serving the NFS share used as the Longhorn backup target.
         type: str
         required: true
-      email_address:
+      core_email_address:
         description: Contact address registered with the ACME issuers.
         type: str
         required: true
@@ -42,7 +50,7 @@ argument_specs:
         description: Namespace holding the Gateway and its certificates.
         type: str
         required: true
-      gateway_ip:
+      core_gateway_ip:
         description: LoadBalancer address requested from MetalLB for the Gateway.
         type: str
         required: true
@@ -62,11 +70,11 @@ argument_specs:
             required: true
 
       # Storage
-      metallb_ip_range:
+      core_metallb_ip_range:
         description: Address range MetalLB allocates LoadBalancer IPs from.
         type: str
         required: true
-      longhorn_snapshot_max_count:
+      core_longhorn_snapshot_max_count:
         description:
           - Hard cap on snapshots per volume. The snapshot alert fires just
             below this value.
@@ -74,51 +82,51 @@ argument_specs:
         required: true
 
       # Chart versions
-      prometheus_crds_version:
+      core_prometheus_crds_version:
         description: Version of the prometheus-operator-crds chart.
         type: str
         required: true
-      longhorn_version:
+      core_longhorn_version:
         description: Version of the Longhorn chart.
         type: str
         required: true
-      cloudnative_pg_chart_version:
+      core_cloudnative_pg_chart_version:
         description: Version of the CloudNativePG operator chart.
         type: str
         required: true
-      metallb_version:
+      core_metallb_version:
         description: Version of the MetalLB chart.
         type: str
         required: true
-      envoy_gateway_version:
+      core_envoy_gateway_version:
         description: Version of the Envoy Gateway chart. OCI tags are v-prefixed.
         type: str
         required: true
-      cert_manager_version:
+      core_cert_manager_version:
         description: Version of the cert-manager chart.
         type: str
         required: true
-      trust_manager_version:
+      core_trust_manager_version:
         description: Version of the trust-manager chart.
         type: str
         required: true
-      loki_version:
+      core_loki_version:
         description: Version of the Loki chart.
         type: str
         required: true
-      tempo_version:
+      core_tempo_version:
         description: Version of the Tempo chart.
         type: str
         required: true
-      otel_collector_version:
+      core_otel_collector_version:
         description: Version of the OpenTelemetry Collector chart.
         type: str
         required: true
-      kube_prometheus_stack_version:
+      core_kube_prometheus_stack_version:
         description: Version of the kube-prometheus-stack chart.
         type: str
         required: true
-      metrics_server_version:
+      core_metrics_server_version:
         description: Version of the metrics-server chart.
         type: str
         required: true

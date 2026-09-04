@@ -1,61 +1,42 @@
 ---
+# Site-level values. Values consumed by only one role are moving into that
+# role's defaults/; core has been done, setup, user and dewpoint have not.
+# Note that anything here outranks a role default, so adding a key back to this
+# file silently overrides the role's own value.
+
+# Connection
 ansible_user: barrelmaker
-cert_expiration_seconds: 2592000  # 30 days
+
+# Cluster identity. cluster_host, nas_host and local_domain are the building
+# blocks for the templated domains at the bottom of this file, so they belong
+# here even though only one role reads each of them directly.
 cluster_host: poseidon
 cluster_port: 6443
 cluster_user: barrelmaker
 cluster_vip: 192.168.15.40
 external_domain: barrelmaker.dev
-install_disk: /dev/nvme0n1
-interface_name: enp86s0
 local_domain: lan
 nas_host: soteria
+
+# Node topology. node_ips is only read by the core role, but it stays here
+# alongside node_names: Kubernetes Endpoints objects require literal IPs
+# (hostnames are rejected), so the two lists must be kept in sync by hand.
 node_names:
   - node1-poseidon
   - node2-poseidon
   - node3-poseidon
-# etcd Prometheus scrape targets. Kubernetes Endpoints objects require literal
-# IPs (hostnames are rejected), so these must be kept in sync with the nodes.
 node_ips:
   - 192.168.15.41
   - 192.168.15.42
   - 192.168.15.43
-ntp_server: 192.168.15.1
-talos_config_dir: /home/barrelmaker/.talos
-talos_version: "1.13.8"
 
-# NUT connection
-nut_host: ups@192.168.15.30
-nut_user: remoteuser
-nut_password: hunter2
-
-# Service versions
-cloudnative_pg_chart_version: "0.29.0"
-kubectl_cnpg_version: "1.30.0"
-cert_manager_version: "1.21.1"
-trust_manager_version: "0.24.0"
-envoy_gateway_version: "v1.8.1"  # OCI chart tags are v-prefixed
-metrics_server_version: "3.13.1"
-metallb_version: "0.16.1"
-prometheus_crds_version: "28.0.0"
-kube_prometheus_stack_version: "82.13.0"
-longhorn_version: "1.12.1"
-loki_version: "6.53.0"
-tempo_version: "1.26.5"
-otel_collector_version: "0.145.0"
-dewpoint_version: "0.1.2"
-
-# Service configuration
-email_address: nolancooper97@gmail.com
-metallb_ip_range: 192.168.15.60-192.168.15.69
-
-# Gateway API configuration
-# IP for the Envoy Gateway LoadBalancer service
-gateway_ip: 192.168.15.60
+# Gateway coordinates, shared by the core and workloads roles
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
 
-# Security headers added to responses on external HTTPS routes
+# Security headers added to responses on external HTTPS routes. Shared: the
+# core role applies them to the Grafana route, and five workload charts apply
+# them to their own routes.
 gateway_response_headers:
   - name: Strict-Transport-Security
     value: "max-age=63072000; includeSubDomains; preload"
@@ -64,10 +45,24 @@ gateway_response_headers:
   - name: X-Content-Type-Options
     value: "nosniff"
 
-# Longhorn configuration
-# Hard cap on snapshots per volume, blocks new snapshots once
-# reached. Alert fires just below this value.
-longhorn_snapshot_max_count: 50
+# Talos, read by the setup role
+install_disk: /dev/nvme0n1
+interface_name: enp86s0
+ntp_server: 192.168.15.1
+talos_config_dir: /home/barrelmaker/.talos
+talos_version: "1.13.8"
+
+# NUT connection, read by the setup role
+nut_host: ups@192.168.15.30
+nut_user: remoteuser
+nut_password: hunter2
+
+# Read by the user role
+cert_expiration_seconds: 2592000  # 30 days
+kubectl_cnpg_version: "1.30.0"
+
+# Read by the dewpoint role
+dewpoint_version: "0.1.2"
 
 # Templated variables
 cluster_domain: "{{ cluster_host }}.{{ local_domain }}"

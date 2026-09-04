@@ -9,6 +9,11 @@ argument_specs:
       - >-
         Reads ansible_facts.env.HOME and ansible_facts.architecture, so the
         calling playbook must gather at least the min subset.
+      - >-
+        Also chowns the kubeconfig directory to ansible_user. That is the
+        connection account rather than a role input - group_vars/all.yaml sets
+        it for every host, including the DNS servers this role never touches -
+        so it is deliberately not declared as an option below.
     options:
       cluster_user:
         description:
@@ -40,9 +45,5 @@ argument_specs:
         description:
           - Version of the CloudNativePG kubectl plugin to install. Changing it
             requires updating user_kubectl_cnpg_checksums in vars/main.yaml.
-        type: str
-        required: true
-      ansible_user:
-        description: Local account that ends up owning the kubeconfig directory.
         type: str
         required: true

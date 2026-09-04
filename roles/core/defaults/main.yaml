@@ -1,0 +1,36 @@
+---
+# Values consumed only by this role. The core_ prefix is what ansible-lint's
+# var-naming[no-role-prefix] rule expects of role-scoped variables, and matches
+# the dewpoint_, pihole_, keepalived_ and user_ prefixes used elsewhere.
+#
+# Anything here can be overridden from group_vars/all.yaml, which outranks role
+# defaults. The site-level file keeps the identity and topology values that
+# more than one role needs, which is why gateway_name, gateway_namespace and
+# gateway_response_headers are not here despite being gateway settings.
+
+# Chart versions
+core_prometheus_crds_version: "28.0.0"
+core_longhorn_version: "1.12.1"
+core_cloudnative_pg_chart_version: "0.29.0"
+core_metallb_version: "0.16.1"
+core_envoy_gateway_version: "v1.8.1"  # OCI chart tags are v-prefixed
+core_cert_manager_version: "1.21.1"
+core_trust_manager_version: "0.24.0"
+core_loki_version: "6.53.0"
+core_tempo_version: "1.26.5"
+core_otel_collector_version: "0.145.0"
+core_kube_prometheus_stack_version: "82.13.0"
+core_metrics_server_version: "3.13.1"
+
+# Contact address registered with the ACME issuers
+core_email_address: nolancooper97@gmail.com
+
+# MetalLB
+core_metallb_ip_range: 192.168.15.60-192.168.15.69
+# IP for the Envoy Gateway LoadBalancer service, allocated from the range above
+core_gateway_ip: 192.168.15.60
+
+# Longhorn configuration
+# Hard cap on snapshots per volume, blocks new snapshots once
+# reached. Alert fires just below this value.
+core_longhorn_snapshot_max_count: 50

@@ -51,3 +51,19 @@ argument_specs:
         description: Namespace of that Gateway.
         type: str
         required: true
+      gateway_response_headers:
+        description:
+          - Security headers applied by the jellyfin, niucraft, website,
+            obscura and devscura chart values. Shared with the core role.
+        type: list
+        elements: dict
+        required: true
+        options:
+          name:
+            description: Header name.
+            type: str
+            required: true
+          value:
+            description: Header value.
+            type: str
+            required: true
