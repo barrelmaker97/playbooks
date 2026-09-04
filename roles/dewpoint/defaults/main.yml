@@ -1,4 +1,7 @@
 ---
+# Release to install; compared against the installed package version.
+dewpoint_version: "0.1.2"
+
 # Port on which the dewpoint exporter serves metrics.
 dewpoint_bind_port: 9185
 # Optional allowlist of Govee H5075 MAC addresses to export. When empty, every
