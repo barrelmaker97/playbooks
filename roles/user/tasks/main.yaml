@@ -22,7 +22,7 @@
   community.crypto.openssl_csr:
     path: "{{ user_csr }}"
     privatekey_path: "{{ user_key }}"
-    common_name: "{{ cluster_user }}"
+    common_name: "{{ user_cluster_user }}"
 
 - name: Get admin kubeconfig
   changed_when: true
@@ -33,7 +33,7 @@
     state: absent
     api_version: certificates.k8s.io/v1
     kind: CertificateSigningRequest
-    name: "{{ cluster_user }}"
+    name: "{{ user_cluster_user }}"
 
 - name: Create User CSR Object
   kubernetes.core.k8s:
@@ -52,7 +52,7 @@
   become: true
   ansible.builtin.get_url:
     url: >-
-      https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v{{ kubectl_cnpg_version }}/{{ user_kubectl_cnpg_package }}
+      https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v{{ user_kubectl_cnpg_version }}/{{ user_kubectl_cnpg_package }}
     dest: "{{ user_kubectl_cnpg_package_path }}"
     checksum: "{{ user_kubectl_cnpg_checksums[user_kubectl_cnpg_architecture] }}"
     mode: "0644"
@@ -63,14 +63,14 @@
     deb: "{{ user_kubectl_cnpg_package_path }}"
 
 - name: Approve User CSR
-  ansible.builtin.command: kubectl certificate approve {{ cluster_user }}
+  ansible.builtin.command: kubectl certificate approve {{ user_cluster_user }}
   changed_when: true
 
 - name: Get User Certificate
   kubernetes.core.k8s_info:
     api_version: certificates.k8s.io/v1
     kind: CertificateSigningRequest
-    name: "{{ cluster_user }}"
+    name: "{{ user_cluster_user }}"
   register: user_cert
 
 - name: Get Cluster Certificate

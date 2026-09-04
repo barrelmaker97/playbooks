@@ -2,7 +2,7 @@
 - name: Template machine config patch for {{ item }}
   ansible.builtin.template:
     src: controlplane-patch.yaml.j2
-    dest: "{{ talos_config_dir }}/patch.yaml"
+    dest: "{{ setup_talos_config_dir }}/patch.yaml"
     mode: "0644"
   vars:
     node_hostname: "{{ item }}"
@@ -15,7 +15,7 @@
     --with-docs=false
     --with-examples=false
     --with-secrets {}
-    --config-patch-control-plane "@{{ talos_config_dir }}/patch.yaml"
+    --config-patch-control-plane "@{{ setup_talos_config_dir }}/patch.yaml"
     --output-types=controlplane
-    --output "{{ talos_config_dir }}/{{ item }}.yaml"
+    --output "{{ setup_talos_config_dir }}/{{ item }}.yaml"
     "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"'

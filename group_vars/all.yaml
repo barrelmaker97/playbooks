@@ -9,7 +9,6 @@ ansible_user: barrelmaker
 # here even though only one role reads each of them directly.
 cluster_host: poseidon
 cluster_port: 6443
-cluster_user: barrelmaker
 cluster_vip: 192.168.15.40
 external_domain: barrelmaker.dev
 local_domain: lan
@@ -39,20 +38,6 @@ gateway_response_headers:
     value: "same-origin"
   - name: X-Content-Type-Options
     value: "nosniff"
-
-install_disk: /dev/nvme0n1
-interface_name: enp86s0
-ntp_server: 192.168.15.1
-talos_config_dir: /home/barrelmaker/.talos
-talos_version: "1.13.8"
-
-# NUT connection
-nut_host: ups@192.168.15.30
-nut_user: remoteuser
-nut_password: hunter2
-
-cert_expiration_seconds: 2592000  # 30 days
-kubectl_cnpg_version: "1.30.0"
 
 dewpoint_version: "0.1.2"
 

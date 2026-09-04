@@ -15,7 +15,7 @@ argument_specs:
         it for every host, including the DNS servers this role never touches -
         so it is deliberately not declared as an option below.
     options:
-      cluster_user:
+      user_cluster_user:
         description:
           - Username. Becomes the certificate common name, the CSR object name
             and the kubeconfig context user.
@@ -37,11 +37,11 @@ argument_specs:
         description: Virtual IP talosctl targets to fetch the admin kubeconfig.
         type: str
         required: true
-      cert_expiration_seconds:
+      user_cert_expiration_seconds:
         description: Requested lifetime of the signed client certificate.
         type: int
         required: true
-      kubectl_cnpg_version:
+      user_kubectl_cnpg_version:
         description:
           - Version of the CloudNativePG kubectl plugin to install. Changing it
             requires updating user_kubectl_cnpg_checksums in vars/main.yaml.

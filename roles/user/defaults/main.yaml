@@ -1,0 +1,13 @@
+---
+# Values only this role reads. The user_ prefix satisfies ansible-lint's
+# var-naming[no-role-prefix] rule; group_vars/all.yaml overrides anything here.
+
+# Kubernetes username: the certificate common name, the CSR object name, and
+# the kubeconfig context user
+user_cluster_user: barrelmaker
+
+# Requested lifetime of the signed client certificate
+user_cert_expiration_seconds: 2592000  # 30 days
+
+# Changing this requires updating user_kubectl_cnpg_checksums in vars/main.yaml
+user_kubectl_cnpg_version: "1.30.0"

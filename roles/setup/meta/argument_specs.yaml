@@ -10,11 +10,11 @@ argument_specs:
         Requires the min and distribution fact subsets, which the calling
         playbook gathers on behalf of community.sops.install.
     options:
-      talos_config_dir:
+      setup_talos_config_dir:
         description: Directory the generated machine configs are written to.
         type: path
         required: true
-      talos_version:
+      setup_talos_version:
         description: Talos version, used for the installer image and ISO link.
         type: str
         required: true
@@ -43,29 +43,29 @@ argument_specs:
         description: LAN domain suffix appended to node hostnames.
         type: str
         required: true
-      install_disk:
+      setup_install_disk:
         description: Device Talos installs itself onto.
         type: str
         required: true
-      interface_name:
+      setup_interface_name:
         description: Network interface carrying the virtual IP.
         type: str
         required: true
-      ntp_server:
+      setup_ntp_server:
         description: NTP server the nodes sync against.
         type: str
         required: true
-      nut_host:
+      setup_nut_host:
         description: NUT server the nut-client extension monitors, as user@host.
         type: str
         required: true
-      nut_user:
+      setup_nut_user:
         description: NUT username.
         type: str
         required: true
-      nut_password:
+      setup_nut_password:
         description:
-          - NUT password. Currently held in plaintext in group_vars/all.yaml,
-            unlike every other credential in this repository.
+          - NUT password. Held in plaintext in defaults/main.yaml, unlike every
+            other credential in this repository, which are sops-encrypted.
         type: str
         required: true

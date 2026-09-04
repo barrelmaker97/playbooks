@@ -17,12 +17,12 @@ machine:
   certSANs:
     - {{ node_hostname }}.{{ local_domain }}
   install:
-    image: factory.talos.dev/installer/{{ setup_factory_response.json.id }}:v{{ talos_version }}
-    disk: {{ install_disk }}
+    image: factory.talos.dev/installer/{{ setup_factory_response.json.id }}:v{{ setup_talos_version }}
+    disk: {{ setup_install_disk }}
     wipe: false
   network:
     interfaces:
-      - interface: {{ interface_name }}
+      - interface: {{ setup_interface_name }}
         dhcp: true
         vip:
           ip: {{ cluster_vip }}
@@ -34,7 +34,7 @@ machine:
       disabled: false
       bootTimeout: 2m0s
       servers:
-          - {{ ntp_server }}
+          - {{ setup_ntp_server }}
   kubelet:
     extraMounts:
       - destination: /var/mnt/longhorn
@@ -61,7 +61,7 @@ kind: ExtensionServiceConfig
 name: nut-client
 configFiles:
   - content: |-
-        MONITOR {{ nut_host }} 1 {{ nut_user }} {{ nut_password }} secondary
+        MONITOR {{ setup_nut_host }} 1 {{ setup_nut_user }} {{ setup_nut_password }} secondary
         SHUTDOWNCMD "/sbin/poweroff"
     mountPath: /usr/local/etc/nut/upsmon.conf
 ---
