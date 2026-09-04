@@ -13,7 +13,6 @@ galaxy_info:
       versions: [all]
   galaxy_tags: [kubernetes, monitoring, networking]
 
-# Intentionally empty. The helm and cloudnative_pg roles are pulled in with
-# include_role + tasks_from at the point they are needed; declaring them here
-# would make Ansible run a tasks/main entry point that these roles do not have.
+# helm is pulled in with include_role + tasks_from where it is needed. Listing
+# it here would make Ansible run a tasks/main entry point it does not have.
 dependencies: []

@@ -2,8 +2,7 @@
 - name: Deploy dewpoint sensor exporter
   hosts: dns_servers
   become: true
-  # None of these roles read ansible_facts; min keeps the per-host
-  # gathering cost down on the DNS servers.
+  # These roles read no facts; min just keeps remote gathering cheap.
   gather_facts: true
   gather_subset: [min]
   roles:

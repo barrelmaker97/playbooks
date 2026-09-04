@@ -11,7 +11,4 @@ galaxy_info:
       versions: [all]
   galaxy_tags: [talos, kubernetes, bootstrap]
 
-# Intentionally empty. The helm and cloudnative_pg roles are pulled in with
-# include_role + tasks_from at the point they are needed; declaring them here
-# would make Ansible run a tasks/main entry point that these roles do not have.
 dependencies: []

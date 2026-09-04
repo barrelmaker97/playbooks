@@ -1,10 +1,7 @@
 ---
-# Site-level values. Values consumed by only one role are moving into that
-# role's defaults/; core has been done, setup, user and dewpoint have not.
-# Note that anything here outranks a role default, so adding a key back to this
-# file silently overrides the role's own value.
-
-# Connection
+# Site-level values: identity, topology, and anything more than one role
+# reads. Values only one role reads belong in that role's defaults/ -- note
+# that this file silently overrides them if a key is added back here.
 ansible_user: barrelmaker
 
 # Cluster identity. cluster_host, nas_host and local_domain are the building
@@ -30,13 +27,11 @@ node_ips:
   - 192.168.15.42
   - 192.168.15.43
 
-# Gateway coordinates, shared by the core and workloads roles
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
 
-# Security headers added to responses on external HTTPS routes. Shared: the
-# core role applies them to the Grafana route, and five workload charts apply
-# them to their own routes.
+# Shared: applied by the core role's Grafana route and by several workload
+# charts to their own routes.
 gateway_response_headers:
   - name: Strict-Transport-Security
     value: "max-age=63072000; includeSubDomains; preload"
@@ -45,23 +40,20 @@ gateway_response_headers:
   - name: X-Content-Type-Options
     value: "nosniff"
 
-# Talos, read by the setup role
 install_disk: /dev/nvme0n1
 interface_name: enp86s0
 ntp_server: 192.168.15.1
 talos_config_dir: /home/barrelmaker/.talos
 talos_version: "1.13.8"
 
-# NUT connection, read by the setup role
+# NUT connection
 nut_host: ups@192.168.15.30
 nut_user: remoteuser
 nut_password: hunter2
 
-# Read by the user role
 cert_expiration_seconds: 2592000  # 30 days
 kubectl_cnpg_version: "1.30.0"
 
-# Read by the dewpoint role
 dewpoint_version: "0.1.2"
 
 # Templated variables

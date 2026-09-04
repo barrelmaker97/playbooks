@@ -16,7 +16,6 @@ argument_specs:
         as a clear error at role entry rather than an undefined variable deep
         inside a template.
     options:
-      # Cluster identity
       cluster_domain:
         description: Internal domain the LAN wildcard certificate and routes use.
         type: str
@@ -41,7 +40,6 @@ argument_specs:
         elements: str
         required: true
 
-      # Gateway
       gateway_name:
         description: Name of the Gateway object.
         type: str
@@ -69,7 +67,6 @@ argument_specs:
             type: str
             required: true
 
-      # Storage
       core_metallb_ip_range:
         description: Address range MetalLB allocates LoadBalancer IPs from.
         type: str
@@ -81,7 +78,6 @@ argument_specs:
         type: int
         required: true
 
-      # Chart versions
       core_prometheus_crds_version:
         description: Version of the prometheus-operator-crds chart.
         type: str

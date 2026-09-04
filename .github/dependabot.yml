@@ -1,9 +1,6 @@
 ---
 version: 2
 updates:
-  # Keeps the action versions in .github/workflows pinned and current.
-  # Ansible collection and Helm chart versions are pinned in group_vars/all.yaml
-  # and are not something Dependabot can track.
   - package-ecosystem: github-actions
     directory: /
     schedule:
