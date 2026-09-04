@@ -13,7 +13,7 @@
 
 - name: Create Talos config directory
   ansible.builtin.file:
-    path: "{{ setup_talos_config_dir }}"
+    path: "{{ talos_config_dir }}"
     state: directory
     mode: '0700'
 
@@ -31,7 +31,7 @@
 
 - name: Clean up machine config patch
   ansible.builtin.file:
-    path: "{{ setup_talos_config_dir }}/patch.yaml"
+    path: "{{ talos_config_dir }}/patch.yaml"
     state: absent
 
 - name: Generate Talos config
@@ -41,17 +41,17 @@
     'talosctl gen config --force
     --with-secrets {}
     --output-types=talosconfig
-    --output "{{ setup_talos_config_dir }}/talosconfig"
+    --output "{{ talos_config_dir }}/talosconfig"
     "{{ cluster_host }}" "https://kube.{{ cluster_domain }}:{{ cluster_port }}"'
 
 - name: Save Talos config
   changed_when: true
   ansible.builtin.command: >
-    talosctl config merge "{{ setup_talos_config_dir }}/talosconfig"
+    talosctl config merge "{{ talos_config_dir }}/talosconfig"
 
 - name: Clean up generated talosconfig
   ansible.builtin.file:
-    path: "{{ setup_talos_config_dir }}/talosconfig"
+    path: "{{ talos_config_dir }}/talosconfig"
     state: absent
 
 - name: Add nodes to Talos config
@@ -78,4 +78,4 @@
 
 - name: Print ISO download link
   ansible.builtin.debug:
-    msg: "https://factory.talos.dev/image/{{ setup_factory_response.json.id }}/v{{ setup_talos_version }}/metal-amd64.iso"
+    msg: "https://factory.talos.dev/image/{{ setup_factory_response.json.id }}/v{{ talos_version }}/metal-amd64.iso"

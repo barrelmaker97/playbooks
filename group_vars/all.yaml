@@ -1,7 +1,7 @@
 ---
-# Site-level values: identity, topology, and anything more than one role
-# reads. Values only one role reads belong in that role's defaults/ -- note
-# that this file silently overrides them if a key is added back here.
+# Site-level values: identity, topology, and anything more than one playbook
+# reads. Values a single playbook needs live in its own vars/ file, which
+# outranks this one, so a key duplicated here has no effect.
 ansible_user: barrelmaker
 
 # Cluster identity. cluster_host, nas_host and local_domain are the building

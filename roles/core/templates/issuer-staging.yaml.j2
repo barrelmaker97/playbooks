@@ -6,7 +6,7 @@ metadata:
   namespace: default
 spec:
   acme:
-    email: "{{ core_email_address }}"
+    email: "{{ email_address }}"
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-staging-key

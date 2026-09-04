@@ -35,7 +35,7 @@ spec:
         maxUnavailable: 1
       envoyService:
         annotations:
-          metallb.io/loadBalancerIPs: "{{ core_gateway_ip }}"
+          metallb.io/loadBalancerIPs: "{{ gateway_ip }}"
   telemetry:
     metrics:
       prometheus: {}

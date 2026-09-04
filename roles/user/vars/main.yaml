@@ -13,5 +13,5 @@ user_kubectl_cnpg_checksums:
 user_kubectl_cnpg_architecture: >-
   {{ user_kubectl_cnpg_architectures[ansible_facts['architecture']] }}
 user_kubectl_cnpg_package: >-
-  kubectl-cnpg_{{ user_kubectl_cnpg_version }}_linux_{{ user_kubectl_cnpg_architecture }}.deb
+  kubectl-cnpg_{{ kubectl_cnpg_version }}_linux_{{ user_kubectl_cnpg_architecture }}.deb
 user_kubectl_cnpg_package_path: "/var/cache/apt/archives/{{ user_kubectl_cnpg_package }}"

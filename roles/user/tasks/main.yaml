@@ -52,7 +52,7 @@
   become: true
   ansible.builtin.get_url:
     url: >-
-      https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v{{ user_kubectl_cnpg_version }}/{{ user_kubectl_cnpg_package }}
+      https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v{{ kubectl_cnpg_version }}/{{ user_kubectl_cnpg_package }}
     dest: "{{ user_kubectl_cnpg_package_path }}"
     checksum: "{{ user_kubectl_cnpg_checksums[user_kubectl_cnpg_architecture] }}"
     mode: "0644"

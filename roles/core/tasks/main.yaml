@@ -26,7 +26,7 @@
   vars:
     helm_chart_name: prometheus-operator-crds
     helm_chart_ref: prometheus-community/prometheus-operator-crds
-    helm_chart_version: "{{ core_prometheus_crds_version }}"
+    helm_chart_version: "{{ prometheus_crds_version }}"
     helm_chart_namespace: monitoring
 
 - name: Create Longhorn Namespace
@@ -49,7 +49,7 @@
   vars:
     helm_chart_name: longhorn
     helm_chart_ref: longhorn/longhorn
-    helm_chart_version: "{{ core_longhorn_version }}"
+    helm_chart_version: "{{ longhorn_version }}"
     helm_chart_namespace: longhorn-system
     helm_chart_values_template: "{{ core_role_path }}/templates/values/longhorn.yaml.j2"
 
@@ -136,7 +136,7 @@
   vars:
     helm_chart_name: cloudnative-pg
     helm_chart_ref: cloudnative-pg/cloudnative-pg
-    helm_chart_version: "{{ core_cloudnative_pg_chart_version }}"
+    helm_chart_version: "{{ cloudnative_pg_chart_version }}"
     helm_chart_namespace: cnpg-system
     helm_chart_values_template: "{{ core_role_path }}/templates/values/cloudnative-pg.yaml.j2"
 
@@ -201,7 +201,7 @@
   vars:
     helm_chart_name: metallb
     helm_chart_ref: metallb/metallb
-    helm_chart_version: "{{ core_metallb_version }}"
+    helm_chart_version: "{{ metallb_version }}"
     helm_chart_namespace: metallb-system
     helm_chart_values_template: "{{ core_role_path }}/templates/values/metallb.yaml.j2"
 
@@ -223,7 +223,7 @@
   vars:
     helm_chart_name: envoy-gateway
     helm_chart_ref: oci://docker.io/envoyproxy/gateway-helm
-    helm_chart_version: "{{ core_envoy_gateway_version }}"
+    helm_chart_version: "{{ envoy_gateway_version }}"
     helm_chart_namespace: "{{ gateway_namespace }}"
     helm_chart_values_template: "{{ core_role_path }}/templates/values/envoy-gateway.yaml.j2"
 
@@ -336,7 +336,7 @@
   vars:
     helm_chart_name: cert-manager
     helm_chart_ref: jetstack/cert-manager
-    helm_chart_version: "{{ core_cert_manager_version }}"
+    helm_chart_version: "{{ cert_manager_version }}"
     helm_chart_namespace: cert-manager
     helm_chart_values_template: "{{ core_role_path }}/templates/values/cert-manager.yaml.j2"
 
@@ -347,7 +347,7 @@
   vars:
     helm_chart_name: trust-manager
     helm_chart_ref: jetstack/trust-manager
-    helm_chart_version: "{{ core_trust_manager_version }}"
+    helm_chart_version: "{{ trust_manager_version }}"
     helm_chart_namespace: cert-manager
     helm_chart_values_template: "{{ core_role_path }}/templates/values/trust-manager.yaml.j2"
 
@@ -483,7 +483,7 @@
   vars:
     helm_chart_name: loki
     helm_chart_ref: grafana/loki
-    helm_chart_version: "{{ core_loki_version }}"
+    helm_chart_version: "{{ loki_version }}"
     helm_chart_namespace: monitoring
     helm_chart_values_template: "{{ core_role_path }}/templates/values/loki.yaml.j2"
 
@@ -494,7 +494,7 @@
   vars:
     helm_chart_name: tempo
     helm_chart_ref: grafana-community/tempo
-    helm_chart_version: "{{ core_tempo_version }}"
+    helm_chart_version: "{{ tempo_version }}"
     helm_chart_namespace: monitoring
     helm_chart_values_template: "{{ core_role_path }}/templates/values/tempo.yaml.j2"
 
@@ -505,7 +505,7 @@
   vars:
     helm_chart_name: otel-collector
     helm_chart_ref: open-telemetry/opentelemetry-collector
-    helm_chart_version: "{{ core_otel_collector_version }}"
+    helm_chart_version: "{{ otel_collector_version }}"
     helm_chart_namespace: monitoring
     helm_chart_values_template: "{{ core_role_path }}/templates/values/otel-collector.yaml.j2"
 
@@ -516,7 +516,7 @@
   vars:
     helm_chart_name: kube-prometheus-stack
     helm_chart_ref: prometheus-community/kube-prometheus-stack
-    helm_chart_version: "{{ core_kube_prometheus_stack_version }}"
+    helm_chart_version: "{{ kube_prometheus_stack_version }}"
     helm_chart_namespace: monitoring
     helm_chart_values_template: "{{ core_role_path }}/templates/values/kube-prometheus-stack.yaml.j2"
 
@@ -555,6 +555,6 @@
   vars:
     helm_chart_name: metrics-server
     helm_chart_ref: metrics-server/metrics-server
-    helm_chart_version: "{{ core_metrics_server_version }}"
+    helm_chart_version: "{{ metrics_server_version }}"
     helm_chart_namespace: kube-system
     helm_chart_values_template: "{{ core_role_path }}/templates/values/metrics-server.yaml.j2"
