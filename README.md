@@ -18,10 +18,15 @@ using [this guide](https://www.talos.dev/v1.13/talos-guides/install/talosctl/). 
 the version that matches the version of Talos to be used for the cluster.
 
 # Running Playbooks
-To run all playbooks, use site.yaml:
+To run the playbooks that manage the running cluster, use site.yaml:
 ```bash
 ansible-playbook site.yaml
 ```
+
+`setup.yaml` is not part of `site.yaml`. It generates Talos machine
+configuration for a new cluster and mints a fresh admin client certificate each
+time it runs, so it is a bootstrap step to run deliberately rather than on every
+converge.
 
 Individual playbooks can be run in a similar manner:
 ```bash
@@ -30,7 +35,7 @@ ansible-playbook setup.yaml
 
 | Playbook         | Targets       | In `site.yaml` | Purpose                                                        |
 |------------------|---------------|----------------|----------------------------------------------------------------|
-| `setup.yaml`     | localhost     | yes            | Generate Talos machine configs for the control plane nodes      |
+| `setup.yaml`     | localhost     | no             | Generate Talos machine configs for the control plane nodes      |
 | `user.yaml`      | localhost     | yes            | Create the cluster user, sign its cert, write a kubeconfig      |
 | `core.yaml`      | localhost     | yes            | Storage, networking, certificates and the monitoring stack      |
 | `workloads.yaml` | localhost     | yes            | Namespaces, PostgreSQL clusters and application Helm releases   |
@@ -38,8 +43,8 @@ ansible-playbook setup.yaml
 | `dewpoint.yaml`  | `dns_servers` | no             | The dewpoint Govee sensor Prometheus exporter                   |
 
 `dns.yaml` and `dewpoint.yaml` run against the hosts in `inventory.yaml` rather
-than localhost, and are deliberately not part of `site.yaml` so that a full
-cluster run never touches the DNS servers. Both support role tags:
+than localhost, and are kept out of `site.yaml` so that a full cluster run never
+touches the DNS servers. Both support role tags:
 
 ```bash
 ansible-playbook dns.yaml --tags pihole
