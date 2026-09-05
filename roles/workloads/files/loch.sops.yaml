@@ -1,57 +1,17 @@
 server:
-    name: L.O.C.H Factory
-    description: Lasciate ogne speranza, voi ch'intrate
-    maxPlayers: 5
-    public: false
-    password: ENC[AES256_GCM,data:FYHukxs9nPBs4Qkr,iv:Ui9dabwAnwgbFXHlzfAnA2ZwILkoB7+Jv1o6IFFp3sI=,tag:RLnpEXpTQsTOi0MgF/QiJg==,type:str]
-config:
-    securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-            drop:
-                - ALL
-    resources:
-        requests:
-            cpu: 20m
-            memory: 20Mi
-        limits:
-            cpu: 60m
-            memory: 60Mi
-persistence:
-    storageClassName: longhorn-protected
-    size: 5Gi
-podSecurityContext:
-    seccompProfile:
-        type: RuntimeDefault
-    runAsNonRoot: true
-    runAsUser: 845
-    runAsGroup: 845
-    fsGroup: 845
-securityContext:
-    capabilities:
-        drop:
-            - ALL
-service:
-    type: LoadBalancer
-    port: 34197
-resources:
-    requests:
-        cpu: 800m
-        memory: 2700Mi
-    limits:
-        memory: 2800Mi
+    password: ENC[AES256_GCM,data:JBAjd+bpNLoW8luo,iv:gzzeTrNSJhjKtg4EUGZjLoZHlUPb1PjuKVSxMSc1Gdc=,tag:+I35D6OCNtDBvNxuOH4u9g==,type:str]
 sops:
     age:
         - enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAyam1vWEdqMjA2YTF6d0RX
-            Z2w4N3kxVStpWjY0VnhRejYwSGNvQ3lrK0hrClk4MjV2aUZ1enpnZzNYNU9kUnRp
-            Z1lsMUVFYzA1ZnF5a3BUTzhMdHBxZE0KLS0tIC9xM2Fmc1ZSUjVVVERoUDdrSExj
-            VmRzVXRQSGt4WDgwVC9jR3B0TWt6dncKK1P0NLd4DNphJk+Bs9l6AAfEzhmf4IrH
-            XKHkktw8tTjfYDGHB6yr7iGZawUx5f/Jt41xnrvQmEraGL19mzD4Fg==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBwTUl5TDZrVk5lYWo4Rmkv
+            Qkc4TlF3MG1qNnFiQXQ5di9HMCtySExOWkNnClZoQ1I3dERPZDF4ODhQTXk1VTcz
+            b2h5T0tJYlRPdWZOVmhJMHBnbEJQd2cKLS0tIGo2QXNIaFY5NXdGK3g1ZHVDTk9j
+            T3IyS3hneE5ZdWtXa3k3cUVhc1RWVDAKWZKtrrrihjQcI0t6BY7B7SdVh0eJZPE3
+            qkY/ZnqTFeb+lTOuMXasl0TNMN4+8s0WchbX3XjnLE5rSSCUrUQKDg==
             -----END AGE ENCRYPTED FILE-----
           recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
-    encrypted_regex: (^data|^stringData|^cluster|^secrets|^certs|^trustdinfo|^password)
-    lastmodified: "2026-08-14T04:42:32Z"
-    mac: ENC[AES256_GCM,data:eyM9c5XtvyfAJc8NIu+chET7O/Np1cWrOz7lN/ViG5W8UdsPPKdkBUcSRcWmUXuyn/4q4joejFWl2wjD37SsiehfCOsfDLuwD94queOA68UmqVKPSOaZP8vC+qVc0FEYT5O47PCJPUl/VolYlzRIpwXIoERvINEM/I7Zrgf19j8=,iv:82vZMRc9S//dteXelHuII+cdE7rfllAl2G3vofWKNC4=,tag:Z/ZUt6fISfILQz2C2+sGWQ==,type:str]
-    version: 3.12.2
+    encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^credentialsJson|.*[Pp]assword$)
+    lastmodified: "2026-09-05T15:40:07Z"
+    mac: ENC[AES256_GCM,data:bMOpiplMHtbCOlIAEEA+GkfoPvBmaGC9p2oOGddXWnM+igkDB7oJWQaftvPvyX5tIme4JFmrk07wHcWe0+xKCo/amCGBjdrsEUsuW5fOOR8P7EVPsMrwCxtoxUeOnB7EYlowyvjwmJlOwAYVIc8dlVpSXsyl5uNmqb8Z660gDyU=,iv:UHeA2x8r1pcINIjdAsgqZhBLK3Sh77uOBN6azRsK2TM=,tag:JjyjG4VCMGCrzhx95ngAmw==,type:str]
+    version: 3.13.3
