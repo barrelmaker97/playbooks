@@ -1,57 +1,17 @@
 server:
-    name: Barrelmaker's Server
-    description: First 2.0 Playthrough!
-    maxPlayers: 5
-    public: false
-    password: ENC[AES256_GCM,data:FCK86JFSw2JWWg==,iv:jOJe4Vcv/wEN1ZfCTxjxob8kgUJxu7Xz69GxWWjn6TM=,tag:6QStDak1ZAZ5nbmSPP2ffw==,type:str]
-config:
-    securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-            drop:
-                - ALL
-    resources:
-        requests:
-            cpu: 20m
-            memory: 20Mi
-        limits:
-            cpu: 60m
-            memory: 60Mi
-persistence:
-    storageClassName: longhorn-protected
-    size: 5Gi
-podSecurityContext:
-    seccompProfile:
-        type: RuntimeDefault
-    runAsNonRoot: true
-    runAsUser: 845
-    runAsGroup: 845
-    fsGroup: 845
-securityContext:
-    capabilities:
-        drop:
-            - ALL
-service:
-    type: LoadBalancer
-    port: 34197
-resources:
-    requests:
-        cpu: 800m
-        memory: 2200Mi
-    limits:
-        memory: 2300Mi
+    password: ENC[AES256_GCM,data:PKViS7EpEyiuwg==,iv:7r8ElBxxEJgXNplylhQIySdBqOKh7qvfZDX4pbmq2CQ=,tag:s0NpKwBcXU5ZK63S+3fUTQ==,type:str]
 sops:
     age:
         - enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBFbDU0VXpxTjhwWHdmSjl0
-            U1FVVXVFaFVtVHJ5ZEJid3JiTE5Kd3F3Z0NjCmlLUkVCdWdTYmN6TW1mcytDVVFM
-            YUtIU1hSOElVWml6VXRHdDQ5Tk94eFkKLS0tIGczejBablhHcDFGQmpDUDJNdjk2
-            YjFtNy9lRzYrQ0Q1UUJNalJyZC9oMVEKOOAq/Orfy+ZHAIFNPQ2oXbBBA0nWl16H
-            vVXpzw53BrMbamw6Ks5bqYVAUhAkv3ELICRTJHmNpPesDFHWnunPjQ==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCRE5VVkR4OGdQZm5IUXlR
+            YktwcjVsY0NvcFFyeDVLRy9DTFFCSW10UWtnCmFwczRoMzNFaWR0RGx2TUp4RDRz
+            RlMwQmFqUTJDcUdzdGpRaUQ0K1F1bXMKLS0tIDZ6Ym51SmtsQVM1RU9iS05talYz
+            SFVaYTBtR0twb0p0aERMZEsyeHlybFkKX67XAPgGf+b2HhjEGQtJzv3EY45mEMtL
+            GW06dRFV8eI8EcZQUBSS8ktBVTqSrrJmvxeVvoUU5XmU90OmKl+2ug==
             -----END AGE ENCRYPTED FILE-----
           recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
-    encrypted_regex: (^data|^stringData|^cluster|^secrets|^certs|^trustdinfo|^password)
-    lastmodified: "2026-08-14T04:42:32Z"
-    mac: ENC[AES256_GCM,data:niZrvS9rJM6yOQA6DI8ZVLacS/pnbGArCAkXsXad7rLQi15EoILoA+e2kTqnVdwLQ7wxNFZHpvGAKuv4Uh8UTV+/9u9c9eRSH4kdkAywQH0Qj/bfpGxFxie583FTFdf4oVSGXKdEyKADwvtF660wvX8O7pzjSHCpq1hFS3B7lV8=,iv:PKpQV+iGdvJB8EtllotqudRaZA5I59usbfK89RKyng4=,tag:fV81JPILZsD9CFAF92r3ag==,type:str]
-    version: 3.10.2
+    encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^credentialsJson|.*[Pp]assword$)
+    lastmodified: "2026-09-05T15:40:07Z"
+    mac: ENC[AES256_GCM,data:K9M6dFN/MfewI9Zz0TgQQs7eXey2RZt+nus83HcJ0769NwavdkIaHRh0Cjk1yIPuC8XU5lSd9KYdbBMiYjDHLC6WEI/IZlCTcFpSmdQ06FzE5e0efCbmmFznE700XcoI/vADcIddkZ/YwaOXFNtvT0aW9xTH/Qx3g6ULM02FVLo=,iv:TFiwlSF8+5L6i7vzEHl6lVyrFdLHseNc9yCvIo6l5Zo=,tag:JohVjd7kwPNKJXeXKjBJYQ==,type:str]
+    version: 3.13.3
