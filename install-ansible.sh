@@ -6,3 +6,4 @@ pipx ensurepath
 pipx install --include-deps ansible
 pipx inject ansible argcomplete kubernetes
 pipx inject --include-apps ansible ansible-lint
+ansible-galaxy collection install -r requirements.yml

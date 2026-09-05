@@ -17,12 +17,17 @@
   changed_when: true
 
 - name: Add Helm Repos
-  ansible.builtin.command: >
-    helm repo add {{ item.key }} {{ item.value }}
+  kubernetes.core.helm_repository:
+    name: "{{ item.key }}"
+    repo_url: "{{ item.value }}"
+    state: present
   loop: "{{ helm_repos | default({}) | dict2items }}"
-  changed_when: true
+  loop_control:
+    label: "{{ item.key }}"
 
+# Refreshes the local chart index. Nothing on the machine changes in a way worth
+# reporting, so this stays quiet rather than marking every run as changed.
 - name: Update Helm Repos
   ansible.builtin.command: helm repo update
-  changed_when: true
+  changed_when: false
   when: helm_repos | default({}) | length > 0

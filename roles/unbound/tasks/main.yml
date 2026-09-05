@@ -14,9 +14,24 @@
     group: root
     mode: '0755'
 
+# internic serves a last-modified that is always newer than the local file, so
+# get_url re-fetches every run and reports changed even though the content is
+# byte-identical. Staging the download and copying lets content decide, which
+# keeps unbound from restarting on every converge. The staging file is kept
+# deliberately; removing it would itself report changed each run.
 - name: Download root hints
   ansible.builtin.get_url:
     url: https://www.internic.net/domain/named.cache
+    dest: /var/lib/unbound/.root.hints.staged
+    owner: root
+    group: root
+    mode: '0644'
+  changed_when: false
+
+- name: Install root hints
+  ansible.builtin.copy:
+    src: /var/lib/unbound/.root.hints.staged
+    remote_src: true
     dest: /var/lib/unbound/root.hints
     owner: root
     group: root
