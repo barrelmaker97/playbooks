@@ -1,0 +1,119 @@
+---
+- name: Deploy Cert Manager
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: cert-manager
+    helm_chart_ref: jetstack/cert-manager
+    helm_chart_version: "{{ cert_manager_version }}"
+    helm_chart_namespace: cert-manager
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/cert-manager.yaml.j2"
+
+- name: Deploy Trust Manager
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: trust-manager
+    helm_chart_ref: jetstack/trust-manager
+    helm_chart_version: "{{ trust_manager_version }}"
+    helm_chart_namespace: cert-manager
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/trust-manager.yaml.j2"
+
+- name: Create Internal Self-Signed Issuer
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: selfsigned-issuer
+      spec:
+        selfSigned: {}
+
+- name: Create Internal Root CA Certificate
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: internal-root-ca
+        namespace: cert-manager
+      spec:
+        isCA: true
+        commonName: "internal-root-ca"
+        duration: 8760h  # 1 year
+        renewBefore: 720h  # 30 days
+        secretName: internal-root-ca-secret
+        privateKey:
+          algorithm: ECDSA
+          size: 256
+        issuerRef:
+          name: selfsigned-issuer
+          kind: ClusterIssuer
+          group: cert-manager.io
+
+- name: Create Internal CA Issuer
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: internal-ca
+      spec:
+        ca:
+          secretName: internal-root-ca-secret
+
+- name: Create Trust Bundle
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: trust.cert-manager.io/v1alpha1
+      kind: Bundle
+      metadata:
+        name: internal-trust
+      spec:
+        sources:
+          - secret:
+              name: internal-root-ca-secret
+              key: ca.crt
+        target:
+          configMap:
+            key: ca-certificates.crt
+
+# sops-encrypted manifests set namespace on the task rather than in metadata:
+# the MAC covers the whole document, so metadata cannot be edited without
+# re-encrypting. Plain manifests carry their own namespace.
+- name: Create Cloudflare API Token Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: cert-manager
+    definition: "{{ lookup('community.sops.sops', 'files/secret-cloudflare-api-token.sops.yaml') | from_yaml }}"
+
+- name: Create Production Issuer
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'issuer-prod.yaml.j2') | from_yaml }}"
+
+- name: Create Staging Issuer
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'issuer-staging.yaml.j2') | from_yaml }}"
+
+# These must follow cert-manager and the issuers above: the Certificate CRD
+# arrives with the cert-manager chart, and each certificate names an issuer
+# created just above it. The Gateway is created earlier and references the
+# secrets these produce, which is fine because it waits for them to appear.
+- name: Create LAN TLS Certificates
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'certificates-lan.yaml.j2') | from_yaml }}"
+
+- name: Create Public TLS Certificates
+  kubernetes.core.k8s:
+    state: present
+    definition: >-
+      {{ lookup('template', 'certificates-public.yaml.j2') | from_yaml }}

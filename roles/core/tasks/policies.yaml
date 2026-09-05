@@ -1,0 +1,21 @@
+---
+# Runs last. The security policies target three HTTPRoutes: longhorn's comes
+# from the storage section, and the Prometheus and Alertmanager routes come from
+# kube-prometheus-stack in the monitoring section. Attaching a policy to a route
+# that does not exist yet is accepted but not enforced until the route appears.
+
+- name: Create Basic Auth Secrets
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('community.sops.sops', 'files/secret-basic-auth.sops.yaml') | from_yaml | combine({'metadata': {'namespace': item}}, recursive=True) }}"
+  loop:
+    - longhorn-system
+    - monitoring
+- name: Create LAN Security Policies
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'securitypolicies-lan.yaml.j2') | from_yaml }}"
+  loop:
+    - { name: longhorn-auth, namespace: longhorn-system, route_name: longhorn-httproute }
+    - { name: prometheus-auth, namespace: monitoring, route_name: kube-prometheus-stack-prometheus }
+    - { name: alertmanager-auth, namespace: monitoring, route_name: kube-prometheus-stack-alertmanager }

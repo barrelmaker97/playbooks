@@ -1,0 +1,30 @@
+---
+- name: Set core role path
+  ansible.builtin.set_fact:
+    core_role_path: "{{ role_path }}"
+
+- name: Setup Helm
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: setup
+  vars:
+    helm_repos:
+      cloudnative-pg: https://cloudnative-pg.github.io/charts
+      grafana: https://grafana.github.io/helm-charts
+      grafana-community: https://grafana-community.github.io/helm-charts
+      jetstack: https://charts.jetstack.io
+      longhorn: https://charts.longhorn.io
+      metallb: https://metallb.github.io/metallb
+      metrics-server: https://kubernetes-sigs.github.io/metrics-server
+      open-telemetry: https://open-telemetry.github.io/opentelemetry-helm-charts
+      prometheus-community: https://prometheus-community.github.io/helm-charts
+
+- name: Deploy Prometheus CRDs
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: prometheus-operator-crds
+    helm_chart_ref: prometheus-community/prometheus-operator-crds
+    helm_chart_version: "{{ prometheus_crds_version }}"
+    helm_chart_namespace: monitoring
