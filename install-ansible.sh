@@ -1,5 +1,7 @@
 #!/bin/bash
 set -euo pipefail
+# requirements.yml is referenced relatively, so run from the script's directory
+cd "$(dirname "$0")"
 sudo apt update
 sudo apt install -y pipx
 pipx ensurepath
