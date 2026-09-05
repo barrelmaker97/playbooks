@@ -1,17 +1,4 @@
 ---
-- name: Create Longhorn Namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: longhorn-system
-        labels:
-          pod-security.kubernetes.io/enforce: privileged
-          pod-security.kubernetes.io/audit: privileged
-          pod-security.kubernetes.io/warn: privileged
-
 - name: Deploy Longhorn
   ansible.builtin.include_role:
     name: helm
@@ -85,19 +72,6 @@
       parameters:
         recurringJobSelector: "[]"
         fsType: ext4
-
-- name: Create CloudNativePG Namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: cnpg-system
-        labels:
-          pod-security.kubernetes.io/enforce: restricted
-          pod-security.kubernetes.io/audit: restricted
-          pod-security.kubernetes.io/warn: restricted
 
 - name: Deploy CloudNativePG
   ansible.builtin.include_role:

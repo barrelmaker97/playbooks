@@ -1,17 +1,4 @@
 ---
-- name: Create MetalLB Namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: metallb-system
-        labels:
-          pod-security.kubernetes.io/enforce: privileged
-          pod-security.kubernetes.io/audit: privileged
-          pod-security.kubernetes.io/warn: privileged
-
 - name: Deploy MetalLB
   ansible.builtin.include_role:
     name: helm
@@ -82,23 +69,6 @@
     state: present
     definition: >-
       {{ lookup('template', 'httproute-https-redirect.yaml.j2') | from_yaml }}
-
-- name: Create Basic Auth Secrets
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('community.sops.sops', 'files/secret-basic-auth.sops.yaml') | from_yaml | combine({'metadata': {'namespace': item}}, recursive=True) }}"
-  loop:
-    - longhorn-system
-    - monitoring
-
-- name: Create LAN Security Policies
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('template', 'securitypolicies-lan.yaml.j2') | from_yaml }}"
-  loop:
-    - { name: longhorn-auth, namespace: longhorn-system, route_name: longhorn-httproute }
-    - { name: prometheus-auth, namespace: monitoring, route_name: kube-prometheus-stack-prometheus }
-    - { name: alertmanager-auth, namespace: monitoring, route_name: kube-prometheus-stack-alertmanager }
 
 - name: Enable Response Compression
   kubernetes.core.k8s:

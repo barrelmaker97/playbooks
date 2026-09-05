@@ -1,0 +1,73 @@
+---
+# Every namespace the role puts resources into, created before anything lands
+# in them. Previously some were created here and some appeared as a Helm
+# --create-namespace side effect; monitoring in particular existed for over 400
+# lines before the task that labels it.
+#
+# cert-manager is deliberately absent: its chart creates it inside the
+# certificates section, which is self-contained. It is also the one namespace
+# with no pod-security labels, which is worth deciding on separately.
+
+- name: Create Longhorn Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: longhorn-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+- name: Create CloudNativePG Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: cnpg-system
+        labels:
+          pod-security.kubernetes.io/enforce: restricted
+          pod-security.kubernetes.io/audit: restricted
+          pod-security.kubernetes.io/warn: restricted
+- name: Create MetalLB Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: metallb-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+- name: Create Monitoring Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Create Envoy Gateway Namespace
+  # Made explicit so the certificates section, which creates Certificates in
+  # this namespace, can run before the Envoy Gateway chart that would otherwise
+  # create it as a --create-namespace side effect. The name label matches what
+  # Helm already set, so this is not a change on an existing cluster.
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ gateway_namespace }}"
+        labels:
+          name: "{{ gateway_namespace }}"

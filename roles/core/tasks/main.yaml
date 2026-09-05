@@ -11,18 +11,26 @@
   ansible.builtin.import_tasks: prereq.yaml
   tags: [always]
 
+- name: Create namespaces
+  ansible.builtin.import_tasks: namespaces.yaml
+  tags: [namespaces]
+
 - name: Deploy storage
   ansible.builtin.import_tasks: storage.yaml
   tags: [storage]
-
-- name: Deploy networking
-  ansible.builtin.import_tasks: networking.yaml
-  tags: [networking]
 
 - name: Deploy certificates
   ansible.builtin.import_tasks: certificates.yaml
   tags: [certificates]
 
+- name: Deploy networking
+  ansible.builtin.import_tasks: networking.yaml
+  tags: [networking]
+
 - name: Deploy monitoring
   ansible.builtin.import_tasks: monitoring.yaml
   tags: [monitoring]
+
+- name: Apply gateway policies
+  ansible.builtin.import_tasks: policies.yaml
+  tags: [policies]
