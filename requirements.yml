@@ -1,0 +1,13 @@
+---
+# Collections the playbooks import. Versions are floors, not pins: they record
+# what is known to work rather than freezing a resolved set. Install with
+#   ansible-galaxy collection install -r requirements.yml
+collections:
+  - name: kubernetes.core       # k8s, k8s_info, helm_repository
+    version: ">=6.4.0"
+  - name: community.sops        # sops lookup, install role
+    version: ">=2.3.0"
+  - name: community.general     # snap
+    version: ">=12.6.1"
+  - name: community.crypto      # openssl_privatekey, openssl_csr
+    version: ">=3.2.1"
