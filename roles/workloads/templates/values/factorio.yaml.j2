@@ -1,0 +1,42 @@
+---
+server:
+  name: Barrelmaker's Server
+  description: First 2.0 Playthrough!
+  maxPlayers: 5
+  public: false
+config:
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+  resources:
+    requests:
+      cpu: 20m
+      memory: 20Mi
+    limits:
+      cpu: 60m
+      memory: 60Mi
+persistence:
+  storageClassName: longhorn-protected
+  size: 5Gi
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  runAsNonRoot: true
+  runAsUser: 845
+  runAsGroup: 845
+  fsGroup: 845
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+service:
+  type: LoadBalancer
+  port: 34197
+resources:
+  requests:
+    cpu: 800m
+    memory: 2200Mi
+  limits:
+    memory: 2300Mi
