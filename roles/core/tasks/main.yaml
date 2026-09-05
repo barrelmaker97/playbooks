@@ -265,17 +265,6 @@
     definition: >-
       {{ lookup('template', 'httproute-https-redirect.yaml.j2') | from_yaml }}
 
-- name: Create LAN TLS Certificates
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('template', 'certificates-lan.yaml.j2') | from_yaml }}"
-
-- name: Create Public TLS Certificates
-  kubernetes.core.k8s:
-    state: present
-    definition: >-
-      {{ lookup('template', 'certificates-public.yaml.j2') | from_yaml }}
-
 - name: Create Basic Auth Secrets
   kubernetes.core.k8s:
     state: present
@@ -432,6 +421,21 @@
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', 'issuer-staging.yaml.j2') | from_yaml }}"
+
+# These must follow cert-manager and the issuers above: the Certificate CRD
+# arrives with the cert-manager chart, and each certificate names an issuer
+# created just above it. The Gateway is created earlier and references the
+# secrets these produce, which is fine because it waits for them to appear.
+- name: Create LAN TLS Certificates
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'certificates-lan.yaml.j2') | from_yaml }}"
+
+- name: Create Public TLS Certificates
+  kubernetes.core.k8s:
+    state: present
+    definition: >-
+      {{ lookup('template', 'certificates-public.yaml.j2') | from_yaml }}
 
 - name: Create Monitoring Namespace
   kubernetes.core.k8s:
