@@ -1,0 +1,137 @@
+---
+- name: Create MetalLB Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: metallb-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Deploy MetalLB
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: metallb
+    helm_chart_ref: metallb/metallb
+    helm_chart_version: "{{ metallb_version }}"
+    helm_chart_namespace: metallb-system
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/metallb.yaml.j2"
+
+- name: Create IP Address Pool
+  kubernetes.core.k8s:
+    state: present
+    definition: >-
+      {{ lookup('template', 'ipaddresspool-metallb.yaml.j2') | from_yaml }}
+
+- name: Advertise Load Balanced IP
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/l2advertisement-metallb.yaml') | from_yaml }}"
+
+- name: Deploy Envoy Gateway
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: envoy-gateway
+    helm_chart_ref: oci://docker.io/envoyproxy/gateway-helm
+    helm_chart_version: "{{ envoy_gateway_version }}"
+    helm_chart_namespace: "{{ gateway_namespace }}"
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/envoy-gateway.yaml.j2"
+
+- name: Create Envoy Proxy Config
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'envoyproxy.yaml.j2') | from_yaml }}"
+
+- name: Create Gateway Class
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: GatewayClass
+      metadata:
+        name: envoy
+      spec:
+        controllerName: gateway.envoyproxy.io/gatewayclass-controller
+        parametersRef:
+          group: gateway.envoyproxy.io
+          kind: EnvoyProxy
+          name: envoy-proxy-config
+          namespace: "{{ gateway_namespace }}"
+
+- name: Create Gateway
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'gateway.yaml.j2') | from_yaml }}"
+
+- name: Create Gateway Client Traffic Policy
+  kubernetes.core.k8s:
+    state: present
+    definition: >-
+      {{ lookup('template', 'clienttrafficpolicy.yaml.j2') | from_yaml }}
+
+- name: Create HTTPS Redirect Route
+  kubernetes.core.k8s:
+    state: present
+    definition: >-
+      {{ lookup('template', 'httproute-https-redirect.yaml.j2') | from_yaml }}
+
+- name: Create Basic Auth Secrets
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('community.sops.sops', 'files/secret-basic-auth.sops.yaml') | from_yaml | combine({'metadata': {'namespace': item}}, recursive=True) }}"
+  loop:
+    - longhorn-system
+    - monitoring
+
+- name: Create LAN Security Policies
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'securitypolicies-lan.yaml.j2') | from_yaml }}"
+  loop:
+    - { name: longhorn-auth, namespace: longhorn-system, route_name: longhorn-httproute }
+    - { name: prometheus-auth, namespace: monitoring, route_name: kube-prometheus-stack-prometheus }
+    - { name: alertmanager-auth, namespace: monitoring, route_name: kube-prometheus-stack-alertmanager }
+
+- name: Enable Response Compression
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: gateway.envoyproxy.io/v1alpha1
+      kind: BackendTrafficPolicy
+      metadata:
+        name: compression
+        namespace: "{{ gateway_namespace }}"
+      spec:
+        targetRefs:
+          - group: gateway.networking.k8s.io
+            kind: Gateway
+            name: "{{ gateway_name }}"
+        compression:
+          - type: Brotli
+          - type: Gzip
+
+- name: Create Envoy Proxy Pod Monitor
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PodMonitor
+      metadata:
+        name: envoy-proxy
+        namespace: "{{ gateway_namespace }}"
+      spec:
+        selector:
+          matchLabels:
+            app.kubernetes.io/component: proxy
+            app.kubernetes.io/managed-by: envoy-gateway
+        podMetricsEndpoints:
+          - port: metrics
+            path: /stats/prometheus

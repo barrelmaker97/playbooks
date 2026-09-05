@@ -1,0 +1,152 @@
+---
+- name: Create Longhorn Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: longhorn-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Deploy Longhorn
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: longhorn
+    helm_chart_ref: longhorn/longhorn
+    helm_chart_version: "{{ longhorn_version }}"
+    helm_chart_namespace: longhorn-system
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/longhorn.yaml.j2"
+
+- name: Create CloudNativePG Local Storage Class
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: longhorn-cnpg-local
+      provisioner: driver.longhorn.io
+      allowVolumeExpansion: true
+      reclaimPolicy: Retain
+      volumeBindingMode: WaitForFirstConsumer
+      parameters:
+        dataEngine: v1
+        dataLocality: strict-local
+        disableRevisionCounter: "true"
+        fsType: ext4
+        numberOfReplicas: "1"
+        recurringJobSelector: "[]"
+
+- name: Create Longhorn Protected Storage Class
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: longhorn-protected
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "true"
+      provisioner: driver.longhorn.io
+      allowVolumeExpansion: true
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+      parameters:
+        backupTargetName: default
+        dataEngine: v1
+        dataLocality: best-effort
+        disableRevisionCounter: "true"
+        fromBackup: ""
+        fsType: ext4
+        numberOfReplicas: "2"
+        recurringJobSelector: >-
+          [{"name":"protected","isGroup":true}]
+        staleReplicaTimeout: "30"
+        unmapMarkSnapChainRemoved: ignored
+
+- name: Create Longhorn Monitoring Storage Class
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: longhorn-monitoring
+      provisioner: driver.longhorn.io
+      allowVolumeExpansion: true
+      reclaimPolicy: Retain
+      volumeBindingMode: Immediate
+      parameters:
+        recurringJobSelector: "[]"
+        fsType: ext4
+
+- name: Create CloudNativePG Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: cnpg-system
+        labels:
+          pod-security.kubernetes.io/enforce: restricted
+          pod-security.kubernetes.io/audit: restricted
+          pod-security.kubernetes.io/warn: restricted
+
+- name: Deploy CloudNativePG
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: cloudnative-pg
+    helm_chart_ref: cloudnative-pg/cloudnative-pg
+    helm_chart_version: "{{ cloudnative_pg_chart_version }}"
+    helm_chart_namespace: cnpg-system
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/cloudnative-pg.yaml.j2"
+
+- name: Create Protected Recurring Snapshot
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: longhorn.io/v1beta2
+      kind: RecurringJob
+      metadata:
+        name: default-snapshotter
+        namespace: longhorn-system
+      spec:
+        concurrency: 1
+        cron: 15 * * * ?
+        groups:
+          - protected
+        labels: {}
+        name: default-snapshotter
+        parameters: {}
+        retain: 24
+        task: snapshot
+
+- name: Create Protected Recurring Backup
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: longhorn.io/v1beta2
+      kind: RecurringJob
+      metadata:
+        name: default-backup
+        namespace: longhorn-system
+      spec:
+        concurrency: 1
+        cron: 0 12 * * ?
+        groups:
+          - protected
+        labels: {}
+        name: default-backup
+        parameters:
+          full-backup-interval: "15"
+        retain: 30
+        task: backup

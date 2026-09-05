@@ -1,0 +1,127 @@
+---
+- name: Create Monitoring Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Create Monitoring Limit Range
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: LimitRange
+      metadata:
+        name: monitoring-default
+        namespace: monitoring
+      spec:
+        limits:
+          - type: Container
+            defaultRequest:
+              cpu: 10m
+              memory: 64Mi
+
+- name: Create Grafana Admin Credentials Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('community.sops.sops', 'files/secret-grafana-admin-credentials.sops.yaml') | from_yaml }}"
+
+- name: Create Additional Prometheus Scrape Config Secret
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/additional-scrape-configs.yaml') | from_yaml }}"
+
+- name: Create Dashboards ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/configmap-dashboards.yaml') | from_yaml }}"
+
+- name: Deploy Loki
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: loki
+    helm_chart_ref: grafana/loki
+    helm_chart_version: "{{ loki_version }}"
+    helm_chart_namespace: monitoring
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/loki.yaml.j2"
+
+- name: Deploy Tempo
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: tempo
+    helm_chart_ref: grafana-community/tempo
+    helm_chart_version: "{{ tempo_version }}"
+    helm_chart_namespace: monitoring
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/tempo.yaml.j2"
+
+- name: Deploy OTel Collector
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: otel-collector
+    helm_chart_ref: open-telemetry/opentelemetry-collector
+    helm_chart_version: "{{ otel_collector_version }}"
+    helm_chart_namespace: monitoring
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/otel-collector.yaml.j2"
+
+- name: Deploy Prometheus Stack
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: kube-prometheus-stack
+    helm_chart_ref: prometheus-community/kube-prometheus-stack
+    helm_chart_version: "{{ kube_prometheus_stack_version }}"
+    helm_chart_namespace: monitoring
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/kube-prometheus-stack.yaml.j2"
+
+- name: Create Grafana Route
+  kubernetes.core.k8s:
+    state: present
+    definition: >-
+      {{ lookup('template', 'httproute-grafana.yaml.j2') | from_yaml }}
+
+- name: Create Alert Manager Config
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/alertmanagerconfig.yaml') | from_yaml }}"
+
+- name: Create Longhorn Snapshot Alerts
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'prometheusrule-longhorn-snapshots.yaml.j2') | from_yaml }}"
+
+- name: Create Dewpoint Sensor Alerts
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'prometheusrule-dewpoint.yaml.j2') | from_yaml }}"
+
+- name: Create Discord Webhook URL Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('community.sops.sops', 'files/secret-discord-webhook-url.sops.yaml') | from_yaml }}"
+
+- name: Deploy Metrics Server
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: metrics-server
+    helm_chart_ref: metrics-server/metrics-server
+    helm_chart_version: "{{ metrics_server_version }}"
+    helm_chart_namespace: kube-system
+    helm_chart_values_template: "{{ core_role_path }}/templates/values/metrics-server.yaml.j2"
