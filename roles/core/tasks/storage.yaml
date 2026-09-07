@@ -1,15 +1,4 @@
 ---
-- name: Deploy Longhorn
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: longhorn
-    helm_chart_ref: longhorn/longhorn
-    helm_chart_version: "{{ longhorn_version }}"
-    helm_chart_namespace: longhorn-system
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/longhorn.yaml.j2"
-
 - name: Create CloudNativePG Local Storage Class
   kubernetes.core.k8s:
     state: present
@@ -72,17 +61,6 @@
       parameters:
         recurringJobSelector: "[]"
         fsType: ext4
-
-- name: Deploy CloudNativePG
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: cloudnative-pg
-    helm_chart_ref: cloudnative-pg/cloudnative-pg
-    helm_chart_version: "{{ cloudnative_pg_chart_version }}"
-    helm_chart_namespace: cnpg-system
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/cloudnative-pg.yaml.j2"
 
 - name: Create Protected Recurring Snapshot
   kubernetes.core.k8s:

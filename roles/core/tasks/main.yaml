@@ -15,19 +15,23 @@
   ansible.builtin.import_tasks: namespaces.yaml
   tags: [namespaces]
 
-- name: Deploy storage
+- name: Deploy operator charts
+  ansible.builtin.import_tasks: operators.yaml
+  tags: [operators]
+
+- name: Configure storage
   ansible.builtin.import_tasks: storage.yaml
   tags: [storage]
 
-- name: Deploy certificates
+- name: Configure certificates
   ansible.builtin.import_tasks: certificates.yaml
   tags: [certificates]
 
-- name: Deploy networking
+- name: Configure networking
   ansible.builtin.import_tasks: networking.yaml
   tags: [networking]
 
-- name: Deploy monitoring
+- name: Configure monitoring
   ansible.builtin.import_tasks: monitoring.yaml
   tags: [monitoring]
 

@@ -1,0 +1,19 @@
+---
+# Charts that install CRDs or that other charts depend on. Everything creating
+# a custom resource runs after this, so the "CRD before CR" constraint holds
+# for the role as a whole rather than section by section.
+- name: Deploy operator charts
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  loop: "{{ core_operator_charts }}"
+  loop_control:
+    loop_var: core_chart
+    label: "{{ core_chart.name }}"
+  vars:
+    helm_chart_name: "{{ core_chart.name }}"
+    helm_chart_ref: "{{ core_chart.ref }}"
+    helm_chart_version: "{{ core_chart.version }}"
+    helm_chart_namespace: "{{ core_chart.namespace }}"
+    helm_chart_values_template: >-
+      {{ core_role_path }}/templates/values/{{ core_chart.name }}.yaml.j2

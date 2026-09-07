@@ -1,15 +1,4 @@
 ---
-- name: Deploy MetalLB
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: metallb
-    helm_chart_ref: metallb/metallb
-    helm_chart_version: "{{ metallb_version }}"
-    helm_chart_namespace: metallb-system
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/metallb.yaml.j2"
-
 - name: Create IP Address Pool
   kubernetes.core.k8s:
     state: present
@@ -20,17 +9,6 @@
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('file', 'files/l2advertisement-metallb.yaml') | from_yaml }}"
-
-- name: Deploy Envoy Gateway
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: envoy-gateway
-    helm_chart_ref: oci://docker.io/envoyproxy/gateway-helm
-    helm_chart_version: "{{ envoy_gateway_version }}"
-    helm_chart_namespace: "{{ gateway_namespace }}"
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/envoy-gateway.yaml.j2"
 
 - name: Create Envoy Proxy Config
   kubernetes.core.k8s:

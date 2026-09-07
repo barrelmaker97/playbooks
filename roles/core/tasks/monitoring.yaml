@@ -31,55 +31,33 @@
     state: present
     definition: "{{ lookup('file', 'files/configmap-dashboards.yaml') | from_yaml }}"
 
-- name: Deploy Loki
+- name: Deploy monitoring charts
   ansible.builtin.include_role:
     name: helm
     tasks_from: deploy
+  loop: "{{ core_monitoring_charts }}"
+  loop_control:
+    loop_var: core_chart
+    label: "{{ core_chart.name }}"
   vars:
-    helm_chart_name: loki
-    helm_chart_ref: grafana/loki
-    helm_chart_version: "{{ loki_version }}"
-    helm_chart_namespace: monitoring
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/loki.yaml.j2"
-
-- name: Deploy Tempo
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: tempo
-    helm_chart_ref: grafana-community/tempo
-    helm_chart_version: "{{ tempo_version }}"
-    helm_chart_namespace: monitoring
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/tempo.yaml.j2"
-
-- name: Deploy OTel Collector
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: otel-collector
-    helm_chart_ref: open-telemetry/opentelemetry-collector
-    helm_chart_version: "{{ otel_collector_version }}"
-    helm_chart_namespace: monitoring
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/otel-collector.yaml.j2"
-
-- name: Deploy Prometheus Stack
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: kube-prometheus-stack
-    helm_chart_ref: prometheus-community/kube-prometheus-stack
-    helm_chart_version: "{{ kube_prometheus_stack_version }}"
-    helm_chart_namespace: monitoring
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/kube-prometheus-stack.yaml.j2"
+    helm_chart_name: "{{ core_chart.name }}"
+    helm_chart_ref: "{{ core_chart.ref }}"
+    helm_chart_version: "{{ core_chart.version }}"
+    helm_chart_namespace: "{{ core_chart.namespace }}"
+    helm_chart_values_template: >-
+      {{ core_role_path }}/templates/values/{{ core_chart.name }}.yaml.j2
 
 - name: Create Grafana Route
   kubernetes.core.k8s:
     state: present
     definition: >-
       {{ lookup('template', 'httproute-grafana.yaml.j2') | from_yaml }}
+
+- name: Create Discord Webhook URL Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('community.sops.sops', 'files/secret-discord-webhook-url.sops.yaml') | from_yaml }}"
 
 - name: Create Alert Manager Config
   kubernetes.core.k8s:
@@ -95,20 +73,3 @@
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', 'prometheusrule-dewpoint.yaml.j2') | from_yaml }}"
-
-- name: Create Discord Webhook URL Secret
-  kubernetes.core.k8s:
-    state: present
-    namespace: monitoring
-    definition: "{{ lookup('community.sops.sops', 'files/secret-discord-webhook-url.sops.yaml') | from_yaml }}"
-
-- name: Deploy Metrics Server
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: metrics-server
-    helm_chart_ref: metrics-server/metrics-server
-    helm_chart_version: "{{ metrics_server_version }}"
-    helm_chart_namespace: kube-system
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/metrics-server.yaml.j2"

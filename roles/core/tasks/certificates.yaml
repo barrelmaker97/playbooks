@@ -1,26 +1,4 @@
 ---
-- name: Deploy Cert Manager
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: cert-manager
-    helm_chart_ref: jetstack/cert-manager
-    helm_chart_version: "{{ cert_manager_version }}"
-    helm_chart_namespace: cert-manager
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/cert-manager.yaml.j2"
-
-- name: Deploy Trust Manager
-  ansible.builtin.include_role:
-    name: helm
-    tasks_from: deploy
-  vars:
-    helm_chart_name: trust-manager
-    helm_chart_ref: jetstack/trust-manager
-    helm_chart_version: "{{ trust_manager_version }}"
-    helm_chart_namespace: cert-manager
-    helm_chart_values_template: "{{ core_role_path }}/templates/values/trust-manager.yaml.j2"
-
 - name: Create Internal Self-Signed Issuer
   kubernetes.core.k8s:
     state: present
