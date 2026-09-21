@@ -41,21 +41,21 @@
     - shared
     - storage
 
-- name: Configure CloudNativePG
-  ansible.builtin.import_tasks: cloudnative-pg.yaml
-  tags: [cloudnative-pg]
-
 - name: Configure storage
   ansible.builtin.import_tasks: storage.yaml
   tags: [storage]
+
+- name: Configure networking
+  ansible.builtin.import_tasks: networking.yaml
+  tags: [networking]
 
 - name: Configure certificates
   ansible.builtin.import_tasks: certificates.yaml
   tags: [certificates]
 
-- name: Configure networking
-  ansible.builtin.import_tasks: networking.yaml
-  tags: [networking]
+- name: Configure CloudNativePG
+  ansible.builtin.import_tasks: cloudnative-pg.yaml
+  tags: [cloudnative-pg]
 
 - name: Configure monitoring
   ansible.builtin.import_tasks: monitoring.yaml
