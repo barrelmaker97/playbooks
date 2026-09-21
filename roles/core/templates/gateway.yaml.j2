@@ -7,13 +7,13 @@ metadata:
 spec:
   gatewayClassName: envoy
   listeners:
-    - name: http
+    - name: "{{ gateway_http_listener_name }}"
       protocol: HTTP
       port: 80
       allowedRoutes:
         namespaces:
           from: All
-    - name: https-lan-wildcard
+    - name: "{{ gateway_lan_listener_name }}"
       protocol: HTTPS
       port: 443
       hostname: "*.{{ cluster_domain }}"
@@ -24,7 +24,7 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: https-apex
+    - name: "{{ gateway_apex_listener_name }}"
       protocol: HTTPS
       port: 443
       hostname: "{{ external_domain }}"
@@ -35,7 +35,7 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: https-wildcard
+    - name: "{{ gateway_public_listener_name }}"
       protocol: HTTPS
       port: 443
       hostname: "*.{{ external_domain }}"

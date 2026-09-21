@@ -28,6 +28,10 @@ node_ips:
 
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
+gateway_http_listener_name: http
+gateway_lan_listener_name: https-lan-wildcard
+gateway_apex_listener_name: https-apex
+gateway_public_listener_name: https-wildcard
 
 # Shared: applied by the core role's Grafana route and by several workload
 # charts to their own routes.

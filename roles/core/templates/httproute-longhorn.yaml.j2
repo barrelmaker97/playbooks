@@ -8,7 +8,7 @@ spec:
   parentRefs:
     - name: "{{ gateway_name }}"
       namespace: "{{ gateway_namespace }}"
-      sectionName: https-lan-wildcard
+      sectionName: "{{ gateway_lan_listener_name }}"
   hostnames:
     - "longhorn.{{ cluster_domain }}"
   rules:

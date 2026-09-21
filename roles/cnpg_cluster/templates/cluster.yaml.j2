@@ -1,0 +1,45 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: "{{ cnpg_cluster_name }}"
+  namespace: "{{ cnpg_cluster_definition.namespace }}"
+spec:
+  description: "{{ cnpg_cluster_definition.description }}"
+  instances: {{ cnpg_cluster_definition.instances }}
+  imageName: "{{ cnpg_cluster_image }}"
+  enablePDB: {{ cnpg_cluster_definition.enable_pdb | bool | lower }}
+  enableSuperuserAccess: false
+  bootstrap:
+    initdb:
+      database: "{{ cnpg_cluster_definition.database }}"
+      owner: "{{ cnpg_cluster_definition.owner }}"
+      dataChecksums: true
+  storage:
+    storageClass: longhorn-cnpg-local
+    size: "{{ cnpg_cluster_definition.storage_size }}"
+  affinity:
+    enablePodAntiAffinity: true
+    podAntiAffinityType: required
+    topologyKey: kubernetes.io/hostname
+{% if cnpg_cluster_definition.synchronous is defined or cnpg_cluster_definition.parameters is defined or cnpg_cluster_definition.pg_hba is defined %}
+  postgresql:
+{% if cnpg_cluster_definition.parameters is defined %}
+    parameters:
+{{ cnpg_cluster_definition.parameters | to_nice_yaml(indent=2) | indent(6, true) }}
+{% endif %}
+{% if cnpg_cluster_definition.pg_hba is defined %}
+    pg_hba:
+{% for rule in cnpg_cluster_definition.pg_hba %}
+      - "{{ rule }}"
+{% endfor %}
+{% endif %}
+{% if cnpg_cluster_definition.synchronous is defined %}
+    synchronous:
+      method: "{{ cnpg_cluster_definition.synchronous.method }}"
+      number: {{ cnpg_cluster_definition.synchronous.number }}
+      dataDurability: "{{ cnpg_cluster_definition.synchronous.data_durability }}"
+{% endif %}
+{% endif %}
+  resources:
+{{ cnpg_cluster_definition.resources | to_nice_yaml(indent=2) | indent(4, true) }}

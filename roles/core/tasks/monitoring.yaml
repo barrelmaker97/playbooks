@@ -35,7 +35,27 @@
   ansible.builtin.include_role:
     name: helm
     tasks_from: deploy
-  loop: "{{ core_monitoring_charts }}"
+  loop:
+    - name: loki
+      ref: grafana/loki
+      version: "{{ loki_version }}"
+      namespace: monitoring
+    - name: tempo
+      ref: grafana-community/tempo
+      version: "{{ tempo_version }}"
+      namespace: monitoring
+    - name: otel-collector
+      ref: open-telemetry/opentelemetry-collector
+      version: "{{ otel_collector_version }}"
+      namespace: monitoring
+    - name: kube-prometheus-stack
+      ref: prometheus-community/kube-prometheus-stack
+      version: "{{ kube_prometheus_stack_version }}"
+      namespace: monitoring
+    - name: metrics-server
+      ref: metrics-server/metrics-server
+      version: "{{ metrics_server_version }}"
+      namespace: kube-system
   loop_control:
     loop_var: core_chart
     label: "{{ core_chart.name }}"

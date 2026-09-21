@@ -25,7 +25,7 @@ dynmap:
     parentRefs:
       - name: "{{ gateway_name }}"
         namespace: "{{ gateway_namespace }}"
-        sectionName: https-wildcard
+        sectionName: "{{ gateway_public_listener_name }}"
     hostnames:
       - "niucraft.{{ external_domain }}"
     filters:

@@ -53,7 +53,7 @@ httpRoute:
   parentRefs:
     - name: "{{ gateway_name }}"
       namespace: "{{ gateway_namespace }}"
-      sectionName: https-apex
+      sectionName: "{{ gateway_apex_listener_name }}"
   hostnames:
     - "{{ external_domain }}"
   filters:
