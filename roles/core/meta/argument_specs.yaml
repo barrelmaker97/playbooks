@@ -4,8 +4,9 @@ argument_specs:
     short_description: Deploy cluster-wide core services
     description:
       - Deploys storage (Longhorn and its storage classes), the CloudNativePG
-        operator, networking (MetalLB and Envoy Gateway), certificates
-        (cert-manager, trust-manager and the issuers) and the monitoring stack.
+        operator, networking (MetalLB), certificates (cert-manager,
+        trust-manager and the issuers), the monitoring stack, and Gateway
+        routing.
       - >-
         Chart versions and this role's own tunables are supplied by the calling
         playbook. Identity and topology values shared with other roles come

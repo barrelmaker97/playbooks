@@ -8,21 +8,29 @@
       metadata:
         name: cert-manager
 
-- name: Deploy certificate charts
+- name: Deploy Cert Manager
   ansible.builtin.include_role:
     name: helm
     tasks_from: deploy
-  loop: "{{ core_certificate_charts }}"
-  loop_control:
-    loop_var: core_chart
-    label: "{{ core_chart.name }}"
   vars:
-    helm_chart_name: "{{ core_chart.name }}"
-    helm_chart_ref: "{{ core_chart.ref }}"
-    helm_chart_version: "{{ core_chart.version }}"
-    helm_chart_namespace: "{{ core_chart.namespace }}"
+    helm_chart_name: cert-manager
+    helm_chart_ref: jetstack/cert-manager
+    helm_chart_version: "{{ cert_manager_version }}"
+    helm_chart_namespace: cert-manager
     helm_chart_values_template: >-
-      {{ core_role_path }}/templates/values/{{ core_chart.name }}.yaml.j2
+      {{ core_role_path }}/templates/values/cert-manager.yaml.j2
+
+- name: Deploy Trust Manager
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: trust-manager
+    helm_chart_ref: jetstack/trust-manager
+    helm_chart_version: "{{ trust_manager_version }}"
+    helm_chart_namespace: cert-manager
+    helm_chart_values_template: >-
+      {{ core_role_path }}/templates/values/trust-manager.yaml.j2
 
 - name: Create Internal Self-Signed Issuer
   kubernetes.core.k8s:
@@ -105,18 +113,3 @@
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', 'issuer-staging.yaml.j2') | from_yaml }}"
-
-# These must follow cert-manager and the issuers above: the Certificate CRD
-# arrives with the cert-manager chart, and each certificate names an issuer
-# created just above it. The Gateway can reference the resulting secrets after
-# networking creates it.
-- name: Create LAN TLS Certificates
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('template', 'certificates-lan.yaml.j2') | from_yaml }}"
-
-- name: Create Public TLS Certificates
-  kubernetes.core.k8s:
-    state: present
-    definition: >-
-      {{ lookup('template', 'certificates-public.yaml.j2') | from_yaml }}

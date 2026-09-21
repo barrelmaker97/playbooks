@@ -47,12 +47,6 @@
     helm_chart_values_template: >-
       {{ core_role_path }}/templates/values/{{ core_chart.name }}.yaml.j2
 
-- name: Create Grafana Route
-  kubernetes.core.k8s:
-    state: present
-    definition: >-
-      {{ lookup('template', 'httproute-grafana.yaml.j2') | from_yaml }}
-
 - name: Create Discord Webhook URL Secret
   kubernetes.core.k8s:
     state: present

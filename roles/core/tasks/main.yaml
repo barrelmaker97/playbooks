@@ -1,49 +1,49 @@
 ---
 # Ordering between these files is load-bearing. Hoisted files contain only
-# shared prerequisites: Helm setup, namespaces used by more than one domain, and
-# CRDs/controllers that multiple sections render resources from. Domain-owned
-# namespaces and charts live with the task file that configures them.
+# shared prerequisites: Helm setup and monitoring CRDs/resources that multiple
+# sections render resources from. Domain-owned namespaces and charts live with
+# the task file that configures them, while Gateway exposure is centralized in
+# routing.
 #
 # These are imports, not includes: tags on an include_tasks apply only to the
 # include itself, so the tasks inside would be filtered out and a --tags run
 # would silently do nothing. import_tasks propagates the tag at parse time.
-- name: Prepare Helm
-  ansible.builtin.import_tasks: prereq.yaml
+- name: Set core role path
+  ansible.builtin.set_fact:
+    core_role_path: "{{ role_path }}"
   tags: [always]
 
-- name: Create shared namespaces
-  ansible.builtin.import_tasks: shared-namespaces.yaml
+- name: Setup Helm
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: setup
+  vars:
+    helm_repos:
+      cloudnative-pg: https://cloudnative-pg.github.io/charts
+      grafana: https://grafana.github.io/helm-charts
+      grafana-community: https://grafana-community.github.io/helm-charts
+      jetstack: https://charts.jetstack.io
+      longhorn: https://charts.longhorn.io
+      metallb: https://metallb.github.io/metallb
+      metrics-server: https://kubernetes-sigs.github.io/metrics-server
+      open-telemetry: https://open-telemetry.github.io/opentelemetry-helm-charts
+      prometheus-community: https://prometheus-community.github.io/helm-charts
+  tags: [always]
+
+- name: Prepare monitoring prerequisites
+  ansible.builtin.import_tasks: monitoring-prereq.yaml
   tags:
     - certificates
     - monitoring
     - networking
-    - operators
-    - policies
+    - cloudnative-pg
+    - routing
     - shared
     - storage
 
-- name: Deploy shared monitoring CRDs
-  ansible.builtin.import_tasks: shared-monitoring-crds.yaml
-  tags:
-    - certificates
-    - monitoring
-    - networking
-    - operators
-    - shared
-    - storage
-
-- name: Deploy shared gateway controller
-  ansible.builtin.import_tasks: shared-gateway.yaml
-  tags:
-    - monitoring
-    - networking
-    - policies
-    - shared
-    - storage
-
-- name: Deploy operator charts
-  ansible.builtin.import_tasks: operators.yaml
-  tags: [operators]
+- name: Configure CloudNativePG
+  ansible.builtin.import_tasks: cloudnative-pg.yaml
+  tags: [cloudnative-pg]
 
 - name: Configure storage
   ansible.builtin.import_tasks: storage.yaml
@@ -61,6 +61,6 @@
   ansible.builtin.import_tasks: monitoring.yaml
   tags: [monitoring]
 
-- name: Apply gateway policies
-  ansible.builtin.import_tasks: policies.yaml
-  tags: [policies]
+- name: Configure routing
+  ansible.builtin.import_tasks: routing.yaml
+  tags: [routing]

@@ -17,10 +17,4 @@ defaultSettings:
   snapshotMaxCount: "{{ longhorn_snapshot_max_count }}"
   storageMinimalAvailablePercentage: "10"
 httproute:
-  enabled: true
-  parentRefs:
-    - name: "{{ gateway_name }}"
-      namespace: "{{ gateway_namespace }}"
-      sectionName: https-lan-wildcard
-  hostnames:
-    - "longhorn.{{ cluster_domain }}"
+  enabled: false

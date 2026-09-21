@@ -61,13 +61,7 @@ alertmanager:
               storage: 10Gi
   route:
     main:
-      enabled: true
-      parentRefs:
-        - name: "{{ gateway_name }}"
-          namespace: "{{ gateway_namespace }}"
-          sectionName: https-lan-wildcard
-      hostnames:
-        - "alertmanager.{{ cluster_domain }}"
+      enabled: false
 grafana:
   admin:
     existingSecret: grafana-admin-credentials
@@ -148,13 +142,7 @@ grafana:
 prometheus:
   route:
     main:
-      enabled: true
-      parentRefs:
-        - name: "{{ gateway_name }}"
-          namespace: "{{ gateway_namespace }}"
-          sectionName: https-lan-wildcard
-      hostnames:
-        - "prometheus.{{ cluster_domain }}"
+      enabled: false
   prometheusSpec:
     enableRemoteWriteReceiver: true
     retention: 30d

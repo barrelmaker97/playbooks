@@ -2,8 +2,8 @@
 galaxy_info:
   author: Nolan Cooper
   description: >-
-    Deploy cluster-wide core services - storage, networking, certificates
-    and monitoring.
+    Deploy cluster-wide core services - storage, networking, certificates,
+    monitoring and routing.
   license: GPL-3.0-or-later
   min_ansible_version: "2.15"
   platforms:

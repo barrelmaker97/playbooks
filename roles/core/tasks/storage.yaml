@@ -12,21 +12,17 @@
           pod-security.kubernetes.io/audit: privileged
           pod-security.kubernetes.io/warn: privileged
 
-- name: Deploy storage charts
+- name: Deploy Longhorn
   ansible.builtin.include_role:
     name: helm
     tasks_from: deploy
-  loop: "{{ core_storage_charts }}"
-  loop_control:
-    loop_var: core_chart
-    label: "{{ core_chart.name }}"
   vars:
-    helm_chart_name: "{{ core_chart.name }}"
-    helm_chart_ref: "{{ core_chart.ref }}"
-    helm_chart_version: "{{ core_chart.version }}"
-    helm_chart_namespace: "{{ core_chart.namespace }}"
+    helm_chart_name: longhorn
+    helm_chart_ref: longhorn/longhorn
+    helm_chart_version: "{{ longhorn_version }}"
+    helm_chart_namespace: longhorn-system
     helm_chart_values_template: >-
-      {{ core_role_path }}/templates/values/{{ core_chart.name }}.yaml.j2
+      {{ core_role_path }}/templates/values/longhorn.yaml.j2
 
 - name: Create CloudNativePG Local Storage Class
   kubernetes.core.k8s:
