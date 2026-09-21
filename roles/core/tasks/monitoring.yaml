@@ -1,0 +1,89 @@
+---
+- name: Create Monitoring Limit Range
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: LimitRange
+      metadata:
+        name: monitoring-default
+        namespace: monitoring
+      spec:
+        limits:
+          - type: Container
+            defaultRequest:
+              cpu: 10m
+              memory: 64Mi
+
+- name: Create Grafana Admin Credentials Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('community.sops.sops', 'files/secret-grafana-admin-credentials.sops.yaml') | from_yaml }}"
+
+- name: Create Additional Prometheus Scrape Config Secret
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/additional-scrape-configs.yaml') | from_yaml }}"
+
+- name: Create Dashboards ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/configmap-dashboards.yaml') | from_yaml }}"
+
+- name: Deploy monitoring charts
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  loop:
+    - name: loki
+      ref: grafana/loki
+      version: "{{ loki_version }}"
+      namespace: monitoring
+    - name: tempo
+      ref: grafana-community/tempo
+      version: "{{ tempo_version }}"
+      namespace: monitoring
+    - name: otel-collector
+      ref: open-telemetry/opentelemetry-collector
+      version: "{{ otel_collector_version }}"
+      namespace: monitoring
+    - name: kube-prometheus-stack
+      ref: prometheus-community/kube-prometheus-stack
+      version: "{{ kube_prometheus_stack_version }}"
+      namespace: monitoring
+    - name: metrics-server
+      ref: metrics-server/metrics-server
+      version: "{{ metrics_server_version }}"
+      namespace: kube-system
+  loop_control:
+    loop_var: core_chart
+    label: "{{ core_chart.name }}"
+  vars:
+    helm_chart_name: "{{ core_chart.name }}"
+    helm_chart_ref: "{{ core_chart.ref }}"
+    helm_chart_version: "{{ core_chart.version }}"
+    helm_chart_namespace: "{{ core_chart.namespace }}"
+    helm_chart_values_template: >-
+      {{ core_role_path }}/templates/values/{{ core_chart.name }}.yaml.j2
+
+- name: Create Discord Webhook URL Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition: "{{ lookup('community.sops.sops', 'files/secret-discord-webhook-url.sops.yaml') | from_yaml }}"
+
+- name: Create Alert Manager Config
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/alertmanagerconfig.yaml') | from_yaml }}"
+
+- name: Create Longhorn Snapshot Alerts
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'prometheusrule-longhorn-snapshots.yaml.j2') | from_yaml }}"
+
+- name: Create Dewpoint Sensor Alerts
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'prometheusrule-dewpoint.yaml.j2') | from_yaml }}"

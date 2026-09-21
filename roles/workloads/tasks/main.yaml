@@ -12,7 +12,7 @@
     loop_var: workload_release
     label: "{{ workload_release.key }}"
 
-- name: Validate CloudNativePG Cluster Namespaces
+- name: Validate CNPG Cluster Namespaces
   ansible.builtin.assert:
     that:
       - workload_postgresql_cluster.value.namespace is defined
@@ -20,7 +20,7 @@
         (workload_postgresql_cluster.value.namespace | default(""))
         in workloads_namespaces
     fail_msg: >-
-      CloudNativePG cluster {{ workload_postgresql_cluster.key }} references an
+      CNPG cluster {{ workload_postgresql_cluster.key }} references an
       undeclared workload namespace.
   loop: "{{ workloads_postgresql_clusters | dict2items }}"
   loop_control:
@@ -68,15 +68,15 @@
 
 - name: Deploy PostgreSQL Clusters
   ansible.builtin.include_role:
-    name: cloudnative_pg
+    name: cnpg_cluster
   loop: "{{ workloads_postgresql_clusters | dict2items }}"
   loop_control:
     loop_var: workload_postgresql_cluster
     label: "{{ workload_postgresql_cluster.key }}"
   vars:
-    cloudnative_pg_cluster_name: "{{ workload_postgresql_cluster.key }}"
-    cloudnative_pg_cluster: "{{ workload_postgresql_cluster.value }}"
-    cloudnative_pg_image: "{{ workloads_postgresql_image }}"
+    cnpg_cluster_name: "{{ workload_postgresql_cluster.key }}"
+    cnpg_cluster_definition: "{{ workload_postgresql_cluster.value }}"
+    cnpg_cluster_image: "{{ workloads_postgresql_image }}"
 
 - name: Set workload role path
   ansible.builtin.set_fact:

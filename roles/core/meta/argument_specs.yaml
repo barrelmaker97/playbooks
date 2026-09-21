@@ -4,8 +4,9 @@ argument_specs:
     short_description: Deploy cluster-wide core services
     description:
       - Deploys storage (Longhorn and its storage classes), the CloudNativePG
-        operator, networking (MetalLB and Envoy Gateway), certificates
-        (cert-manager, trust-manager and the issuers) and the monitoring stack.
+        operator, networking (MetalLB), certificates (cert-manager,
+        trust-manager and the issuers), the monitoring stack, and Gateway
+        routing.
       - >-
         Chart versions and this role's own tunables are supplied by the calling
         playbook. Identity and topology values shared with other roles come
@@ -46,6 +47,22 @@ argument_specs:
         required: true
       gateway_namespace:
         description: Namespace holding the Gateway and its certificates.
+        type: str
+        required: true
+      gateway_http_listener_name:
+        description: Name of the Gateway HTTP listener.
+        type: str
+        required: true
+      gateway_lan_listener_name:
+        description: Name of the Gateway internal HTTPS wildcard listener.
+        type: str
+        required: true
+      gateway_apex_listener_name:
+        description: Name of the Gateway public apex HTTPS listener.
+        type: str
+        required: true
+      gateway_public_listener_name:
+        description: Name of the Gateway public wildcard HTTPS listener.
         type: str
         required: true
       gateway_ip:

@@ -8,7 +8,7 @@ metadata:
 spec:
   parentRefs:
     - name: "{{ gateway_name }}"
-      sectionName: http
+      sectionName: "{{ gateway_http_listener_name }}"
   rules:
     - filters:
         - type: RequestRedirect

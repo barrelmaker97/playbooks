@@ -1,0 +1,26 @@
+---
+# Several domain charts render ServiceMonitor, PodMonitor, PrometheusRule, or
+# dashboard resources from their values. Create the shared monitoring namespace
+# and CRDs before any of those charts run.
+- name: Create Monitoring Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Deploy Prometheus Operator CRDs
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: prometheus-operator-crds
+    helm_chart_ref: prometheus-community/prometheus-operator-crds
+    helm_chart_version: "{{ prometheus_crds_version }}"
+    helm_chart_namespace: monitoring

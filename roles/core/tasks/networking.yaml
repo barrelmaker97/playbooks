@@ -1,0 +1,36 @@
+---
+- name: Create MetalLB Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: metallb-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Deploy MetalLB
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: metallb
+    helm_chart_ref: metallb/metallb
+    helm_chart_version: "{{ metallb_version }}"
+    helm_chart_namespace: metallb-system
+    helm_chart_values_template: >-
+      {{ core_role_path }}/templates/values/metallb.yaml.j2
+
+- name: Create IP Address Pool
+  kubernetes.core.k8s:
+    state: present
+    definition: >-
+      {{ lookup('template', 'ipaddresspool-metallb.yaml.j2') | from_yaml }}
+
+- name: Advertise Load Balanced IP
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/l2advertisement-metallb.yaml') | from_yaml }}"

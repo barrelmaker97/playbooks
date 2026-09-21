@@ -4,12 +4,12 @@ argument_specs:
     short_description: Deploy application namespaces, databases and Helm releases
     description:
       - Creates the workload namespaces with their quotas and limit ranges,
-        deploys a CloudNativePG cluster per entry in
+        deploys a CNPG-backed PostgreSQL cluster per entry in
         workloads_postgresql_clusters, then deploys the Helm releases.
       - >-
         The three mappings below are keyed by caller-defined names, so their
         contents cannot be validated with suboptions here. The per-cluster
-        schema is enforced by roles/cloudnative_pg, and the namespace
+        schema is enforced by roles/cnpg_cluster, and the namespace
         cross-references are checked by asserts in tasks/main.yaml.
     options:
       workloads_namespaces:
@@ -25,8 +25,8 @@ argument_specs:
         required: true
       workloads_postgresql_clusters:
         description:
-          - CloudNativePG clusters to deploy, keyed by cluster name. Each value
-            is passed through to the cloudnative_pg role, which validates it.
+          - CNPG-backed PostgreSQL clusters to deploy, keyed by cluster name. Each value
+            is passed through to the cnpg_cluster role, which validates it.
         type: dict
         required: true
       workloads_helm_releases:
@@ -49,6 +49,14 @@ argument_specs:
         required: true
       gateway_namespace:
         description: Namespace of that Gateway.
+        type: str
+        required: true
+      gateway_apex_listener_name:
+        description: Name of the Gateway public apex HTTPS listener.
+        type: str
+        required: true
+      gateway_public_listener_name:
+        description: Name of the Gateway public wildcard HTTPS listener.
         type: str
         required: true
       gateway_response_headers:
