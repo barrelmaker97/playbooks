@@ -1,4 +1,33 @@
 ---
+- name: Create MetalLB Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: metallb-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
+- name: Deploy networking charts
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  loop: "{{ core_networking_charts }}"
+  loop_control:
+    loop_var: core_chart
+    label: "{{ core_chart.name }}"
+  vars:
+    helm_chart_name: "{{ core_chart.name }}"
+    helm_chart_ref: "{{ core_chart.ref }}"
+    helm_chart_version: "{{ core_chart.version }}"
+    helm_chart_namespace: "{{ core_chart.namespace }}"
+    helm_chart_values_template: >-
+      {{ core_role_path }}/templates/values/{{ core_chart.name }}.yaml.j2
+
 - name: Create IP Address Pool
   kubernetes.core.k8s:
     state: present

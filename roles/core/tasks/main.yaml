@@ -1,19 +1,45 @@
 ---
-# Ordering between these files is load-bearing. Each chart that supplies a CRD
-# must run before anything creating that kind, and namespaces must exist before
-# resources land in them. prereq is tagged always: every other section needs
-# core_role_path for its values path and the Helm repositories registered.
+# Ordering between these files is load-bearing. Hoisted files contain only
+# shared prerequisites: Helm setup, namespaces used by more than one domain, and
+# CRDs/controllers that multiple sections render resources from. Domain-owned
+# namespaces and charts live with the task file that configures them.
 #
 # These are imports, not includes: tags on an include_tasks apply only to the
 # include itself, so the tasks inside would be filtered out and a --tags run
 # would silently do nothing. import_tasks propagates the tag at parse time.
-- name: Prepare Helm and shared CRDs
+- name: Prepare Helm
   ansible.builtin.import_tasks: prereq.yaml
   tags: [always]
 
-- name: Create namespaces
-  ansible.builtin.import_tasks: namespaces.yaml
-  tags: [namespaces]
+- name: Create shared namespaces
+  ansible.builtin.import_tasks: shared-namespaces.yaml
+  tags:
+    - certificates
+    - monitoring
+    - networking
+    - operators
+    - policies
+    - shared
+    - storage
+
+- name: Deploy shared monitoring CRDs
+  ansible.builtin.import_tasks: shared-monitoring-crds.yaml
+  tags:
+    - certificates
+    - monitoring
+    - networking
+    - operators
+    - shared
+    - storage
+
+- name: Deploy shared gateway controller
+  ansible.builtin.import_tasks: shared-gateway.yaml
+  tags:
+    - monitoring
+    - networking
+    - policies
+    - shared
+    - storage
 
 - name: Deploy operator charts
   ansible.builtin.import_tasks: operators.yaml

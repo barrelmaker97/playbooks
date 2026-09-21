@@ -4,13 +4,13 @@
 # not something a site should override; the versions it interpolates are the
 # overridable part and come from the calling playbook.
 #
-# Order is load-bearing in both lists. A values template is optional: the helm
+# Order is load-bearing in each list. A values template is optional: the helm
 # role looks for templates/values/<name>.yaml.j2 and skips it when absent,
 # which is how prometheus-operator-crds gets deployed without one.
 
-# Charts that install CRDs, or that other charts need in place first. Deployed
-# before anything that creates a custom resource.
-core_operator_charts:
+# Shared CRDs/controllers are hoisted only when multiple sections render their
+# resources. Domain-owned charts stay with the task file that configures them.
+core_monitoring_crd_charts:
   # Supplies monitoring.coreos.com. Several charts below switch on a
   # ServiceMonitor, so this has to come first.
   - name: prometheus-operator-crds
@@ -18,39 +18,40 @@ core_operator_charts:
     version: "{{ prometheus_crds_version }}"
     namespace: monitoring
 
+core_gateway_controller_charts:
   # Supplies the Gateway API CRDs, in its chart's crds/ directory. Longhorn
-  # below renders an HTTPRoute, so it cannot come before this.
+  # and monitoring render HTTPRoutes, so it cannot live in networking alone.
   - name: envoy-gateway
     ref: oci://docker.io/envoyproxy/gateway-helm
     version: "{{ envoy_gateway_version }}"
     namespace: "{{ gateway_namespace }}"
 
-  # Supplies cert-manager.io, which the certificates section needs
-  - name: cert-manager
-    ref: jetstack/cert-manager
-    version: "{{ cert_manager_version }}"
-    namespace: cert-manager
-
-  # Supplies trust.cert-manager.io and depends on cert-manager
-  - name: trust-manager
-    ref: jetstack/trust-manager
-    version: "{{ trust_manager_version }}"
-    namespace: cert-manager
-
-  # Supplies metallb.io
-  - name: metallb
-    ref: metallb/metallb
-    version: "{{ metallb_version }}"
-    namespace: metallb-system
-
-  # Supplies longhorn.io. Renders both a ServiceMonitor and an HTTPRoute, so it
-  # depends on the first two entries above.
+core_storage_charts:
   - name: longhorn
     ref: longhorn/longhorn
     version: "{{ longhorn_version }}"
     namespace: longhorn-system
 
-  # Supplies postgresql.cnpg.io, used by the workloads role
+core_certificate_charts:
+  - name: cert-manager
+    ref: jetstack/cert-manager
+    version: "{{ cert_manager_version }}"
+    namespace: cert-manager
+
+  # Depends on cert-manager.
+  - name: trust-manager
+    ref: jetstack/trust-manager
+    version: "{{ trust_manager_version }}"
+    namespace: cert-manager
+
+core_networking_charts:
+  - name: metallb
+    ref: metallb/metallb
+    version: "{{ metallb_version }}"
+    namespace: metallb-system
+
+core_operator_charts:
+  # Cluster-wide application operator used by the workloads role.
   - name: cloudnative-pg
     ref: cloudnative-pg/cloudnative-pg
     version: "{{ cloudnative_pg_chart_version }}"
