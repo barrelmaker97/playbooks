@@ -33,23 +33,34 @@ obscura:
 postgresql:
   enabled: false
 
-minio:
-  persistence:
-    enabled: true
-    storageClass: longhorn-protected
-    size: 10Gi
+rustfs:
+  storageclass:
+    name: longhorn-protected
+    dataStorageSize: 10Gi
+  secret:
+    rustfs:
+      access_key: obscura
   resources:
     requests:
       cpu: 100m
       memory: 256Mi
     limits:
       memory: 512Mi
-  metrics:
-    serviceMonitor:
-      enabled: true
-      includeNode: true
-      additionalLabels:
-        release: prometheus-stack
+  podSecurityContext:
+    fsGroup: 10001
+    runAsGroup: 10001
+    runAsUser: 10001
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+bucketSetup:
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
 
 podSecurityContext:
   fsGroup: 10001
