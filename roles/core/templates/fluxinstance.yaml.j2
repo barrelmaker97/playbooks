@@ -1,0 +1,28 @@
+---
+# The operator requires this name and namespace. The sync block creates a
+# GitRepository and a Kustomization, both named flux-system, which apply
+# flux_sync_path.
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+  distribution:
+    version: "{{ flux_version }}"
+    registry: ghcr.io/fluxcd
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+  cluster:
+    type: kubernetes
+    domain: cluster.local
+    networkPolicy: true
+  sync:
+    kind: GitRepository
+    url: "{{ flux_sync_url }}"
+    ref: "{{ flux_sync_ref }}"
+    path: "{{ flux_sync_path }}"
+    interval: 1m

@@ -64,3 +64,9 @@
 - name: Configure routing
   ansible.builtin.import_tasks: routing.yaml
   tags: [routing]
+
+# Last, so everything Flux-managed resources depend on (CRDs, storage classes,
+# the Gateway) already exists when the first sync runs.
+- name: Configure Flux
+  ansible.builtin.import_tasks: flux.yaml
+  tags: [flux]

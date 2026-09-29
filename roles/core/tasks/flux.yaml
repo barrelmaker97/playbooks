@@ -1,0 +1,72 @@
+---
+- name: Create Flux Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: flux-system
+
+- name: Deploy Flux Operator
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: flux-operator
+    helm_chart_ref: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
+    helm_chart_version: "{{ flux_operator_version }}"
+    helm_chart_namespace: flux-system
+
+# Flux looks for keys ending in .agekey.
+- name: Create Flux SOPS Age Key Secret
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: sops-age
+        namespace: flux-system
+      type: Opaque
+      stringData:
+        age.agekey: "{{ lookup('file', flux_sops_age_key_file) }}"
+  no_log: true
+
+# Values Flux substitutes into manifests as ${name}. Written from group_vars so
+# the domains and gateway names keep a single source while both tools deploy.
+- name: Create Flux Cluster Variables
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: cluster-vars
+        namespace: flux-system
+      data:
+        cluster_domain: "{{ cluster_domain }}"
+        external_domain: "{{ external_domain }}"
+        gateway_name: "{{ gateway_name }}"
+        gateway_namespace: "{{ gateway_namespace }}"
+        gateway_lan_listener_name: "{{ gateway_lan_listener_name }}"
+        gateway_apex_listener_name: "{{ gateway_apex_listener_name }}"
+        gateway_public_listener_name: "{{ gateway_public_listener_name }}"
+
+- name: Create Flux Instance
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'fluxinstance.yaml.j2') | from_yaml }}"
+
+- name: Wait for Flux Instance
+  kubernetes.core.k8s_info:
+    api_version: fluxcd.controlplane.io/v1
+    kind: FluxInstance
+    name: flux
+    namespace: flux-system
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_sleep: 10
+    wait_timeout: 600
