@@ -49,6 +49,19 @@ touches the DNS servers. Both support role tags:
 ```bash
 ansible-playbook dns.yaml --tags pihole
 ```
+
+## Obscura storage
+
+Obscura and devscura use the chart's bundled RustFS store with 10Gi data PVCs
+on `longhorn-protected`. Storage passwords are SOPS-encrypted under
+`rustfs.secret.rustfs.secret_key`; `.sops.yaml` encrypts this key explicitly.
+Bucket initialization runs without privilege escalation and with a read-only
+root filesystem, using the chart's writable client configuration volume.
+
+The old MinIO ServiceMonitor settings have been removed. The bundled RustFS
+chart does not provide an equivalent ServiceMonitor configuration, so these
+values do not enable object-store metrics scraping.
+
 # IP Plan
 ### Cluster
 | Name         | Address                     | Hostname           |
