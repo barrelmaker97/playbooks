@@ -1,0 +1,34 @@
+---
+name: Kubernetes Manifests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+# Flux applies whatever lands on main, so this is the last check before a
+# change reaches the cluster. Every directory holding a kustomization.yaml is
+# built and validated, custom resources against the datreeio CRD catalog.
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      KUBECONFORM_VERSION: v0.8.0
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install kubeconform
+        run: |
+          curl -sSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" \
+            | sudo tar xz -C /usr/local/bin kubeconform
+      - name: Build and validate
+        # shell: bash adds pipefail, so a failed build cannot hand kubeconform
+        # empty input and pass.
+        shell: bash
+        run: |
+          find kubernetes -name kustomization.yaml -printf '%h\n' | sort | while read -r dir; do
+            echo "== $dir"
+            kubectl kustomize "$dir" | kubeconform -strict -summary \
+              -schema-location default \
+              -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+              -
+          done
