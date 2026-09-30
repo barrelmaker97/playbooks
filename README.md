@@ -57,20 +57,25 @@ Operator and a FluxInstance that syncs `kubernetes/clusters/poseidon` from
 `kubernetes/apps`, it is removed from `vars/workloads.yaml` in the same change,
 so Ansible and Flux never manage the same objects.
 
-| Path                           | Contents                                                  |
-|--------------------------------|-----------------------------------------------------------|
-| `kubernetes/clusters/poseidon` | Entry point: Helm repositories and one Kustomization per app |
-| `kubernetes/apps/<app>`        | The app's namespace, database, alerts and HelmRelease     |
+| Path                                          | Contents                                                     |
+|-----------------------------------------------|--------------------------------------------------------------|
+| `kubernetes/clusters/poseidon`                | Entry point: Helm repositories and one Kustomization per directory below |
+| `kubernetes/infrastructure/flux-notifications`| Discord alerts for failed Flux reconciliations               |
+| `kubernetes/apps/<app>`                       | The app's namespace, database, alerts and HelmRelease        |
 
 Differences from the Ansible roles:
 
 - Merging to `main` deploys. Flux polls every minute, so there is no playbook
   run to trigger, and CI validates every kustomization before merge.
-- Templating is limited to `${var}` substitution from the `cluster-vars`
-  ConfigMap, which the core role writes from `group_vars/all.yaml`.
-- sops files are decrypted in-cluster with the `sops-age` Secret. A Helm values
-  file stays a sops file and becomes a Secret through a kustomize
-  `secretGenerator`, read by the HelmRelease's `valuesFrom`.
+- There is no templating. Manifests hold literal values, so what is in Git is
+  what is applied; values that also live in `group_vars/all.yaml` are
+  duplicated until the Ansible side no longer needs them.
+- sops files under `kubernetes/` are encrypted to a second, cluster-only age
+  key as well as the personal one (see `.sops.yaml`). Flux holds that key as
+  the `sops-age` Secret, and it cannot decrypt anything outside `kubernetes/`.
+  A Helm values file stays a sops file and becomes a Secret through a
+  kustomize `secretGenerator`, read by the HelmRelease's `valuesFrom`.
+- Failed reconciliations post to the same Discord channel as Alertmanager.
 - Namespaces and database Clusters carry
   `kustomize.toolkit.fluxcd.io/prune: disabled`, so deleting their files never
   deletes their data.
