@@ -18,10 +18,9 @@ spec:
         namespace: flux-system
       interval: 1h
   interval: 30m
-  timeout: 5m
-  maxHistory: 5
-  # The equivalents of the --atomic and --cleanup-on-fail flags the helm role
-  # passes.
+  # With retries set, a failed install is uninstalled and a failed upgrade
+  # rolled back: the equivalent of the --atomic and --cleanup-on-fail flags
+  # the helm role passes.
   install:
     remediation:
       retries: 3
@@ -29,8 +28,6 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-      remediateLastFailure: true
-      strategy: rollback
   # Report drift as events without correcting it yet. Switch to enabled once
   # the events show nothing unexpected.
   driftDetection:
@@ -128,16 +125,15 @@ spec:
     httpRoute:
       enabled: true
       parentRefs:
-        - name: ${gateway_name}
-          namespace: ${gateway_namespace}
-          sectionName: ${gateway_public_listener_name}
+        - name: poseidon
+          namespace: envoy-gateway-system
+          sectionName: https-wildcard
       hostnames:
-        - devscura.${external_domain}
+        - devscura.barrelmaker.dev
       filters:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
             # Mirrors gateway_response_headers in group_vars/all.yaml.
-            # Substitution only handles strings, so the list is written out.
             set:
               - name: Strict-Transport-Security
                 value: max-age=63072000; includeSubDomains; preload

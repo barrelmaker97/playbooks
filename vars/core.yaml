@@ -30,8 +30,8 @@ longhorn_snapshot_max_count: 50
 
 # Flux syncs flux_sync_path from this repository. flux_version is the Flux
 # distribution the operator installs, separate from the operator chart itself.
-flux_version: "2.9.5"
+# A semver range: the operator applies Flux patch releases on its own.
+flux_version: "2.9.x"
 flux_sync_url: https://github.com/barrelmaker97/playbooks.git
 flux_sync_ref: refs/heads/main
 flux_sync_path: kubernetes/clusters/poseidon
-flux_sops_age_key_file: "{{ lookup('env', 'HOME') }}/.config/sops/age/keys.txt"

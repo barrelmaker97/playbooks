@@ -149,7 +149,9 @@ argument_specs:
         type: str
         required: true
       flux_version:
-        description: Flux distribution version the FluxInstance installs.
+        description:
+          - Flux distribution version the FluxInstance installs, as an exact
+            version or a semver range.
         type: str
         required: true
       flux_sync_url:
@@ -164,11 +166,5 @@ argument_specs:
         required: true
       flux_sync_path:
         description: Directory within the repository that Flux applies.
-        type: str
-        required: true
-      flux_sops_age_key_file:
-        description:
-          - Local age key file loaded into the sops-age Secret so Flux can
-            decrypt the sops files it applies.
         type: str
         required: true

@@ -26,7 +26,3 @@ generatorOptions:
   disableNameSuffixHash: true
   labels:
     reconcile.fluxcd.io/watch: Enabled
-  # Decryption runs before substitution, so a secret value containing ${...}
-  # would otherwise be rewritten.
-  annotations:
-    kustomize.toolkit.fluxcd.io/substitute: disabled

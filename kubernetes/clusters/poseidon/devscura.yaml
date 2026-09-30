@@ -20,9 +20,3 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
-  # cluster-vars is written by the core role from group_vars/all.yaml, so
-  # Ansible stays the single source for domains and gateway names.
-  postBuild:
-    substituteFrom:
-      - kind: ConfigMap
-        name: cluster-vars

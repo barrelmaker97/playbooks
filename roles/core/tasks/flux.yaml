@@ -18,40 +18,14 @@
     helm_chart_version: "{{ flux_operator_version }}"
     helm_chart_namespace: flux-system
 
-# Flux looks for keys ending in .agekey.
+# The cluster's own age key, which decrypts only files under kubernetes/ (see
+# .sops.yaml). Namespace is set here because the sops MAC covers metadata.
 - name: Create Flux SOPS Age Key Secret
   kubernetes.core.k8s:
     state: present
-    definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: sops-age
-        namespace: flux-system
-      type: Opaque
-      stringData:
-        age.agekey: "{{ lookup('file', flux_sops_age_key_file) }}"
+    namespace: flux-system
+    definition: "{{ lookup('community.sops.sops', 'files/secret-sops-age.sops.yaml') | from_yaml }}"
   no_log: true
-
-# Values Flux substitutes into manifests as ${name}. Written from group_vars so
-# the domains and gateway names keep a single source while both tools deploy.
-- name: Create Flux Cluster Variables
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: cluster-vars
-        namespace: flux-system
-      data:
-        cluster_domain: "{{ cluster_domain }}"
-        external_domain: "{{ external_domain }}"
-        gateway_name: "{{ gateway_name }}"
-        gateway_namespace: "{{ gateway_namespace }}"
-        gateway_lan_listener_name: "{{ gateway_lan_listener_name }}"
-        gateway_apex_listener_name: "{{ gateway_apex_listener_name }}"
-        gateway_public_listener_name: "{{ gateway_public_listener_name }}"
 
 - name: Create Flux Instance
   kubernetes.core.k8s:
