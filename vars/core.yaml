@@ -15,6 +15,7 @@ tempo_version: "1.26.5"
 otel_collector_version: "0.145.0"
 kube_prometheus_stack_version: "82.13.0"
 metrics_server_version: "3.14.0"
+flux_operator_version: "0.60.0"
 
 # Contact address registered with the ACME issuers
 email_address: nolancooper97@gmail.com
@@ -26,3 +27,11 @@ gateway_ip: 192.168.15.60
 # Hard cap on snapshots per volume; blocks new snapshots once reached. The
 # alert in prometheusrule-longhorn-snapshots fires just below this value.
 longhorn_snapshot_max_count: 50
+
+# Flux syncs flux_sync_path from this repository. flux_version is the Flux
+# distribution the operator installs, separate from the operator chart itself.
+# A semver range: the operator applies Flux patch releases on its own.
+flux_version: "2.9.x"
+flux_sync_url: https://github.com/barrelmaker97/playbooks.git
+flux_sync_ref: refs/heads/main
+flux_sync_path: kubernetes/clusters/poseidon

@@ -1,17 +1,12 @@
 ---
+# devscura (namespace obscura-dev, its PostgreSQL cluster and its release)
+# is deployed by Flux from kubernetes/apps/devscura instead.
 workloads_namespaces:
   barrelmaker:
     labels: {}
     requests_cpu: "10"
     requests_memory: 30Gi
   obscura:
-    labels:
-      pod-security.kubernetes.io/enforce: baseline
-      pod-security.kubernetes.io/audit: restricted
-      pod-security.kubernetes.io/warn: restricted
-    requests_cpu: "2"
-    requests_memory: 4Gi
-  obscura-dev:
     labels:
       pod-security.kubernetes.io/enforce: baseline
       pod-security.kubernetes.io/audit: restricted
@@ -48,27 +43,6 @@ workloads_postgresql_clusters:
         memory: 512Mi
       limits:
         memory: 1Gi
-  devscura-postgres:
-    namespace: obscura-dev
-    description: Development PostgreSQL cluster for Obscura
-    instances: 1
-    enable_pdb: false
-    database: obscura
-    owner: obscura
-    storage_size: 8Gi
-    availability_alert_severity: warning
-    parameters:
-      idle_in_transaction_session_timeout: 5min
-      track_io_timing: "on"
-      track_wal_io_timing: "on"
-    pg_hba:
-      - hostnossl all all all reject
-    resources:
-      requests:
-        cpu: 200m
-        memory: 512Mi
-      limits:
-        memory: 1Gi
 
 workloads_helm_releases:
   jellyfin:
@@ -92,10 +66,6 @@ workloads_helm_releases:
     ref: barrelmaker/obscura
     version: 0.13.1
     namespace: obscura
-  devscura:
-    ref: barrelmaker/obscura
-    version: 0.13.1
-    namespace: obscura-dev
   valheim:
     ref: barrelmaker/valheim
     namespace: barrelmaker

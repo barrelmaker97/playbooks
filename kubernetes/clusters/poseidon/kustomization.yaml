@@ -1,0 +1,9 @@
+---
+# Entry point for Flux. The FluxInstance created by the core role syncs this
+# directory; everything Flux manages is reachable from the list below.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - repositories.yaml
+  - flux-notifications.yaml
+  - devscura.yaml

@@ -1,0 +1,46 @@
+---
+- name: Create Flux Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: flux-system
+
+- name: Deploy Flux Operator
+  ansible.builtin.include_role:
+    name: helm
+    tasks_from: deploy
+  vars:
+    helm_chart_name: flux-operator
+    helm_chart_ref: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
+    helm_chart_version: "{{ flux_operator_version }}"
+    helm_chart_namespace: flux-system
+
+# The cluster's own age key, which decrypts only files under kubernetes/ (see
+# .sops.yaml). Namespace is set here because the sops MAC covers metadata.
+- name: Create Flux SOPS Age Key Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: flux-system
+    definition: "{{ lookup('community.sops.sops', 'files/secret-sops-age.sops.yaml') | from_yaml }}"
+  no_log: true
+
+- name: Create Flux Instance
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'fluxinstance.yaml.j2') | from_yaml }}"
+
+- name: Wait for Flux Instance
+  kubernetes.core.k8s_info:
+    api_version: fluxcd.controlplane.io/v1
+    kind: FluxInstance
+    name: flux
+    namespace: flux-system
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_sleep: 10
+    wait_timeout: 600

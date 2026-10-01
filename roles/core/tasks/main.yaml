@@ -13,10 +13,15 @@
     core_role_path: "{{ role_path }}"
   tags: [always]
 
+# include_role is dynamic: tags on it select only the include, so apply
+# passes always down to the setup tasks. Without it, any --tags run skipped
+# installing Helm and refreshing the chart repositories.
 - name: Setup Helm
   ansible.builtin.include_role:
     name: helm
     tasks_from: setup
+    apply:
+      tags: [always]
   vars:
     helm_repos:
       cloudnative-pg: https://cloudnative-pg.github.io/charts
@@ -64,3 +69,9 @@
 - name: Configure routing
   ansible.builtin.import_tasks: routing.yaml
   tags: [routing]
+
+# Last, so everything Flux-managed resources depend on (CRDs, storage classes,
+# the Gateway) already exists when the first sync runs.
+- name: Configure Flux
+  ansible.builtin.import_tasks: flux.yaml
+  tags: [flux]

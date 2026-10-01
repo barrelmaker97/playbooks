@@ -62,7 +62,8 @@ argument_specs:
       gateway_response_headers:
         description:
           - Security headers applied by the jellyfin, niucraft, website,
-            obscura and devscura chart values. Shared with the core role.
+            obscura chart values. Shared with the core role. Flux-managed
+            releases write the list out; see kubernetes/apps.
         type: list
         elements: dict
         required: true

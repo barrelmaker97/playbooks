@@ -37,7 +37,7 @@ ansible-playbook setup.yaml
 |------------------|---------------|----------------|----------------------------------------------------------------|
 | `setup.yaml`     | localhost     | no             | Generate Talos machine configs for the control plane nodes      |
 | `user.yaml`      | localhost     | yes            | Create the cluster user, sign its cert, write a kubeconfig      |
-| `core.yaml`      | localhost     | yes            | Storage, networking, certificates and the monitoring stack      |
+| `core.yaml`      | localhost     | yes            | Storage, networking, certificates, monitoring, routing and Flux |
 | `workloads.yaml` | localhost     | yes            | Namespaces, PostgreSQL clusters and application Helm releases   |
 | `dns.yaml`       | `dns_servers` | no             | unbound, Pi-hole and keepalived on the DNS pair                 |
 | `dewpoint.yaml`  | `dns_servers` | no             | The dewpoint Govee sensor Prometheus exporter                   |
@@ -49,6 +49,54 @@ touches the DNS servers. Both support role tags:
 ```bash
 ansible-playbook dns.yaml --tags pihole
 ```
+# Flux
+Flux is being adopted one workload at a time. The core role installs the Flux
+Operator and a FluxInstance that syncs `kubernetes/clusters/poseidon` from
+`main`; each entry there is a Flux Kustomization pointing at a directory under
+`kubernetes/apps`. A workload lives in exactly one place: when it moves to
+`kubernetes/apps`, it is removed from `vars/workloads.yaml` in the same change,
+so Ansible and Flux never manage the same objects.
+
+| Path                                          | Contents                                                     |
+|-----------------------------------------------|--------------------------------------------------------------|
+| `kubernetes/clusters/poseidon`                | Entry point: Helm repositories and one Kustomization per directory below |
+| `kubernetes/infrastructure/flux-notifications`| Discord alerts for failed Flux reconciliations               |
+| `kubernetes/apps/<app>`                       | The app's namespace, database, alerts and HelmRelease        |
+
+Differences from the Ansible roles:
+
+- Merging to `main` deploys. Flux polls every minute, so there is no playbook
+  run to trigger, and CI validates every kustomization before merge.
+- There is no templating. Manifests hold literal values, so what is in Git is
+  what is applied; values that also live in `group_vars/all.yaml` are
+  duplicated until the Ansible side no longer needs them.
+- sops files under `kubernetes/` are encrypted to a second, cluster-only age
+  key as well as the personal one (see `.sops.yaml`). Flux holds that key as
+  the `sops-age` Secret, and it cannot decrypt anything outside `kubernetes/`.
+  A Helm values file stays a sops file and becomes a Secret through a
+  kustomize `secretGenerator`, read by the HelmRelease's `valuesFrom`.
+- Failed reconciliations post to the same Discord channel as Alertmanager.
+- Namespaces and database Clusters carry
+  `kustomize.toolkit.fluxcd.io/prune: disabled`, so deleting their files never
+  deletes their data.
+
+Install or update Flux itself:
+```bash
+ansible-playbook core.yaml --tags flux
+# Try a branch before merging it
+ansible-playbook core.yaml --tags flux -e flux_sync_ref=refs/heads/<branch>
+```
+
+Day to day, with the [flux CLI](https://fluxcd.io/flux/installation/#install-the-flux-cli):
+```bash
+flux get all -A                                   # Status of every Flux object
+flux reconcile kustomization devscura --with-source  # Apply now instead of waiting
+flux diff kustomization devscura --path kubernetes/apps/devscura  # Preview local changes
+flux suspend helmrelease devscura -n obscura-dev   # Pause while fixing by hand
+flux resume helmrelease devscura -n obscura-dev
+flux events -A                                    # Why something is not Ready
+```
+
 # IP Plan
 ### Cluster
 | Name         | Address                     | Hostname           |
