@@ -38,7 +38,6 @@ ansible-playbook setup.yaml
 | `setup.yaml`     | localhost     | no             | Generate Talos machine configs for the control plane nodes      |
 | `user.yaml`      | localhost     | yes            | Create the cluster user, sign its cert, write a kubeconfig      |
 | `core.yaml`      | localhost     | yes            | Storage, networking, certificates, monitoring, routing and Flux |
-| `workloads.yaml` | localhost     | yes            | Namespaces, PostgreSQL clusters and application Helm releases   |
 | `dns.yaml`       | `dns_servers` | no             | unbound, Pi-hole and keepalived on the DNS pair                 |
 | `dewpoint.yaml`  | `dns_servers` | no             | The dewpoint Govee sensor Prometheus exporter                   |
 
@@ -50,18 +49,18 @@ touches the DNS servers. Both support role tags:
 ansible-playbook dns.yaml --tags pihole
 ```
 # Flux
-Flux is being adopted one workload at a time. The core role installs the Flux
-Operator and a FluxInstance that syncs `kubernetes/clusters/poseidon` from
-`main`; each entry there is a Flux Kustomization pointing at a directory under
-`kubernetes/apps`. A workload lives in exactly one place: when it moves to
-`kubernetes/apps`, it is removed from `vars/workloads.yaml` in the same change,
-so Ansible and Flux never manage the same objects.
+Every application is deployed by Flux; Ansible deploys the core platform and
+installs Flux itself. The core role installs the Flux Operator and a
+FluxInstance that syncs `kubernetes/clusters/poseidon` from `main`. Each
+application has a Flux Kustomization in `apps.yaml` there, pointing at its own
+directory under `kubernetes/apps`.
 
 | Path                                          | Contents                                                     |
 |-----------------------------------------------|--------------------------------------------------------------|
 | `kubernetes/clusters/poseidon`                | Entry point: Helm repositories and one Kustomization per directory below |
 | `kubernetes/infrastructure/flux-notifications`| Discord alerts for failed Flux reconciliations               |
-| `kubernetes/apps/<app>`                       | The app's namespace, database, alerts and HelmRelease        |
+| `kubernetes/apps/<app>`                       | The app's HelmRelease, plus its namespace, database and alerts where it owns them |
+| `kubernetes/apps/barrelmaker`                 | The shared barrelmaker namespace, its quota and limit range  |
 
 Differences from the Ansible roles:
 

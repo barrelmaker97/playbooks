@@ -7,5 +7,4 @@
   import_playbook: user.yaml
 - name: Deploy core services
   import_playbook: core.yaml
-- name: Deploy workloads
-  import_playbook: workloads.yaml
+# Applications are deployed by Flux from kubernetes/, not from here.
