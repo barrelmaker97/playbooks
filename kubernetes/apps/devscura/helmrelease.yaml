@@ -28,10 +28,8 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-  # Report drift as events without correcting it yet. Switch to enabled once
-  # the events show nothing unexpected.
   driftDetection:
-    mode: warn
+    mode: enabled
   # The sops values only add keys that the values below do not set, so the
   # merge order (valuesFrom first, then values) does not change the result.
   valuesFrom:

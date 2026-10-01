@@ -26,7 +26,7 @@ spec:
     remediation:
       retries: 3
   driftDetection:
-    mode: warn
+    mode: enabled
   valuesFrom:
     - kind: Secret
       name: valheim-values
