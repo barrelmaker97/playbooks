@@ -1,9 +1,11 @@
 ---
-# Ordering between these files is load-bearing. Hoisted files contain only
-# shared prerequisites: Helm setup and monitoring CRDs/resources that multiple
-# sections render resources from. Domain-owned namespaces and charts live with
-# the task file that configures them, while Gateway exposure is centralized in
-# routing.
+# Ordering between these files is load-bearing. Helm setup and
+# monitoring-prereq run first because the chart sections depend on them: the
+# Helm repositories, and the monitoring namespace and CRDs that charts render
+# ServiceMonitors and PrometheusRules into. Flux needs neither, so it is not
+# tagged into monitoring-prereq. Domain-owned namespaces and charts
+# live with the task file that configures them, while Gateway exposure is
+# centralized in routing.
 #
 # These are imports, not includes: tags on an include_tasks apply only to the
 # include itself, so the tasks inside would be filtered out and a --tags run
@@ -43,7 +45,6 @@
     - networking
     - cloudnative-pg
     - routing
-    - shared
     - storage
 
 - name: Configure storage
