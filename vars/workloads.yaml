@@ -59,9 +59,6 @@ workloads_helm_releases:
     ref: barrelmaker/website
     version: 0.6.2
     namespace: barrelmaker
-  factorio:
-    ref: barrelmaker/factorio
-    namespace: barrelmaker
   loch:
     ref: barrelmaker/factorio
     namespace: barrelmaker
