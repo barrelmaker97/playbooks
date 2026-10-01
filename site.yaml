@@ -3,8 +3,10 @@
 # fresh Talos admin certificate and merges it as a new client context, so
 # including it here accumulated a context per site.yaml run. Run it by hand
 # when building or rebuilding the cluster.
-- name: Create cluster user
-  import_playbook: user.yaml
+#
+# user.yaml is absent too: it issues a new client certificate and rewrites
+# ~/.kube/config on every run. Run it by hand when the kubeconfig needs
+# creating or renewing.
 - name: Deploy core services
   import_playbook: core.yaml
 # Applications are deployed by Flux from kubernetes/, not from here.

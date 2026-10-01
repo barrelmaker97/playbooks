@@ -26,7 +26,9 @@ ansible-playbook site.yaml
 `setup.yaml` is not part of `site.yaml`. It generates Talos machine
 configuration for a new cluster and mints a fresh admin client certificate each
 time it runs, so it is a bootstrap step to run deliberately rather than on every
-converge.
+converge. `user.yaml` is left out for the same reason: it issues a new client
+certificate and rewrites `~/.kube/config`, so run it when the kubeconfig needs
+creating or renewing.
 
 Individual playbooks can be run in a similar manner:
 ```bash
@@ -36,7 +38,7 @@ ansible-playbook setup.yaml
 | Playbook         | Targets       | In `site.yaml` | Purpose                                                        |
 |------------------|---------------|----------------|----------------------------------------------------------------|
 | `setup.yaml`     | localhost     | no             | Generate Talos machine configs for the control plane nodes      |
-| `user.yaml`      | localhost     | yes            | Create the cluster user, sign its cert, write a kubeconfig      |
+| `user.yaml`      | localhost     | no             | Create the cluster user, sign its cert, write a kubeconfig      |
 | `core.yaml`      | localhost     | yes            | Storage, networking, certificates, monitoring, routing and Flux |
 | `dns.yaml`       | `dns_servers` | no             | unbound, Pi-hole and keepalived on the DNS pair                 |
 | `dewpoint.yaml`  | `dns_servers` | no             | The dewpoint Govee sensor Prometheus exporter                   |

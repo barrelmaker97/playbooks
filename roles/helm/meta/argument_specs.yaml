@@ -53,8 +53,3 @@ argument_specs:
             --values when the file exists; silently skipped when it does not,
             which is how releases that need no values are handled.
         type: path
-      helm_chart_sops_file:
-        description:
-          - Absolute path to a sops-encrypted values file. Decrypted and passed
-            as an additional --values when the file exists.
-        type: path
