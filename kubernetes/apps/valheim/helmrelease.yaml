@@ -1,0 +1,32 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: valheim
+  namespace: barrelmaker
+spec:
+  releaseName: valheim
+  chart:
+    spec:
+      chart: valheim
+      # Any 0.x release: Flux upgrades within an hour of a new chart
+      # version, and stops at 1.0.0.
+      version: "0.x"
+      sourceRef:
+        kind: HelmRepository
+        name: barrelmaker
+        namespace: flux-system
+      interval: 1h
+  interval: 30m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: warn
+  valuesFrom:
+    - kind: Secret
+      name: valheim-values

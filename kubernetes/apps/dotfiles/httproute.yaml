@@ -1,5 +1,5 @@
 ---
-# Serves https://dotfiles.{{ external_domain }} as a redirect to the updot
+# Serves https://dotfiles.barrelmaker.dev as a redirect to the updot
 # script, replacing the retired ingress chart's rewrite-target hack.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -8,11 +8,11 @@ metadata:
   namespace: barrelmaker
 spec:
   parentRefs:
-    - name: "{{ gateway_name }}"
-      namespace: "{{ gateway_namespace }}"
-      sectionName: "{{ gateway_public_listener_name }}"
+    - name: poseidon
+      namespace: envoy-gateway-system
+      sectionName: https-wildcard
   hostnames:
-    - "dotfiles.{{ external_domain }}"
+    - dotfiles.barrelmaker.dev
   rules:
     - filters:
         - type: ResponseHeaderModifier

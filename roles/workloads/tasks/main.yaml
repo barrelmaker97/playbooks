@@ -82,11 +82,6 @@
   ansible.builtin.set_fact:
     workloads_role_path: "{{ role_path }}"
 
-- name: Create Jellyfin Media Persistent Volume
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('template', 'pv-jellyfin-media.yaml.j2') | from_yaml }}"
-
 - name: Setup Helm
   ansible.builtin.include_role:
     name: helm
@@ -113,9 +108,3 @@
       {{ workloads_role_path }}/templates/values/{{ workload_release.key }}.yaml.j2
     helm_chart_sops_file: >-
       {{ workloads_role_path }}/files/{{ workload_release.key }}.sops.yaml
-
-- name: Create Dotfiles Redirect Route
-  kubernetes.core.k8s:
-    state: present
-    definition: >-
-      {{ lookup('template', 'httproute-dotfiles.yaml.j2') | from_yaml }}

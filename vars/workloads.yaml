@@ -1,11 +1,6 @@
 ---
-# devscura (namespace obscura-dev, its PostgreSQL cluster and its release)
-# is deployed by Flux from kubernetes/apps/devscura instead.
+# Everything except obscura is deployed by Flux from kubernetes/apps.
 workloads_namespaces:
-  barrelmaker:
-    labels: {}
-    requests_cpu: "10"
-    requests_memory: 30Gi
   obscura:
     labels:
       pod-security.kubernetes.io/enforce: baseline
@@ -45,36 +40,7 @@ workloads_postgresql_clusters:
         memory: 1Gi
 
 workloads_helm_releases:
-  jellyfin:
-    ref: barrelmaker/jellyfin
-    namespace: barrelmaker
-  niucraft:
-    ref: barrelmaker/minecraft
-    namespace: barrelmaker
-  pistachio:
-    ref: barrelmaker/pistachio
-    version: 0.3.1
-    namespace: barrelmaker
-  website:
-    ref: barrelmaker/website
-    version: 0.6.2
-    namespace: barrelmaker
-  loch:
-    ref: barrelmaker/factorio
-    namespace: barrelmaker
   obscura:
     ref: barrelmaker/obscura
     version: 0.13.1
     namespace: obscura
-  valheim:
-    ref: barrelmaker/valheim
-    namespace: barrelmaker
-
-  # gmod:
-  #   ref: barrelmaker/gmod
-  #   namespace: barrelmaker
-
-  # satisfactory:
-  #   ref: barrelmaker/satisfactory
-  #   namespace: barrelmaker
-  #   timeout: 10m

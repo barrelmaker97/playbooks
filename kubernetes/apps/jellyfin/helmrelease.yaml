@@ -1,0 +1,77 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: jellyfin
+  namespace: barrelmaker
+spec:
+  releaseName: jellyfin
+  chart:
+    spec:
+      chart: jellyfin
+      # Any 0.x release: Flux upgrades within an hour of a new chart
+      # version, and stops at 1.0.0.
+      version: "0.x"
+      sourceRef:
+        kind: HelmRepository
+        name: barrelmaker
+        namespace: flux-system
+      interval: 1h
+  interval: 30m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: warn
+  values:
+    persistence:
+      config:
+        storageClassName: longhorn-protected
+        size: 3Gi
+      media:
+        storageClassName: jellyfin-media
+        size: 50Gi
+
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - name: "poseidon"
+          namespace: "envoy-gateway-system"
+          sectionName: "https-wildcard"
+      hostnames:
+        - "jellyfin.barrelmaker.dev"
+      filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set:
+              - name: "Strict-Transport-Security"
+                value: "max-age=63072000; includeSubDomains; preload"
+              - name: "Referrer-Policy"
+                value: "same-origin"
+              - name: "X-Content-Type-Options"
+                value: "nosniff"
+
+    resources:
+      requests:
+        cpu: 700m
+        memory: 2500Mi
+      limits:
+        memory: 3000Mi
