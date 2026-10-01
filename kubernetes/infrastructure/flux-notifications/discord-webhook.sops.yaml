@@ -5,7 +5,7 @@ metadata:
     namespace: flux-system
 type: Opaque
 stringData:
-    address: ENC[AES256_GCM,data:q8bfL18PkN+OLDdrf1KYov4WpCDKE073OlNS+xcadgte+FB1BTjcTGtozx32P5xQuBEDj4/TneRxNe6jChfcR0MF79R4DIlEFCFYEhYZO11L34k7R1/njtlTod9wphUN68l5oOCiLRQodZigJ3HBACldGOA6sKAicoOu/A==,iv:1/aeDTeQegSAkqlUEUN/SOrRYWPRZ77tPTcYZfVfwoE=,tag:UIql+u+BmqM9zZCrm1iPBQ==,type:str]
+    address: ENC[AES256_GCM,data:2gERTK5tTW4BxSZR8DZ7MQPooduQTdMyAekomMXmYavGKoNJfhRdg3+tA612/PkX3Pm6VwNvI+MkaGkgI7jHpkLvHm+BspiGEUAsXtpwMZ6EOuI8YhsX5CzsW8eeLcKC07n7c68KyIyrE6zkIKUkHVXcD6lk7lMjDw==,iv:54v07ZH7JmLxoFAIed7VcGsM8Y9OISgu45vXseIocD0=,tag:kA85E2VaOJrt7HoIHy+vwg==,type:str]
 sops:
     age:
         - enc: |
@@ -27,6 +27,6 @@ sops:
             -----END AGE ENCRYPTED FILE-----
           recipient: age1d70v7e0uyptut9mjuh06zsdt7udslentsp3ernvtwhemnlgz6s3s2587sr
     encrypted_regex: (^data|^stringData|^cluster|^secrets|^jwtSecret|^certs|^trustdinfo|^credentialsJson|^secret_key$|.*[Pp]assword$)
-    lastmodified: "2026-09-30T23:54:12Z"
-    mac: ENC[AES256_GCM,data:0PlqBveTpAALOGgpLK8T8PgdYc3iKY0BJXqh6zFQRiRQ8pSJMZ9DGIPr3MU5RKZUdM5fgplYLVafcu1CK43cNUnCQug2gtpfDdduoHAZesLAju3Pp4f5RceHMsal2LlhjZ5iqECJ+qhxAwu9keLqlWxrJv7wF1jU/uBmIgPcQHA=,iv:0/lQflCPu1m3I4TavAAPuUCIRPi8z583DnXV1fz9gbc=,tag:CYrqepyqaumh44KG34u6QQ==,type:str]
+    lastmodified: "2026-10-01T00:16:49Z"
+    mac: ENC[AES256_GCM,data:idTsA9NwOJElmcMKuLdFlo6a+riY1Bf+ciRl5CHBNUAX3O5KRx3WikEbySART/V7fVSZIxSRgYtobzQj07UNc+aUC7vjEt4AyrrVh2qFPKPROHsXMiyCAwnSTb+QpwAWDqmp+U+ocZaG6bxAxBlCz6DWh1VjS/xAi2FNz8VqRcA=,iv:11qyhKMf6wWnyRq8q1gTQe9zTO3HgSnMT7Y0pnJrIeg=,tag:Z+mS4o0UhynKps3zGQ8/ZA==,type:str]
     version: 3.13.3
