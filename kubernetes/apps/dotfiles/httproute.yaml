@@ -1,0 +1,35 @@
+---
+# Serves https://dotfiles.barrelmaker.dev as a redirect to the updot
+# script, replacing the retired ingress chart's rewrite-target hack.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: dotfiles
+  namespace: barrelmaker
+spec:
+  parentRefs:
+    - name: poseidon
+      namespace: envoy-gateway-system
+      sectionName: https-wildcard
+  hostnames:
+    - dotfiles.barrelmaker.dev
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set:
+              - name: Strict-Transport-Security
+                value: max-age=63072000; includeSubDomains; preload
+              - name: Referrer-Policy
+                value: same-origin
+              - name: X-Content-Type-Options
+                value: nosniff
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            hostname: raw.githubusercontent.com
+            port: 443
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /barrelmaker97/dotfiles/master/bin/updot
+            statusCode: 302

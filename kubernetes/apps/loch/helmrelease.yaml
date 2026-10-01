@@ -1,0 +1,74 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: loch
+  namespace: barrelmaker
+spec:
+  releaseName: loch
+  chart:
+    spec:
+      chart: factorio
+      # Any 0.x release: Flux upgrades within an hour of a new chart
+      # version, and stops at 1.0.0.
+      version: "0.x"
+      sourceRef:
+        kind: HelmRepository
+        name: barrelmaker
+        namespace: flux-system
+      interval: 1h
+  interval: 30m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: warn
+  valuesFrom:
+    - kind: Secret
+      name: loch-values
+  values:
+    server:
+      name: L.O.C.H Factory
+      description: Lasciate ogne speranza, voi ch'intrate
+      maxPlayers: 5
+      public: false
+    config:
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+      resources:
+        requests:
+          cpu: 20m
+          memory: 20Mi
+        limits:
+          cpu: 60m
+          memory: 60Mi
+    persistence:
+      storageClassName: longhorn-protected
+      size: 5Gi
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      runAsNonRoot: true
+      runAsUser: 845
+      runAsGroup: 845
+      fsGroup: 845
+    securityContext:
+      capabilities:
+        drop:
+          - ALL
+    service:
+      type: LoadBalancer
+      port: 34197
+    resources:
+      requests:
+        cpu: 800m
+        memory: 3000Mi
+      limits:
+        memory: 3100Mi

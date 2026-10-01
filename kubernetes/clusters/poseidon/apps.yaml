@@ -1,0 +1,194 @@
+# One Kustomization per app, so a failure is reported by app name and blocks
+# nothing else. Apps in the shared barrelmaker namespace wait for the
+# Kustomization that creates it. wait: true makes each one Ready only once
+# everything it applied is healthy, including its HelmRelease.
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: barrelmaker
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/barrelmaker
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: dotfiles
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/dotfiles
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+  dependsOn:
+    - name: barrelmaker
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: jellyfin
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/jellyfin
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+  dependsOn:
+    - name: barrelmaker
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: niucraft
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/niucraft
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+  dependsOn:
+    - name: barrelmaker
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: pistachio
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/pistachio
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+  dependsOn:
+    - name: barrelmaker
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: website
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/website
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+  dependsOn:
+    - name: barrelmaker
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: loch
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/loch
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+  dependsOn:
+    - name: barrelmaker
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: valheim
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/valheim
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+  dependsOn:
+    - name: barrelmaker
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: obscura
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/obscura
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: devscura
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/devscura
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: true
+  wait: true
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

@@ -1,0 +1,140 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: obscura
+  namespace: obscura
+spec:
+  releaseName: obscura
+  chart:
+    spec:
+      chart: obscura
+      version: "0.13.1"
+      sourceRef:
+        kind: HelmRepository
+        name: barrelmaker
+        namespace: flux-system
+      interval: 1h
+  interval: 30m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: warn
+  valuesFrom:
+    - kind: Secret
+      name: obscura-values
+  values:
+    replicaCount: 3
+
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+
+    topologySpreadConstraints:
+      - maxSkew: 1
+        minDomains: 3
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: obscura
+            app.kubernetes.io/instance: obscura
+        matchLabelKeys:
+          - pod-template-hash
+
+    obscura:
+      database:
+        existingSecret:
+          name: obscura-postgres-app
+          key: uri
+      telemetry:
+        otlpEndpoint: http://otel.monitoring.svc.cluster.local:4317
+        logFormat: json
+      server:
+        trustedProxies: 10.244.0.0/16
+      fcm:
+        projectId: obscura-af88b
+
+    postgresql:
+      enabled: false
+
+    rustfs:
+      storageclass:
+        name: longhorn-protected
+        dataStorageSize: 10Gi
+      secret:
+        rustfs:
+          access_key: obscura
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 512Mi
+      podSecurityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsUser: 10001
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+
+    bucketSetup:
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+
+    podSecurityContext:
+      fsGroup: 10001
+      runAsGroup: 10001
+      runAsUser: 10001
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
+
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - name: "poseidon"
+          namespace: "envoy-gateway-system"
+          sectionName: "https-wildcard"
+      hostnames:
+        - "obscura.barrelmaker.dev"
+      filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set:
+              - name: "Strict-Transport-Security"
+                value: "max-age=63072000; includeSubDomains; preload"
+              - name: "Referrer-Policy"
+                value: "same-origin"
+              - name: "X-Content-Type-Options"
+                value: "nosniff"
+
+    securityPolicy:
+      cors:
+        enabled: true
+        allowOrigins:
+          - https://*.obscura-client-web.pages.dev
+          - https://obscura-client-web.pages.dev

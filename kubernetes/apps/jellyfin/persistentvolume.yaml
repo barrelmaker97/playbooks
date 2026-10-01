@@ -1,0 +1,19 @@
+---
+# Static NFS volume for the media library on the NAS. The chart's media PVC
+# binds to it through the jellyfin-media storage class name.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-media
+  annotations:
+    # The data lives on the NAS; never let a deleted file unbind the library.
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: jellyfin-media
+  nfs:
+    server: soteria.lan
+    path: /volume1/local_only/content/media

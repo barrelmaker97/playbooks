@@ -1,0 +1,48 @@
+serverName: Barrelmaker
+worldName: Asgard
+public: false
+metrics: true
+password: ENC[AES256_GCM,data:+TYDz0gvj3a/bQ==,iv:35Sts08Fv4Q4O6UOaHDgA64kM0aWYBBRTkf5nJzf5TE=,tag:BqLZ4Rh2jO7nx2erdbp6og==,type:str]
+persistence:
+    storageClassName: longhorn-protected
+    size: 10Gi
+podSecurityContext:
+    seccompProfile:
+        type: RuntimeDefault
+    runAsNonRoot: true
+    runAsUser: 111
+    runAsGroup: 1000
+    fsGroup: 1000
+service:
+    type: LoadBalancer
+    port: 2456
+resources:
+    requests:
+        cpu: 700m
+        memory: 3000Mi
+    limits:
+        memory: 4000Mi
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBlaWxTQ2d4b0pjWGNVNDBa
+            R2N5Vkxod1VjbkwweW5qc1RZT2NuQS9LeUhvCmFCTEx1T1JpS2RVeHJESWV1Tmpt
+            MzN1T2ZPa2V6R2RIKzNBRXl5aVpvQWsKLS0tIHdHMXlNY0Q5NGduNFdLRENGOXBU
+            OU9NQSswRVRYZlhqN0ZFZ3hoMy9ucUEKHe9FKnFFyGTbA+SWNBSHYNBOEchQCoMh
+            bccmVU3i7JwEVE8pgO6ZxDjquB8YoJOqDWc5RCCjautBFMLnwsYPdA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1wk5ucdcd2nzjs2ztpfhr2l0ds284p284f2c7grcmns7hsl0hp42syku7c6
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBLVE1STTA2aUdCZ0tBUE94
+            M0p2TGg0cEJQWTVJYXAzRFRkWmkxVDdxcUh3CmNZT0dFK1ZSb2FUcDBuTitybms1
+            Z3h1WTgwMjZ0N3p2SVZXaHBqcHRlMTAKLS0tIFZ0MnQwUkZWNVF2Y09QQ0lyL3V4
+            and2azhVZlJLS1FsZHpZM2FlZm5KUVUKCwyTqaM9k/C7mIKL+jl/ZtBql8IVPvni
+            ixhvyP9kCgIBVBzDZwvqVVfEn8CRSM6uqQeBqX/BHK5pFdC/x3jYtg==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1d70v7e0uyptut9mjuh06zsdt7udslentsp3ernvtwhemnlgz6s3s2587sr
+    encrypted_regex: (^data|^stringData|^cluster|^secrets|^certs|^trustdinfo|^password)
+    lastmodified: "2026-08-14T04:42:32Z"
+    mac: ENC[AES256_GCM,data:9t0qgYmEQHxK7Pqt18B3FiYP3JH07PRU6LgS7vc7C5H2iXPq3kULG/cm70vLt9uTvYTJZW5M1tfmmMQPcJwNqZ9P5jsrCBH4NdlYcXqoZr4LBc9EZC98hp4s4JV9wL51hrHKmDYqunPyUH57st001iKunbvMwBpgSEv327fT1tQ=,iv:HrkwlDhVKkHhNOhY6mz8RtzPdLuVe7RzUnaQNPvZnFA=,tag:glyjSkbfauOJd1v7aFzcgQ==,type:str]
+    version: 3.9.4

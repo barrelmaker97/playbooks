@@ -1,0 +1,12 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: obscura-postgres
+  namespace: obscura
+spec:
+  selector:
+    matchLabels:
+      cnpg.io/cluster: obscura-postgres
+  podMetricsEndpoints:
+    - port: metrics

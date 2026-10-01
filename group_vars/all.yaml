@@ -33,8 +33,8 @@ gateway_lan_listener_name: https-lan-wildcard
 gateway_apex_listener_name: https-apex
 gateway_public_listener_name: https-wildcard
 
-# Shared: applied by the core role's Grafana route and by several workload
-# charts to their own routes.
+# Applied by the core role's Grafana route. The Flux-managed apps under
+# kubernetes/apps write the same three headers out in their own routes.
 gateway_response_headers:
   - name: Strict-Transport-Security
     value: "max-age=63072000; includeSubDomains; preload"

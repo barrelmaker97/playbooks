@@ -1,0 +1,24 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - resourcequota.yaml
+  - limitrange.yaml
+  - postgres-cluster.yaml
+  - postgres-podmonitor.yaml
+  - postgres-prometheusrule.yaml
+  - helmrelease.yaml
+
+# kustomize-controller decrypts values.sops.yaml before building; see
+# kubernetes/apps/devscura/kustomization.yaml.
+secretGenerator:
+  - name: obscura-values
+    namespace: obscura
+    files:
+      - values.yaml=values.sops.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    reconcile.fluxcd.io/watch: Enabled
