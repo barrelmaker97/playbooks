@@ -1,4 +1,4 @@
-# playbooks
+# homelab
 GitOps and Ansible for the poseidon homelab cluster and the hosts around it.
 Flux deploys everything on the cluster from `kubernetes/`; Ansible builds and
 bootstraps the cluster, issues the local kubeconfig, and manages the DNS and
