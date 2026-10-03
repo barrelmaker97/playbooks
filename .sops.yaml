@@ -2,7 +2,7 @@
 # cluster key, which Flux holds as the sops-age Secret; that key can decrypt
 # nothing else, so the Talos secrets and other Ansible-only files stay out of
 # the cluster's reach. The cluster key itself is stored in
-# roles/core/files/secret-sops-age.sops.yaml, encrypted to the personal key
+# ansible/roles/flux/files/secret-sops-age.sops.yaml, encrypted to the personal key
 # only.
 creation_rules:
   - path_regex: ^kubernetes/.*\.sops\.ya?ml$

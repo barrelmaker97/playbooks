@@ -1,0 +1,86 @@
+---
+# Bootstraps Flux on a cluster that has none, or recovers one that lost it.
+# Flux manages itself from there: the operator chart and the FluxInstance
+# live in kubernetes/clusters/poseidon/flux-system, and upgrades are commits
+# to those files. This role reads the same files, so the two can never
+# disagree, and only creates what is missing, so an old checkout can never
+# downgrade a running Flux.
+
+# kubernetes.core.helm drives the helm binary.
+- name: Install Helm
+  become: true
+  community.general.snap:
+    name: helm
+    classic: true
+    channel: latest/stable
+
+- name: Read the Flux manifests Flux syncs
+  ansible.builtin.set_fact:
+    flux_operator_source: >-
+      {{ lookup('ansible.builtin.file', flux_cluster_dir + '/flux-system/flux-operator.yaml')
+         | from_yaml_all | selectattr('kind', 'eq', 'OCIRepository') | first }}
+    flux_instance: >-
+      {{ lookup('ansible.builtin.file', flux_cluster_dir + '/flux-system/flux-instance.yaml')
+         | from_yaml }}
+
+- name: Create Flux Namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: flux-system
+
+# The cluster's own age key, which decrypts only files under kubernetes/ (see
+# .sops.yaml). It is the one secret Flux cannot hold in Git for itself, so it
+# is always kept in step from here. Namespace is set on the task because the
+# sops MAC covers metadata.
+- name: Create Flux SOPS Age Key Secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: flux-system
+    definition: "{{ lookup('community.sops.sops', 'files/secret-sops-age.sops.yaml') | from_yaml }}"
+  no_log: true
+
+- name: Check for the Flux Operator
+  kubernetes.core.helm_info:
+    name: flux-operator
+    release_namespace: flux-system
+  register: flux_operator_release
+
+- name: Install the Flux Operator
+  kubernetes.core.helm:
+    name: flux-operator
+    chart_ref: "{{ flux_operator_source.spec.url }}"
+    chart_version: "{{ flux_operator_source.spec.ref.tag }}"
+    release_namespace: flux-system
+    wait: true
+  when: not flux_operator_release.status
+
+- name: Check for the FluxInstance
+  kubernetes.core.k8s_info:
+    api_version: fluxcd.controlplane.io/v1
+    kind: FluxInstance
+    name: flux
+    namespace: flux-system
+  register: flux_instance_live
+
+- name: Create the FluxInstance
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ flux_instance }}"
+  when: flux_instance_live.resources | length == 0
+
+- name: Wait for Flux
+  kubernetes.core.k8s_info:
+    api_version: fluxcd.controlplane.io/v1
+    kind: FluxInstance
+    name: flux
+    namespace: flux-system
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_sleep: 10
+    wait_timeout: 600

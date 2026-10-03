@@ -1,0 +1,5 @@
+---
+# Read by flux.yaml. Everything else about Flux - the operator version, the
+# Flux version and the sync source - lives in Git under this directory, in
+# flux-system/, where Flux manages it.
+flux_cluster_dir: "{{ playbook_dir }}/../kubernetes/clusters/poseidon"
