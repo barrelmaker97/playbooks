@@ -1,0 +1,86 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  // Every update is a PR: CI renders the cluster (flate) and comments the
+  // rendered diff, and merging deploys. Nothing automerges.
+  extends: ['config:recommended'],
+  timezone: 'America/Chicago',
+  // Flux HelmReleases, HelmRepositories and OCIRepositories.
+  flux: {
+    managerFilePatterns: ['/^kubernetes/.+\\.ya?ml$/'],
+  },
+  customManagers: [
+    {
+      description: 'Flux version the FluxInstance installs',
+      customType: 'regex',
+      managerFilePatterns: ['/^kubernetes/clusters/.+/flux-system/flux-instance\\.yaml$/'],
+      matchStrings: ['distribution:\\s+version: "(?<currentValue>[^"]+)"'],
+      depNameTemplate: 'fluxcd/flux2',
+      datasourceTemplate: 'github-releases',
+      extractVersionTemplate: '^v(?<version>.+)$',
+    },
+    {
+      description: 'Talos version for new machine configs and the ISO',
+      customType: 'regex',
+      managerFilePatterns: ['/^ansible/vars/setup\\.yaml$/'],
+      matchStrings: ['talos_version: "(?<currentValue>[^"]+)"'],
+      depNameTemplate: 'siderolabs/talos',
+      datasourceTemplate: 'github-releases',
+      extractVersionTemplate: '^v(?<version>.+)$',
+    },
+    {
+      description: 'dewpoint exporter release installed on the DNS hosts',
+      customType: 'regex',
+      managerFilePatterns: ['/^ansible/vars/dewpoint\\.yaml$/'],
+      matchStrings: ['dewpoint_version: "(?<currentValue>[^"]+)"'],
+      depNameTemplate: 'barrelmaker97/dewpoint',
+      datasourceTemplate: 'github-releases',
+      extractVersionTemplate: '^v(?<version>.+)$',
+    },
+    {
+      description: 'PostgreSQL image of CloudNativePG Clusters, tag and digest',
+      customType: 'regex',
+      managerFilePatterns: ['/^kubernetes/.+\\.ya?ml$/'],
+      matchStrings: ['imageName: (?<depName>[^:\\s]+):(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)'],
+      datasourceTemplate: 'docker',
+    },
+  ],
+  packageRules: [
+    {
+      description: 'Major updates wait on the Dependency Dashboard until approved: they usually need migration work',
+      matchUpdateTypes: ['major'],
+      dependencyDashboardApproval: true,
+    },
+    {
+      description: 'Flux: the CLI, the FluxInstance version and the operator move together',
+      matchDepNames: ['flux2', 'fluxcd/flux2', 'ghcr.io/controlplaneio-fluxcd/charts/flux-operator'],
+      groupName: 'Flux',
+    },
+    {
+      description: 'Talos: talosctl must match the Talos version',
+      matchDepNames: ['talosctl', 'siderolabs/talos'],
+      groupName: 'Talos',
+    },
+    {
+      description: 'CloudNativePG: the operator chart and the kubectl plugin',
+      matchDepNames: ['cloudnative-pg', 'aqua:cloudnative-pg/cloudnative-pg/kubectl-cnpg'],
+      groupName: 'CloudNativePG',
+    },
+    {
+      description: 'kubectl follows the cluster, which is upgraded with talosctl upgrade-k8s; only patches here',
+      matchDepNames: ['kubectl'],
+      matchUpdateTypes: ['minor', 'major'],
+      enabled: false,
+    },
+    {
+      description: 'Without this, the newest patch hides behind the disabled minor and never arrives',
+      matchDepNames: ['kubectl'],
+      separateMinorPatch: true,
+    },
+    {
+      description: 'A PostgreSQL major version is a data migration, not a bump',
+      matchDepNames: ['ghcr.io/cloudnative-pg/postgresql'],
+      matchUpdateTypes: ['major'],
+      enabled: false,
+    },
+  ],
+}
