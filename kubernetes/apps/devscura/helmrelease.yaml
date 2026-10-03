@@ -130,17 +130,6 @@ spec:
           sectionName: https-wildcard
       hostnames:
         - devscura.barrelmaker.dev
-      filters:
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            # The security headers every public route sets; keep them in step.
-            set:
-              - name: Strict-Transport-Security
-                value: max-age=63072000; includeSubDomains; preload
-              - name: Referrer-Policy
-                value: same-origin
-              - name: X-Content-Type-Options
-                value: nosniff
 
     securityPolicy:
       cors:

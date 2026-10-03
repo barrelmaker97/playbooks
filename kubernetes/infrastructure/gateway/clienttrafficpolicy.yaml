@@ -28,3 +28,42 @@ spec:
       - X25519MLKEM768
       - X25519
       - P-256
+---
+# The public listeners: the same TLS settings, plus the security headers
+# every public response carries. A policy targeting a listener replaces the
+# Gateway-wide one for that listener rather than merging with it, so the TLS
+# settings above are repeated here. Scoped to the public listeners only: HSTS
+# on the LAN listener would stop browsers on devices that do not trust the
+# internal CA from reaching the internal UIs at all.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: poseidon-public
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: poseidon
+      sectionName: https-apex
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: poseidon
+      sectionName: https-wildcard
+  tls:
+    alpnProtocols:
+      - h2
+      - http/1.1
+    ecdhCurves:
+      - X25519MLKEM768
+      - X25519
+      - P-256
+  headers:
+    lateResponseHeaders:
+      set:
+        - name: Strict-Transport-Security
+          value: max-age=63072000; includeSubDomains; preload
+        - name: Referrer-Policy
+          value: same-origin
+        - name: X-Content-Type-Options
+          value: nosniff
