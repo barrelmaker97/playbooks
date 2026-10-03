@@ -1,0 +1,12 @@
+---
+# Shared by the monitoring stack, and the namespace the Prometheus CRDs
+# release lives in. Privileged because node-exporter runs with the host's
+# network, PID namespace and filesystem.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged

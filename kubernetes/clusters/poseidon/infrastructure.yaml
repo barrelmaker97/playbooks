@@ -1,0 +1,22 @@
+# The cluster platform, one Kustomization per layer, ordered by dependsOn
+# from the bottom up. These differ from the apps on purpose:
+#   prune: false  removing a file never removes the platform; deleting
+#                 infrastructure is a deliberate manual step.
+#   wait: true    a layer is Ready only once everything in it is healthy,
+#                 which is what the layers above wait for.
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: monitoring-prereq
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/monitoring-prereq
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true

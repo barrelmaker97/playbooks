@@ -51,8 +51,10 @@ touches the DNS servers. Both support role tags:
 ansible-playbook dns.yaml --tags pihole
 ```
 # Flux
-Every application is deployed by Flux; Ansible deploys the core platform and
-installs Flux itself. The core role installs the Flux Operator and a
+Every application is deployed by Flux, and the core platform is moving to it
+layer by layer from the bottom up; Ansible deploys the layers that remain and
+installs Flux itself, first, waiting for Flux's layers before deploying its
+own on top. The core role installs the Flux Operator and a
 FluxInstance that syncs `kubernetes/clusters/poseidon` from `main`. Each
 application has a Flux Kustomization in `apps.yaml` there, pointing at its own
 directory under `kubernetes/apps`.
@@ -61,6 +63,7 @@ directory under `kubernetes/apps`.
 |-----------------------------------------------|--------------------------------------------------------------|
 | `kubernetes/clusters/poseidon`                | Entry point: Helm repositories and one Kustomization per directory below |
 | `kubernetes/infrastructure/flux-notifications`| Discord alerts for failed Flux reconciliations               |
+| `kubernetes/infrastructure/<layer>`           | Platform layers migrated from the core role, bottom up; see `infrastructure.yaml` |
 | `kubernetes/apps/<app>`                       | The app's HelmRelease, plus its namespace, database and alerts where it owns them |
 | `kubernetes/apps/barrelmaker`                 | The shared barrelmaker namespace, its quota and limit range  |
 
@@ -77,6 +80,13 @@ Differences from the Ansible roles:
   A Helm values file stays a sops file and becomes a Secret through a
   kustomize `secretGenerator`, read by the HelmRelease's `valuesFrom`.
 - Failed reconciliations post to the same Discord channel as Alertmanager.
+- HelmReleases fail forward: a failed install or upgrade is retried as
+  written every 15 minutes and never rolled back, so the cluster does not drift
+  from Git. Fix forward with a commit, or `git revert`. A StatefulSet stuck on a
+  bad pod also needs that pod deleted by hand once the spec is fixed.
+- Infrastructure is never pruned (removing a file does not uninstall it), its
+  CRDs are marked `helm.sh/resource-policy: keep`, and its drift is reported
+  rather than corrected until known operator-managed fields are ignored.
 - Namespaces and database Clusters carry
   `kustomize.toolkit.fluxcd.io/prune: disabled`, so deleting their files never
   deletes their data.

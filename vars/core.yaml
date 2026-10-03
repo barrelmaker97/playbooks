@@ -3,7 +3,6 @@
 # group_vars/all.yaml instead.
 
 # Chart versions
-prometheus_crds_version: "28.0.0"
 longhorn_version: "1.12.1"
 cloudnative_pg_chart_version: "0.29.0"
 metallb_version: "0.16.1"

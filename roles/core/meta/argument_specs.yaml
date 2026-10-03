@@ -96,10 +96,6 @@ argument_specs:
         type: int
         required: true
 
-      prometheus_crds_version:
-        description: Version of the prometheus-operator-crds chart.
-        type: str
-        required: true
       longhorn_version:
         description: Version of the Longhorn chart.
         type: str
