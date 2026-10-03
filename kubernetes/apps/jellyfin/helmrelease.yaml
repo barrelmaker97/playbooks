@@ -9,9 +9,7 @@ spec:
   chart:
     spec:
       chart: jellyfin
-      # Any 0.6.x patch release: Flux upgrades within an hour of a new
-      # chart version, and stops at 0.7.0.
-      version: "0.6.x"
+      version: "0.6.2"
       sourceRef:
         kind: HelmRepository
         name: barrelmaker
