@@ -182,3 +182,67 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
+
+# Layer 3: the Gateway on top of everything below it, then the routes to the
+# platform UIs, which need the services they route to.
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: envoy-gateway
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/envoy-gateway
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: gateway
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/gateway
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: envoy-gateway
+    - name: cert-manager-config
+    - name: metallb-config
+    - name: monitoring-prereq
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: routing
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/routing
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: gateway
+    - name: monitoring
+    - name: longhorn
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

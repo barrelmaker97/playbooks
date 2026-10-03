@@ -39,7 +39,7 @@ ansible-playbook setup.yaml
 |------------------|---------------|----------------|----------------------------------------------------------------|
 | `setup.yaml`     | localhost     | no             | Generate Talos machine configs for the control plane nodes      |
 | `user.yaml`      | localhost     | no             | Create the cluster user, sign its cert, write a kubeconfig      |
-| `core.yaml`      | localhost     | yes            | Flux, then the platform layer not yet in Flux: routing |
+| `core.yaml`      | localhost     | yes            | Install Flux, which deploys the platform and applications       |
 | `dns.yaml`       | `dns_servers` | no             | unbound, Pi-hole and keepalived on the DNS pair                 |
 | `dewpoint.yaml`  | `dns_servers` | no             | The dewpoint Govee sensor Prometheus exporter                   |
 
@@ -51,19 +51,18 @@ touches the DNS servers. Both support role tags:
 ansible-playbook dns.yaml --tags pihole
 ```
 # Flux
-Every application is deployed by Flux, and the core platform is moving to it
-layer by layer from the bottom up; Ansible deploys the layers that remain and
-installs Flux itself, first, waiting for Flux's layers before deploying its
-own on top. The core role installs the Flux Operator and a
-FluxInstance that syncs `kubernetes/clusters/poseidon` from `main`. Each
-application has a Flux Kustomization in `apps.yaml` there, pointing at its own
-directory under `kubernetes/apps`.
+Flux deploys the whole cluster: the platform layers in
+`kubernetes/infrastructure` and every application in `kubernetes/apps`.
+Ansible's core role only installs the Flux Operator, the cluster's sops key,
+and a FluxInstance that syncs `kubernetes/clusters/poseidon` from `main`. That
+directory holds one Flux Kustomization per platform layer
+(`infrastructure.yaml`) and per application (`apps.yaml`).
 
 | Path                                          | Contents                                                     |
 |-----------------------------------------------|--------------------------------------------------------------|
 | `kubernetes/clusters/poseidon`                | Entry point: Helm repositories and one Kustomization per directory below |
 | `kubernetes/infrastructure/flux-notifications`| Discord alerts for failed Flux reconciliations               |
-| `kubernetes/infrastructure/<layer>`           | Platform layers migrated from the core role, bottom up; see `infrastructure.yaml` |
+| `kubernetes/infrastructure/<layer>`           | Platform layers, ordered bottom up by `dependsOn` in `infrastructure.yaml` |
 | `kubernetes/apps/<app>`                       | The app's HelmRelease, plus its namespace, database and alerts where it owns them |
 | `kubernetes/apps/barrelmaker`                 | The shared barrelmaker namespace, its quota and limit range  |
 

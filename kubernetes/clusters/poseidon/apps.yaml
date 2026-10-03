@@ -3,7 +3,8 @@
 # Kustomization that creates it, and apps that create ServiceMonitors,
 # PodMonitors or PrometheusRules wait for the CRDs in monitoring-prereq, and
 # apps with a PostgreSQL Cluster wait for the cloudnative-pg operator, and
-# apps with volumes wait for Longhorn's storage classes in longhorn-config.
+# apps with volumes wait for Longhorn's storage classes in longhorn-config,
+# and apps with routes wait for the Gateway.
 # wait: true makes each one Ready only once
 # everything it applied is healthy, including its HelmRelease.
 ---
@@ -40,6 +41,7 @@ spec:
   wait: true
   dependsOn:
     - name: barrelmaker
+    - name: gateway
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -59,6 +61,7 @@ spec:
   dependsOn:
     - name: barrelmaker
     - name: longhorn-config
+    - name: gateway
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -79,6 +82,7 @@ spec:
     - name: monitoring-prereq
     - name: barrelmaker
     - name: longhorn-config
+    - name: gateway
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -116,6 +120,7 @@ spec:
   wait: true
   dependsOn:
     - name: barrelmaker
+    - name: gateway
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -182,6 +187,7 @@ spec:
     - name: monitoring-prereq
     - name: cloudnative-pg
     - name: longhorn-config
+    - name: gateway
   decryption:
     provider: sops
     secretRef:
@@ -206,6 +212,7 @@ spec:
     - name: monitoring-prereq
     - name: cloudnative-pg
     - name: longhorn-config
+    - name: gateway
   decryption:
     provider: sops
     secretRef:

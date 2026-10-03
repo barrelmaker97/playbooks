@@ -6,11 +6,11 @@ metadata:
   namespace: monitoring
 spec:
   parentRefs:
-    - name: "{{ gateway_name }}"
-      namespace: "{{ gateway_namespace }}"
-      sectionName: "{{ gateway_lan_listener_name }}"
+    - name: poseidon
+      namespace: envoy-gateway-system
+      sectionName: https-lan-wildcard
   hostnames:
-    - "prometheus.{{ cluster_domain }}"
+    - prometheus.poseidon.lan
   rules:
     - matches:
         - path:

@@ -2,21 +2,21 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: "{{ gateway_name }}"
-  namespace: "{{ gateway_namespace }}"
+  name: poseidon
+  namespace: envoy-gateway-system
 spec:
   gatewayClassName: envoy
   listeners:
-    - name: "{{ gateway_http_listener_name }}"
+    - name: http
       protocol: HTTP
       port: 80
       allowedRoutes:
         namespaces:
           from: All
-    - name: "{{ gateway_lan_listener_name }}"
+    - name: https-lan-wildcard
       protocol: HTTPS
       port: 443
-      hostname: "*.{{ cluster_domain }}"
+      hostname: "*.poseidon.lan"
       tls:
         mode: Terminate
         certificateRefs:
@@ -24,10 +24,10 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: "{{ gateway_apex_listener_name }}"
+    - name: https-apex
       protocol: HTTPS
       port: 443
-      hostname: "{{ external_domain }}"
+      hostname: barrelmaker.dev
       tls:
         mode: Terminate
         certificateRefs:
@@ -35,10 +35,10 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: "{{ gateway_public_listener_name }}"
+    - name: https-wildcard
       protocol: HTTPS
       port: 443
-      hostname: "*.{{ external_domain }}"
+      hostname: "*.barrelmaker.dev"
       tls:
         mode: Terminate
         certificateRefs:

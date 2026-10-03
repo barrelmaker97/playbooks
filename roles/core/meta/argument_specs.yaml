@@ -1,85 +1,24 @@
 ---
 argument_specs:
   main:
-    short_description: Deploy cluster-wide core services
+    short_description: Install Flux, which deploys the cluster from Git
     description:
-      - Installs the Flux Operator and the FluxInstance that syncs kubernetes/
-        from Git, waits for the platform layers Flux owns, then deploys the
-        layer not yet moved to Flux - Gateway routing.
-      - >-
-        Chart versions and this role's own tunables are supplied by the calling
-        playbook. Identity and topology values shared with other roles come
-        from group_vars, which the playbook's vars file outranks.
+      - Installs the Flux Operator, the cluster's sops age key, and the
+        FluxInstance that syncs kubernetes/ from Git. Flux deploys the whole
+        platform and every application from there.
       - >-
         Everything below stays required on purpose - a default satisfies the
         requirement, so validation fires only if one is deleted, which surfaces
         as a clear error at role entry rather than an undefined variable deep
         inside a template.
     options:
-      cluster_domain:
-        description: Internal domain the LAN wildcard certificate and routes use.
-        type: str
-        required: true
-      external_domain:
-        description: Public domain served by the Gateway's HTTPS listeners.
-        type: str
-        required: true
-      gateway_name:
-        description: Name of the Gateway object.
-        type: str
-        required: true
-      gateway_namespace:
-        description: Namespace holding the Gateway and its certificates.
-        type: str
-        required: true
-      gateway_http_listener_name:
-        description: Name of the Gateway HTTP listener.
-        type: str
-        required: true
-      gateway_lan_listener_name:
-        description: Name of the Gateway internal HTTPS wildcard listener.
-        type: str
-        required: true
-      gateway_apex_listener_name:
-        description: Name of the Gateway public apex HTTPS listener.
-        type: str
-        required: true
-      gateway_public_listener_name:
-        description: Name of the Gateway public wildcard HTTPS listener.
-        type: str
-        required: true
-      gateway_ip:
-        description: LoadBalancer address requested from MetalLB for the Gateway.
-        type: str
-        required: true
-      gateway_response_headers:
-        description: Security headers set on external HTTPS responses.
-        type: list
-        elements: dict
-        required: true
-        options:
-          name:
-            description: Header name.
-            type: str
-            required: true
-          value:
-            description: Header value.
-            type: str
-            required: true
-
-
-      envoy_gateway_version:
-        description: Version of the Envoy Gateway chart. OCI tags are v-prefixed.
-        type: str
-        required: true
       flux_operator_version:
         description: Version of the flux-operator chart.
         type: str
         required: true
       flux_version:
         description:
-          - Flux distribution version the FluxInstance installs, as an exact
-            version or a semver range.
+          - Flux distribution version the FluxInstance installs, as an exact version or a semver range.
         type: str
         required: true
       flux_sync_url:
@@ -88,8 +27,7 @@ argument_specs:
         required: true
       flux_sync_ref:
         description:
-          - Git ref Flux syncs, such as refs/heads/main. Point it at a branch
-            to try changes before merging.
+          - Git ref Flux syncs, such as refs/heads/main. Point it at a branch to try changes before merging.
         type: str
         required: true
       flux_sync_path:
