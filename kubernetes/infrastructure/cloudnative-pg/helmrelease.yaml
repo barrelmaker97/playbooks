@@ -65,8 +65,9 @@ spec:
       grafanaDashboard:
         create: true
         namespace: monitoring
-        labels:
-          grafana_dashboard: "1"
+        # The chart already labels the dashboard grafana_dashboard: "1" (its
+        # sidecarLabel default); repeating it in labels renders a duplicate
+        # key, which Flux's post-renderer rejects.
 
     resources:
       requests:
