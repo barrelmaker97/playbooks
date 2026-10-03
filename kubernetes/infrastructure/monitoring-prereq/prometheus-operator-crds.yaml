@@ -33,10 +33,8 @@ spec:
     strategy:
       name: RetryOnFailure
       retryInterval: 15m
-  # Infrastructure reports drift before correcting it: operators patch their
-  # own CRDs and webhooks, and correcting that would undo them.
   driftDetection:
-    mode: warn
+    mode: enabled
   # Uninstalling a CRD deletes every object of its kind, cluster-wide. Helm
   # skips anything marked keep, so no release removal can take the CRDs.
   postRenderers:

@@ -46,4 +46,4 @@ spec:
       name: RetryOnFailure
       retryInterval: 15m
   driftDetection:
-    mode: warn
+    mode: enabled

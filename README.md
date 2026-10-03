@@ -91,9 +91,12 @@ Differences from the Ansible roles:
   written every 15 minutes and never rolled back, so the cluster does not drift
   from Git. Fix forward with a commit, or `git revert`. A StatefulSet stuck on a
   bad pod also needs that pod deleted by hand once the spec is fixed.
-- Infrastructure is never pruned (removing a file does not uninstall it), its
-  CRDs are marked `helm.sh/resource-policy: keep`, and its drift is reported
-  rather than corrected until known operator-managed fields are ignored.
+- Infrastructure is never pruned (removing a file does not uninstall it) and
+  its CRDs are marked `helm.sh/resource-policy: keep`.
+- Every HelmRelease corrects drift: a change made by hand to an object a chart
+  manages is reverted. Fields that operators manage themselves, such as the CA
+  bundles cert-manager injects into webhooks, are not owned by Helm and are left
+  alone.
 - Namespaces and database Clusters carry
   `kustomize.toolkit.fluxcd.io/prune: disabled`, so deleting their files never
   deletes their data.
