@@ -1,10 +1,10 @@
 ---
-# Ordering between these files is load-bearing. Helm setup and
-# monitoring-prereq run first because the chart sections depend on them: the
-# Helm repositories, and the monitoring namespace and CRDs that charts render
-# ServiceMonitors and PrometheusRules into. Flux needs neither, so it is not
-# tagged into monitoring-prereq. Domain-owned namespaces and charts
-# live with the task file that configures them, while Gateway exposure is
+# Ordering between these files is load-bearing. The platform is moving to
+# Flux from the bottom up, so Flux runs first: it owns the lowest layers
+# (kubernetes/infrastructure), and its section waits for them before the
+# sections below deploy charts on top of them. Helm setup runs before every
+# section for the chart repositories. Domain-owned namespaces and charts live
+# with the task file that configures them, while Gateway exposure is
 # centralized in routing.
 #
 # These are imports, not includes: tags on an include_tasks apply only to the
@@ -37,15 +37,9 @@
       prometheus-community: https://prometheus-community.github.io/helm-charts
   tags: [always]
 
-- name: Prepare monitoring prerequisites
-  ansible.builtin.import_tasks: monitoring-prereq.yaml
-  tags:
-    - certificates
-    - monitoring
-    - networking
-    - cloudnative-pg
-    - routing
-    - storage
+- name: Configure Flux
+  ansible.builtin.import_tasks: flux.yaml
+  tags: [flux]
 
 - name: Configure storage
   ansible.builtin.import_tasks: storage.yaml
@@ -70,9 +64,3 @@
 - name: Configure routing
   ansible.builtin.import_tasks: routing.yaml
   tags: [routing]
-
-# Last, so everything Flux-managed resources depend on (CRDs, storage classes,
-# the Gateway) already exists when the first sync runs.
-- name: Configure Flux
-  ansible.builtin.import_tasks: flux.yaml
-  tags: [flux]

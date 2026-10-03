@@ -1,6 +1,8 @@
 # One Kustomization per app, so a failure is reported by app name and blocks
 # nothing else. Apps in the shared barrelmaker namespace wait for the
-# Kustomization that creates it. wait: true makes each one Ready only once
+# Kustomization that creates it, and apps that create ServiceMonitors,
+# PodMonitors or PrometheusRules wait for the CRDs in monitoring-prereq.
+# wait: true makes each one Ready only once
 # everything it applied is healthy, including its HelmRelease.
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -71,6 +73,7 @@ spec:
   prune: true
   wait: true
   dependsOn:
+    - name: monitoring-prereq
     - name: barrelmaker
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -89,6 +92,7 @@ spec:
   prune: true
   wait: true
   dependsOn:
+    - name: monitoring-prereq
     - name: barrelmaker
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -168,6 +172,8 @@ spec:
   timeout: 10m
   prune: true
   wait: true
+  dependsOn:
+    - name: monitoring-prereq
   decryption:
     provider: sops
     secretRef:
@@ -188,6 +194,8 @@ spec:
   timeout: 10m
   prune: true
   wait: true
+  dependsOn:
+    - name: monitoring-prereq
   decryption:
     provider: sops
     secretRef:

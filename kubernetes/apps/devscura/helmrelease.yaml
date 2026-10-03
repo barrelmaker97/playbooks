@@ -18,16 +18,18 @@ spec:
         namespace: flux-system
       interval: 1h
   interval: 30m
-  # With retries set, a failed install is uninstalled and a failed upgrade
-  # rolled back: the equivalent of the --atomic and --cleanup-on-fail flags
-  # the helm role passes.
+  # Fail forward: a failed action is retried as written, never rolled back
+  # or uninstalled. Fix with a commit; a stuck StatefulSet pod also needs
+  # deleting by hand.
   install:
-    remediation:
-      retries: 3
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 15m
   upgrade:
     cleanupOnFail: true
-    remediation:
-      retries: 3
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 15m
   driftDetection:
     mode: enabled
   # The sops values only add keys that the values below do not set, so the

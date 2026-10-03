@@ -6,4 +6,5 @@ kind: Kustomization
 resources:
   - repositories.yaml
   - flux-notifications.yaml
+  - infrastructure.yaml
   - apps.yaml
