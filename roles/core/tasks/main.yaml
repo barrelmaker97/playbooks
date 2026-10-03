@@ -28,7 +28,6 @@
     helm_repos:
       grafana: https://grafana.github.io/helm-charts
       grafana-community: https://grafana-community.github.io/helm-charts
-      longhorn: https://charts.longhorn.io
       metrics-server: https://kubernetes-sigs.github.io/metrics-server
       open-telemetry: https://open-telemetry.github.io/opentelemetry-helm-charts
       prometheus-community: https://prometheus-community.github.io/helm-charts
@@ -37,10 +36,6 @@
 - name: Configure Flux
   ansible.builtin.import_tasks: flux.yaml
   tags: [flux]
-
-- name: Configure storage
-  ansible.builtin.import_tasks: storage.yaml
-  tags: [storage]
 
 - name: Configure monitoring
   ansible.builtin.import_tasks: monitoring.yaml

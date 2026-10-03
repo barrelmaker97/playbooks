@@ -69,5 +69,7 @@
     - cert-manager
     - cert-manager-config
     - cloudnative-pg
+    - longhorn
+    - longhorn-config
   loop_control:
     loop_var: core_flux_layer_name

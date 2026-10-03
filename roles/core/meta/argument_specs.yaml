@@ -5,8 +5,8 @@ argument_specs:
     description:
       - Installs the Flux Operator and the FluxInstance that syncs kubernetes/
         from Git, waits for the platform layers Flux owns, then deploys the
-        layers not yet moved to Flux - storage (Longhorn and its storage
-        classes), the monitoring stack and Gateway routing.
+        layers not yet moved to Flux - the monitoring stack and Gateway
+        routing.
       - >-
         Chart versions and this role's own tunables are supplied by the calling
         playbook. Identity and topology values shared with other roles come
@@ -23,10 +23,6 @@ argument_specs:
         required: true
       external_domain:
         description: Public domain served by the Gateway's HTTPS listeners.
-        type: str
-        required: true
-      nas_domain:
-        description: Host serving the NFS share used as the Longhorn backup target.
         type: str
         required: true
       node_ips:
@@ -87,10 +83,6 @@ argument_specs:
         type: int
         required: true
 
-      longhorn_version:
-        description: Version of the Longhorn chart.
-        type: str
-        required: true
       envoy_gateway_version:
         description: Version of the Envoy Gateway chart. OCI tags are v-prefixed.
         type: str

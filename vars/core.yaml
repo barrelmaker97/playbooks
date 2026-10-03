@@ -3,7 +3,6 @@
 # group_vars/all.yaml instead.
 
 # Chart versions
-longhorn_version: "1.12.1"
 envoy_gateway_version: "v1.8.1"  # OCI chart tags are v-prefixed
 loki_version: "6.53.0"
 tempo_version: "1.26.5"
@@ -16,8 +15,9 @@ flux_operator_version: "0.60.0"
 # (kubernetes/infrastructure/metallb-config)
 gateway_ip: 192.168.15.60
 
-# Hard cap on snapshots per volume; blocks new snapshots once reached. The
-# alert in prometheusrule-longhorn-snapshots fires just below this value.
+# Longhorn's per-volume snapshot cap, read by the snapshot alerts in
+# prometheusrule-longhorn-snapshots, which fire just below it. The cap itself
+# is set in kubernetes/infrastructure/longhorn; keep the two in step.
 longhorn_snapshot_max_count: 50
 
 # Flux syncs flux_sync_path from this repository. flux_version is the Flux

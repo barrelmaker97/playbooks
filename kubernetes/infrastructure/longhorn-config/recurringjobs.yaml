@@ -1,0 +1,35 @@
+# Hourly snapshots and daily backups for volumes in the protected group:
+# everything on longhorn-protected, plus volumes labelled into the group.
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: default-snapshotter
+  namespace: longhorn-system
+spec:
+  concurrency: 1
+  cron: 15 * * * ?
+  groups:
+    - protected
+  labels: {}
+  name: default-snapshotter
+  parameters: {}
+  retain: 24
+  task: snapshot
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: default-backup
+  namespace: longhorn-system
+spec:
+  concurrency: 1
+  cron: 0 12 * * ?
+  groups:
+    - protected
+  labels: {}
+  name: default-backup
+  parameters:
+    full-backup-interval: '15'
+  retain: 30
+  task: backup
