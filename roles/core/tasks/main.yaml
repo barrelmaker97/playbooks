@@ -1,14 +1,10 @@
 ---
 # The core role installs Flux and its decryption key; Flux then deploys the
 # whole platform and every application from kubernetes/ in Git.
-- name: Set core role path
-  ansible.builtin.set_fact:
-    core_role_path: "{{ role_path }}"
-  tags: [always]
 
 # include_role is dynamic: tags on it select only the include, so apply
 # passes always down to the setup tasks. Without it, any --tags run skipped
-# installing Helm and refreshing the chart repositories.
+# installing Helm.
 - name: Setup Helm
   ansible.builtin.include_role:
     name: helm

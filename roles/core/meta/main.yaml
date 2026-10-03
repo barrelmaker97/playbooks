@@ -11,7 +11,7 @@ galaxy_info:
       versions: [all]
     - name: Ubuntu
       versions: [all]
-  galaxy_tags: [kubernetes, monitoring, networking]
+  galaxy_tags: [kubernetes, flux]
 
 # helm is pulled in with include_role + tasks_from where it is needed. Listing
 # it here would make Ansible run a tasks/main entry point it does not have.
