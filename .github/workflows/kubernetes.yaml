@@ -18,13 +18,13 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     env:
-      KUBECONFORM_VERSION: v0.8.0
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
-      - name: Install kubeconform
-        run: |
-          curl -sSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" \
-            | sudo tar xz -C /usr/local/bin kubeconform
+      - uses: jdx/mise-action@v5.0.1
+        with:
+          version: 2026.10.1
+          install_args: "kubectl kubeconform"
       - name: Build and validate
         # shell: bash adds pipefail, so a failed build cannot hand kubeconform
         # empty input and pass.
@@ -45,13 +45,16 @@ jobs:
   # flux-local.
   render:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
-      - uses: home-operations/flate/action@v0.6.5
+      - uses: jdx/mise-action@v5.0.1
+        with:
+          version: 2026.10.1
+          install_args: "github:home-operations/flate"
       - name: Render and test the whole cluster
-        # The action exports FLATE_BASE, which would test only what the PR
-        # changed; the full tree takes seconds, so test all of it.
-        run: env -u FLATE_BASE flate test all --path ./kubernetes
+        run: flate test all --path ./kubernetes
 
   # Comments the rendered diff against the base branch on the PR: the
   # objects that will actually change in the cluster, not just the lines that
@@ -61,11 +64,16 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: home-operations/flate/action@v0.6.5
+      - uses: jdx/mise-action@v5.0.1
+        with:
+          version: 2026.10.1
+          install_args: "github:home-operations/flate"
       - name: Diff rendered output
         env:
           BASE_REF: ${{ github.base_ref }}

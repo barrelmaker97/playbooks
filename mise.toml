@@ -1,0 +1,31 @@
+# Every tool this repository needs, pinned. Install with `mise install`, then
+# `mise run collections` for the Ansible collections. CI installs from this
+# same file. Versions that track something else are noted.
+
+[tools]
+# Cluster
+kubectl = "1.37.0"            # within one minor of the cluster's Kubernetes
+talosctl = "1.14.1"           # matches talos_version in ansible/vars/setup.yaml
+flux2 = "2.9.5"               # matches the FluxInstance distribution version
+helm = "4.3.0"
+"aqua:cloudnative-pg/cloudnative-pg/kubectl-cnpg" = "1.30.0"  # the CNPG operator's version
+
+# Secrets
+sops = "3.13.3"
+age = "1.2.1"
+
+# Validation, as run in CI
+kubeconform = "0.8.0"
+"github:home-operations/flate" = "0.6.5"
+
+# Ansible. ansible-core only: the collections the playbooks use are pinned in
+# ansible/requirements.yml. kubernetes.core needs the kubernetes library in
+# ansible's own environment.
+python = "3.14.8"
+uv = "0.12.10"
+"pypi:ansible-core" = { version = "2.21.3", with = ["kubernetes"] }
+"pypi:ansible-lint" = { version = "26.8.0", with = ["ansible-core==2.21.3"] }
+
+[tasks.collections]
+description = "Install the Ansible collections in ansible/requirements.yml"
+run = "ansible-galaxy collection install -r ansible/requirements.yml"

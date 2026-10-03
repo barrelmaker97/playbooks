@@ -6,22 +6,23 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
-      - name: Set up Python
-        uses: actions/setup-python@v7
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install pipx
-          pipx ensurepath
-          pipx install --include-deps ansible
-          pipx inject --include-apps ansible ansible-lint
+      # Tool versions come from mise.toml, as on a workstation.
+      - uses: jdx/mise-action@v5.0.1
+        with:
+          version: 2026.10.1
+          install_args: "python uv pypi:ansible-core pypi:ansible-lint"
       - name: Install collections
-        run: ansible-galaxy collection install -r ansible/requirements.yml
+        run: mise run collections
       - name: Lint
         run: ansible-lint
       - name: Syntax check

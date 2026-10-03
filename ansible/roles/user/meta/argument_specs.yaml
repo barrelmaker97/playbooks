@@ -4,11 +4,11 @@ argument_specs:
     short_description: Create a cluster user and write its kubeconfig
     description:
       - Generates a private key and CSR, submits and approves a
-        CertificateSigningRequest, binds the user to cluster-admin, installs
-        kubectl and the CloudNativePG plugin, and writes a kubeconfig.
+        CertificateSigningRequest, binds the user to cluster-admin, and writes
+        a kubeconfig. kubectl comes from mise.toml.
       - >-
-        Reads ansible_facts.env.HOME and ansible_facts.architecture, so the
-        calling playbook must gather at least the min subset.
+        Reads ansible_facts.env.HOME, so the calling playbook must gather at
+        least the min subset.
       - >-
         Also chowns the kubeconfig directory to ansible_user. That is the
         connection account rather than a role input - group_vars/all.yaml sets
@@ -40,10 +40,4 @@ argument_specs:
       cert_expiration_seconds:
         description: Requested lifetime of the signed client certificate.
         type: int
-        required: true
-      kubectl_cnpg_version:
-        description:
-          - Version of the CloudNativePG kubectl plugin to install. Changing it
-            requires updating user_kubectl_cnpg_checksums in vars/main.yaml.
-        type: str
         required: true
