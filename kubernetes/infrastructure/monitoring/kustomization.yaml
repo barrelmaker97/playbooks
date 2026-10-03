@@ -18,3 +18,5 @@ resources:
   - alertmanagerconfig.yaml
   - prometheusrule-longhorn-snapshots.yaml
   - prometheusrule-dewpoint.yaml
+  - podmonitor-flux.yaml
+  - prometheusrule-flux.yaml

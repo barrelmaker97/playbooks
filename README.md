@@ -1,5 +1,8 @@
 # playbooks
-Personal Ansible Playbook Library
+GitOps and Ansible for the poseidon homelab cluster and the hosts around it.
+Flux deploys everything on the cluster from `kubernetes/`; Ansible builds and
+bootstraps the cluster, issues the local kubeconfig, and manages the DNS and
+sensor hosts.
 
 # Installing Ansible
 ```bash
@@ -7,14 +10,16 @@ Personal Ansible Playbook Library
 ```
 
 # Secrets Management
-Secret values needed for playbooks are encrypted with age/sops,
-which will be installed by the `setup.yaml` playbook if they are not present.
-The age key file is expected to be at `~/.config/sops/age/keys.txt`.
+Secrets are encrypted with age/sops, which the `setup.yaml` playbook installs
+if they are not present. The personal age key is expected at
+`~/.config/sops/age/keys.txt` and can decrypt every secret in the repository.
+Files under `kubernetes/` are also encrypted to a cluster-only key that Flux
+holds; see the Flux section below and `.sops.yaml`.
 
 # Prerequisites
 The `setup.yaml` playbook depends on `talosctl` to generate artifacts for cluster setup
 and will also be needed for bootstrapping after the playbook is complete. It can be installed
-using [this guide](https://www.talos.dev/v1.13/talos-guides/install/talosctl/). Be sure to install
+using [this guide](https://docs.siderolabs.com/talos/v1.14/getting-started/talosctl). Be sure to install
 the version that matches the version of Talos to be used for the cluster.
 
 # Running Playbooks
@@ -71,14 +76,18 @@ Differences from the Ansible roles:
 - Merging to `main` deploys. Flux polls every minute, so there is no playbook
   run to trigger, and CI validates every kustomization before merge.
 - There is no templating. Manifests hold literal values, so what is in Git is
-  what is applied; values that also live in `group_vars/all.yaml` are
-  duplicated until the Ansible side no longer needs them.
+  what is applied.
 - sops files under `kubernetes/` are encrypted to a second, cluster-only age
   key as well as the personal one (see `.sops.yaml`). Flux holds that key as
   the `sops-age` Secret, and it cannot decrypt anything outside `kubernetes/`.
   A Helm values file stays a sops file and becomes a Secret through a
   kustomize `secretGenerator`, read by the HelmRelease's `valuesFrom`.
-- Failed reconciliations post to the same Discord channel as Alertmanager.
+- Failed reconciliations post to the same Discord channel as Alertmanager,
+  through a separate webhook named for Flux. Flux itself is watched from the
+  other side too: Prometheus scrapes the controllers and the operator, and
+  Alertmanager alerts if a Flux object stays not ready, a controller has no
+  replicas, or its metrics stop (`prometheusrule-flux.yaml`), so a broken
+  notification-controller cannot fail silently.
 - HelmReleases fail forward: a failed install or upgrade is retried as
   written every 15 minutes and never rolled back, so the cluster does not drift
   from Git. Fix forward with a commit, or `git revert`. A StatefulSet stuck on a
@@ -92,9 +101,10 @@ Differences from the Ansible roles:
 
 Install or update Flux itself:
 ```bash
-ansible-playbook core.yaml --tags flux
-# Try a branch before merging it
-ansible-playbook core.yaml --tags flux -e flux_sync_ref=refs/heads/<branch>
+ansible-playbook core.yaml
+# Try a branch before merging it; any later run without the override points
+# Flux back at main
+ansible-playbook core.yaml -e flux_sync_ref=refs/heads/<branch>
 ```
 
 Day to day, with the [flux CLI](https://fluxcd.io/flux/installation/#install-the-flux-cli):
@@ -126,18 +136,33 @@ flux events -A                                    # Why something is not Ready
 | Pollux     | 192.168.15.30 | pollux.lan | BACKUP |
 
 # Cluster Bootstrap
-```bash
-# Node 1
-talosctl -n node1-poseidon.lan apply-config --insecure --file node1-poseidon.yaml
-talosctl -n node1-poseidon.lan -e node1-poseidon.lan bootstrap
-talosctl -n node1-poseidon.lan -e node1-poseidon.lan kubeconfig
+1. Generate the Talos machine configs and the ISO link:
+   ```bash
+   ansible-playbook setup.yaml
+   ```
+2. Boot the nodes from the ISO, then apply the configs and bootstrap etcd:
+   ```bash
+   # Node 1
+   talosctl -n node1-poseidon.lan apply-config --insecure --file node1-poseidon.yaml
+   talosctl -n node1-poseidon.lan -e node1-poseidon.lan bootstrap
 
-# Node 2
-talosctl -n node2-poseidon.lan apply-config --insecure --file node2-poseidon.yaml
+   # Node 2
+   talosctl -n node2-poseidon.lan apply-config --insecure --file node2-poseidon.yaml
 
-# Node 3
-talosctl -n node3-poseidon.lan apply-config --insecure --file node3-poseidon.yaml
-```
+   # Node 3
+   talosctl -n node3-poseidon.lan apply-config --insecure --file node3-poseidon.yaml
+   ```
+3. Create the cluster user and the local kubeconfig:
+   ```bash
+   ansible-playbook user.yaml
+   ```
+4. Install Flux. It then builds the platform layer by layer, in the
+   `dependsOn` order of `kubernetes/clusters/poseidon/infrastructure.yaml`, and
+   the applications on top:
+   ```bash
+   ansible-playbook core.yaml
+   flux get kustomizations --watch
+   ```
 
 # Cluster Upgrade
 ## Upgrade Talos

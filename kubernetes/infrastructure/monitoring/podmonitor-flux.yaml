@@ -1,0 +1,34 @@
+---
+# Scrapes the Flux controllers, and the Flux Operator, whose flux_resource_info
+# gauge reports the readiness of every Flux object. They live in
+# kubernetes/ rather than the operator's chart values: on a fresh cluster the
+# operator is installed before the monitoring CRDs exist.
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: flux-controllers
+  namespace: flux-system
+spec:
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - source-controller
+          - kustomize-controller
+          - helm-controller
+          - notification-controller
+  podMetricsEndpoints:
+    - port: http-prom
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: flux-operator
+  namespace: flux-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: flux-operator
+  podMetricsEndpoints:
+    - port: http-metrics

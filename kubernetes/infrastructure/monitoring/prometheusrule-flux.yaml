@@ -1,0 +1,49 @@
+---
+# Alerts on Flux through Alertmanager, a path that does not depend on Flux:
+# if notification-controller is down, Flux's own Discord alerts stop silently.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: flux
+  namespace: monitoring
+spec:
+  groups:
+    - name: flux
+      rules:
+        - alert: FluxControllerUnavailable
+          expr: >-
+            kube_deployment_status_replicas_available{namespace="flux-system"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: >-
+              Flux deployment {{ $labels.deployment }} has no available replicas
+            description: >-
+              Changes in Git are not being applied, and if this is
+              notification-controller, Flux's own alerts are not being sent.
+
+        - alert: FluxResourceNotReady
+          expr: >-
+            flux_resource_info{ready="False", suspended="False"} == 1
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: >-
+              Flux {{ $labels.kind }} {{ $labels.exported_namespace }}/{{ $labels.name }}
+              is not ready
+            description: >-
+              Not ready for 15 minutes ({{ $labels.reason }}). See flux events -A.
+
+        - alert: FluxMetricsDown
+          expr: >-
+            up{namespace="flux-system"} == 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: >-
+              Prometheus cannot scrape {{ $labels.pod }} in flux-system
+            description: >-
+              Flux readiness alerts depend on these metrics.
