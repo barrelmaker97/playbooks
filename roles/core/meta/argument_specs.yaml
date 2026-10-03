@@ -3,11 +3,10 @@ argument_specs:
   main:
     short_description: Deploy cluster-wide core services
     description:
-      - Deploys storage (Longhorn and its storage classes), the CloudNativePG
-        operator, networking (MetalLB), certificates (cert-manager,
-        trust-manager and the issuers), the monitoring stack, Gateway
-        routing, and the Flux Operator with the FluxInstance that syncs
-        kubernetes/ from Git.
+      - Installs the Flux Operator and the FluxInstance that syncs kubernetes/
+        from Git, waits for the platform layers Flux owns, then deploys the
+        layers not yet moved to Flux - storage (Longhorn and its storage
+        classes), the monitoring stack and Gateway routing.
       - >-
         Chart versions and this role's own tunables are supplied by the calling
         playbook. Identity and topology values shared with other roles come
@@ -28,10 +27,6 @@ argument_specs:
         required: true
       nas_domain:
         description: Host serving the NFS share used as the Longhorn backup target.
-        type: str
-        required: true
-      email_address:
-        description: Contact address registered with the ACME issuers.
         type: str
         required: true
       node_ips:
@@ -85,10 +80,6 @@ argument_specs:
             type: str
             required: true
 
-      metallb_ip_range:
-        description: Address range MetalLB allocates LoadBalancer IPs from.
-        type: str
-        required: true
       longhorn_snapshot_max_count:
         description:
           - Hard cap on snapshots per volume. The snapshot alert fires just
@@ -100,24 +91,8 @@ argument_specs:
         description: Version of the Longhorn chart.
         type: str
         required: true
-      cloudnative_pg_chart_version:
-        description: Version of the CloudNativePG operator chart.
-        type: str
-        required: true
-      metallb_version:
-        description: Version of the MetalLB chart.
-        type: str
-        required: true
       envoy_gateway_version:
         description: Version of the Envoy Gateway chart. OCI tags are v-prefixed.
-        type: str
-        required: true
-      cert_manager_version:
-        description: Version of the cert-manager chart.
-        type: str
-        required: true
-      trust_manager_version:
-        description: Version of the trust-manager chart.
         type: str
         required: true
       loki_version:

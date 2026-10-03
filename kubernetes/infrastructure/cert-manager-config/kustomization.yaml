@@ -1,0 +1,11 @@
+---
+# cert-manager's issuers and certificates. Separate from the charts: they
+# need cert-manager's CRDs and webhook, which only exist once the cert-manager
+# Kustomization is Ready.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - internal-ca.yaml
+  - secret-cloudflare-api-token.sops.yaml
+  - letsencrypt-prod.yaml
+  - letsencrypt-staging.yaml

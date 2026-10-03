@@ -1,0 +1,8 @@
+---
+# MetalLB's own resources. Separate from the chart: they need its CRDs and
+# webhook, which only exist once the metallb Kustomization is Ready.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ipaddresspool.yaml
+  - l2advertisement.yaml

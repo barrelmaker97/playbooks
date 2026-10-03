@@ -4,6 +4,9 @@
 #                 infrastructure is a deliberate manual step.
 #   wait: true    a layer is Ready only once everything in it is healthy,
 #                 which is what the layers above wait for.
+# A chart and the custom resources it defines are separate Kustomizations
+# (metallb and metallb-config): Flux validates a Kustomization as a whole
+# before applying it, so the resources cannot ship with the CRDs they need.
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -20,3 +23,100 @@ spec:
   timeout: 10m
   prune: false
   wait: true
+
+# Layer 1: independent of each other; each needs the monitoring CRDs for
+# its ServiceMonitors or PodMonitors.
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: metallb
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/metallb
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: monitoring-prereq
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: metallb-config
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/metallb-config
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: metallb
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cert-manager
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/cert-manager
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: monitoring-prereq
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cert-manager-config
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/cert-manager-config
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: cert-manager
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cloudnative-pg
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/cloudnative-pg
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: monitoring-prereq
