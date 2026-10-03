@@ -32,6 +32,22 @@ Secrets are encrypted with age/sops. The personal age key is expected at
 Files under `kubernetes/` are also encrypted to a cluster-only key that Flux
 holds; see the Flux section below and `.sops.yaml`.
 
+# Updates
+[Renovate](https://docs.renovatebot.com/) (`renovate.json5`) opens a PR for
+every pinned version: chart and OCI versions, the FluxInstance and operator,
+the CloudNativePG PostgreSQL image, Talos and dewpoint, the tools in
+`mise.toml`, the Ansible collections, and GitHub Actions. Each PR gets the
+usual checks and rendered diff, and merging deploys it; nothing automerges.
+
+- Versions that must move together arrive as one PR: Flux (CLI, FluxInstance,
+  operator), Talos (talosctl and `talos_version`), CloudNativePG (chart and
+  kubectl plugin).
+- Major updates wait on the Dependency Dashboard issue until ticked.
+- kubectl gets patches only; it follows the cluster, which is upgraded with
+  `talosctl upgrade-k8s`. A Talos update PR only changes new configs and
+  talosctl; upgrading the nodes is the manual step under Cluster Upgrade.
+- PostgreSQL major versions are disabled: they are data migrations.
+
 # Running Playbooks
 Playbooks run from `ansible/`, where its `ansible.cfg`, inventory and
 `group_vars` apply:

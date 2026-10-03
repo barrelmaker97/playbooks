@@ -2,9 +2,12 @@
 # Collections the playbooks import, pinned like everything in mise.toml.
 # Install with `mise run collections` from the repository root.
 collections:
-  - name: kubernetes.core       # k8s, k8s_info, helm, helm_info
+  # k8s, k8s_info, helm, helm_info
+  - name: kubernetes.core
     version: "6.6.0"
-  - name: community.sops        # sops lookup
+  # sops lookup
+  - name: community.sops
     version: "2.4.0"
-  - name: community.crypto      # openssl_privatekey, openssl_csr
+  # openssl_privatekey, openssl_csr
+  - name: community.crypto
     version: "3.4.0"
