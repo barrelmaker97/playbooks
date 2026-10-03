@@ -71,5 +71,6 @@
     - cloudnative-pg
     - longhorn
     - longhorn-config
+    - monitoring
   loop_control:
     loop_var: core_flux_layer_name

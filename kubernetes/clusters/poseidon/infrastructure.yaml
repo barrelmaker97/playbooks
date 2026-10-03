@@ -156,3 +156,29 @@ spec:
   wait: true
   dependsOn:
     - name: longhorn
+
+# Layer 2: needs the monitoring CRDs, and Longhorn's storage classes for the
+# Prometheus, Alertmanager, Loki and Tempo volumes.
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: monitoring
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/monitoring
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: monitoring-prereq
+    - name: longhorn-config
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

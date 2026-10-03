@@ -52,3 +52,39 @@ metadata:
 spec:
   url: https://charts.longhorn.io
   interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: grafana
+  namespace: flux-system
+spec:
+  url: https://grafana.github.io/helm-charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: grafana-community
+  namespace: flux-system
+spec:
+  url: https://grafana-community.github.io/helm-charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: open-telemetry
+  namespace: flux-system
+spec:
+  url: https://open-telemetry.github.io/opentelemetry-helm-charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: metrics-server
+  namespace: flux-system
+spec:
+  url: https://kubernetes-sigs.github.io/metrics-server
+  interval: 1h

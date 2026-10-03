@@ -1,0 +1,20 @@
+---
+# The monitoring stack, its configuration and its alert rules. The
+# AlertmanagerConfig and PrometheusRules need only the CRDs from
+# monitoring-prereq, so they can ship alongside the charts.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - limitrange.yaml
+  - secret-grafana-admin-credentials.sops.yaml
+  - secret-additional-scrape-configs.yaml
+  - configmap-dashboards.yaml
+  - kube-prometheus-stack.yaml
+  - loki.yaml
+  - tempo.yaml
+  - otel-collector.yaml
+  - metrics-server.yaml
+  - secret-discord-webhook-url.sops.yaml
+  - alertmanagerconfig.yaml
+  - prometheusrule-longhorn-snapshots.yaml
+  - prometheusrule-dewpoint.yaml

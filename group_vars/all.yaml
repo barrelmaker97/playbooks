@@ -13,17 +13,13 @@ cluster_vip: 192.168.15.40
 external_domain: barrelmaker.dev
 local_domain: lan
 
-# Node topology. node_ips is only read by the core role, but it stays here
-# alongside node_names: Kubernetes Endpoints objects require literal IPs
-# (hostnames are rejected), so the two lists must be kept in sync by hand.
+# Node topology. The node IPs are not listed here: the only reader was the
+# etcd scrape endpoints, now in
+# kubernetes/infrastructure/monitoring/kube-prometheus-stack.yaml.
 node_names:
   - node1-poseidon
   - node2-poseidon
   - node3-poseidon
-node_ips:
-  - 192.168.15.41
-  - 192.168.15.42
-  - 192.168.15.43
 
 gateway_name: poseidon
 gateway_namespace: envoy-gateway-system
