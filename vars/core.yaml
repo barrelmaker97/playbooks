@@ -2,14 +2,7 @@
 # Read by core.yaml. Values shared with other playbooks live in
 # group_vars/all.yaml instead.
 
-# Chart versions
-envoy_gateway_version: "v1.8.1"  # OCI chart tags are v-prefixed
 flux_operator_version: "0.60.0"
-
-# IP for the Envoy Gateway LoadBalancer service, allocated from MetalLB's pool
-# (kubernetes/infrastructure/metallb-config)
-gateway_ip: 192.168.15.60
-
 
 # Flux syncs flux_sync_path from this repository. flux_version is the Flux
 # distribution the operator installs, separate from the operator chart itself.

@@ -133,7 +133,7 @@ spec:
       filters:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
-            # Mirrors gateway_response_headers in group_vars/all.yaml.
+            # The security headers every public route sets; keep them in step.
             set:
               - name: Strict-Transport-Security
                 value: max-age=63072000; includeSubDomains; preload

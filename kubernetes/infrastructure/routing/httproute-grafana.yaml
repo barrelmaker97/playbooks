@@ -8,11 +8,11 @@ metadata:
   namespace: monitoring
 spec:
   parentRefs:
-    - name: "{{ gateway_name }}"
-      namespace: "{{ gateway_namespace }}"
-      sectionName: "{{ gateway_public_listener_name }}"
+    - name: poseidon
+      namespace: envoy-gateway-system
+      sectionName: https-wildcard
   hostnames:
-    - "grafana.{{ external_domain }}"
+    - grafana.barrelmaker.dev
   rules:
     - matches:
         - path:
@@ -22,10 +22,12 @@ spec:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
             set:
-{% for header in gateway_response_headers %}
-              - name: "{{ header.name }}"
-                value: "{{ header.value }}"
-{% endfor %}
+              - name: Strict-Transport-Security
+                value: "max-age=63072000; includeSubDomains; preload"
+              - name: Referrer-Policy
+                value: same-origin
+              - name: X-Content-Type-Options
+                value: nosniff
       backendRefs:
         - name: kube-prometheus-stack-grafana
           port: 80

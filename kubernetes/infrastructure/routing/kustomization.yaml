@@ -1,0 +1,14 @@
+---
+# Routes for the platform UIs. The charts' own routes are disabled in favour
+# of these: Grafana's subchart has no Gateway API support, and the LAN-only
+# UIs sit behind basic auth through SecurityPolicies.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - httproute-grafana.yaml
+  - httproute-prometheus.yaml
+  - httproute-alertmanager.yaml
+  - httproute-longhorn.yaml
+  - secret-basic-auth-monitoring.sops.yaml
+  - secret-basic-auth-longhorn.sops.yaml
+  - securitypolicies.yaml

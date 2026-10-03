@@ -88,3 +88,18 @@ metadata:
 spec:
   url: https://kubernetes-sigs.github.io/metrics-server
   interval: 1h
+---
+# Envoy Gateway publishes its chart only as an OCI artifact.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: envoy-gateway
+  namespace: flux-system
+spec:
+  url: oci://docker.io/envoyproxy/gateway-helm
+  ref:
+    tag: v1.8.1  # OCI chart tags are v-prefixed
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  interval: 1h

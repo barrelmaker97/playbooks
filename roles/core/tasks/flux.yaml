@@ -44,33 +44,3 @@
       status: "True"
     wait_sleep: 10
     wait_timeout: 600
-
-# The layers Flux owns that the Ansible sections after this one build on. On
-# a fresh cluster they must be Ready before those sections deploy charts into
-# them. Each layer migrated to Flux is added here.
-- name: Wait for Flux-managed layers
-  kubernetes.core.k8s_info:
-    api_version: kustomize.toolkit.fluxcd.io/v1
-    kind: Kustomization
-    name: "{{ core_flux_layer_name }}"
-    namespace: flux-system
-  register: core_flux_layer
-  until: >-
-    core_flux_layer.resources | length > 0 and
-    (core_flux_layer.resources[0].status.conditions | default([])
-     | selectattr('type', 'eq', 'Ready') | map(attribute='status')
-     | first | default('')) == 'True'
-  retries: 60
-  delay: 10
-  loop:
-    - monitoring-prereq
-    - metallb
-    - metallb-config
-    - cert-manager
-    - cert-manager-config
-    - cloudnative-pg
-    - longhorn
-    - longhorn-config
-    - monitoring
-  loop_control:
-    loop_var: core_flux_layer_name

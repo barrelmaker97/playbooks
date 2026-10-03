@@ -1,15 +1,6 @@
 ---
-# Ordering between these files is load-bearing. The platform is moving to
-# Flux from the bottom up, so Flux runs first: it owns the lowest layers
-# (kubernetes/infrastructure), and its section waits for them before the
-# sections below deploy charts on top of them. Helm setup runs before every
-# section for the chart repositories. Domain-owned namespaces and charts live
-# with the task file that configures them, while Gateway exposure is
-# centralized in routing.
-#
-# These are imports, not includes: tags on an include_tasks apply only to the
-# include itself, so the tasks inside would be filtered out and a --tags run
-# would silently do nothing. import_tasks propagates the tag at parse time.
+# The core role installs Flux and its decryption key; Flux then deploys the
+# whole platform and every application from kubernetes/ in Git.
 - name: Set core role path
   ansible.builtin.set_fact:
     core_role_path: "{{ role_path }}"
@@ -29,7 +20,3 @@
 - name: Configure Flux
   ansible.builtin.import_tasks: flux.yaml
   tags: [flux]
-
-- name: Configure routing
-  ansible.builtin.import_tasks: routing.yaml
-  tags: [routing]

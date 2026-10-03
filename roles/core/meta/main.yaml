@@ -2,8 +2,8 @@
 galaxy_info:
   author: Nolan Cooper
   description: >-
-    Deploy cluster-wide core services - storage, networking, certificates,
-    monitoring and routing.
+    Install Flux and its sops key; Flux deploys the platform and every
+    application from kubernetes/ in Git.
   license: GPL-3.0-or-later
   min_ansible_version: "2.15"
   platforms:

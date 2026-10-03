@@ -6,11 +6,11 @@ metadata:
   namespace: longhorn-system
 spec:
   parentRefs:
-    - name: "{{ gateway_name }}"
-      namespace: "{{ gateway_namespace }}"
-      sectionName: "{{ gateway_lan_listener_name }}"
+    - name: poseidon
+      namespace: envoy-gateway-system
+      sectionName: https-lan-wildcard
   hostnames:
-    - "longhorn.{{ cluster_domain }}"
+    - longhorn.poseidon.lan
   rules:
     - matches:
         - path:

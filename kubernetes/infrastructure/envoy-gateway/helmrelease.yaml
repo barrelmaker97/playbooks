@@ -1,0 +1,62 @@
+---
+# Published only as an OCI artifact, so the chart comes from an
+# OCIRepository (kubernetes/clusters/poseidon/repositories.yaml) through
+# chartRef rather than a HelmRepository. The version is pinned there.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: envoy-gateway
+  namespace: envoy-gateway-system
+spec:
+  releaseName: envoy-gateway
+  chartRef:
+    kind: OCIRepository
+    name: envoy-gateway
+    namespace: flux-system
+  interval: 30m
+  # Infrastructure guards; see kubernetes/clusters/poseidon/infrastructure.yaml.
+  install:
+    crds: CreateReplace
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 15m
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 15m
+  driftDetection:
+    mode: warn
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: CustomResourceDefinition
+            patch: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: any
+                annotations:
+                  helm.sh/resource-policy: keep
+  values:
+    podDisruptionBudget:
+      minAvailable: null
+      maxUnavailable: 1
+
+    deployment:
+      replicas: 2
+      pod:
+        topologySpreadConstraints:
+          - maxSkew: 1
+            minDomains: 2
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/instance: envoy-gateway
+                app.kubernetes.io/name: gateway-helm
+                control-plane: envoy-gateway
+            matchLabelKeys:
+              - pod-template-hash

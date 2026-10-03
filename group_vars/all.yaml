@@ -10,7 +10,6 @@ ansible_user: barrelmaker
 cluster_host: poseidon
 cluster_port: 6443
 cluster_vip: 192.168.15.40
-external_domain: barrelmaker.dev
 local_domain: lan
 
 # Node topology. The node IPs are not listed here: the only reader was the
@@ -20,23 +19,6 @@ node_names:
   - node1-poseidon
   - node2-poseidon
   - node3-poseidon
-
-gateway_name: poseidon
-gateway_namespace: envoy-gateway-system
-gateway_http_listener_name: http
-gateway_lan_listener_name: https-lan-wildcard
-gateway_apex_listener_name: https-apex
-gateway_public_listener_name: https-wildcard
-
-# Applied by the core role's Grafana route. The Flux-managed apps under
-# kubernetes/apps write the same three headers out in their own routes.
-gateway_response_headers:
-  - name: Strict-Transport-Security
-    value: "max-age=63072000; includeSubDomains; preload"
-  - name: Referrer-Policy
-    value: "same-origin"
-  - name: X-Content-Type-Options
-    value: "nosniff"
 
 # Templated variables
 cluster_domain: "{{ cluster_host }}.{{ local_domain }}"
