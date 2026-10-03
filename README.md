@@ -39,7 +39,7 @@ ansible-playbook setup.yaml
 |------------------|---------------|----------------|----------------------------------------------------------------|
 | `setup.yaml`     | localhost     | no             | Generate Talos machine configs for the control plane nodes      |
 | `user.yaml`      | localhost     | no             | Create the cluster user, sign its cert, write a kubeconfig      |
-| `core.yaml`      | localhost     | yes            | Storage, networking, certificates, monitoring, routing and Flux |
+| `core.yaml`      | localhost     | yes            | Flux, then the platform layers not yet in Flux: storage, monitoring, routing |
 | `dns.yaml`       | `dns_servers` | no             | unbound, Pi-hole and keepalived on the DNS pair                 |
 | `dewpoint.yaml`  | `dns_servers` | no             | The dewpoint Govee sensor Prometheus exporter                   |
 

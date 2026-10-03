@@ -16,3 +16,30 @@ metadata:
 spec:
   url: https://prometheus-community.github.io/helm-charts
   interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: metallb
+  namespace: flux-system
+spec:
+  url: https://metallb.github.io/metallb
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: jetstack
+  namespace: flux-system
+spec:
+  url: https://charts.jetstack.io
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: cloudnative-pg
+  namespace: flux-system
+spec:
+  url: https://cloudnative-pg.github.io/charts
+  interval: 1h

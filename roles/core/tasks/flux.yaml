@@ -64,5 +64,10 @@
   delay: 10
   loop:
     - monitoring-prereq
+    - metallb
+    - metallb-config
+    - cert-manager
+    - cert-manager-config
+    - cloudnative-pg
   loop_control:
     loop_var: core_flux_layer_name

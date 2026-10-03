@@ -1,7 +1,8 @@
 # One Kustomization per app, so a failure is reported by app name and blocks
 # nothing else. Apps in the shared barrelmaker namespace wait for the
 # Kustomization that creates it, and apps that create ServiceMonitors,
-# PodMonitors or PrometheusRules wait for the CRDs in monitoring-prereq.
+# PodMonitors or PrometheusRules wait for the CRDs in monitoring-prereq, and
+# apps with a PostgreSQL Cluster wait for the cloudnative-pg operator.
 # wait: true makes each one Ready only once
 # everything it applied is healthy, including its HelmRelease.
 ---
@@ -174,6 +175,7 @@ spec:
   wait: true
   dependsOn:
     - name: monitoring-prereq
+    - name: cloudnative-pg
   decryption:
     provider: sops
     secretRef:
@@ -196,6 +198,7 @@ spec:
   wait: true
   dependsOn:
     - name: monitoring-prereq
+    - name: cloudnative-pg
   decryption:
     provider: sops
     secretRef:

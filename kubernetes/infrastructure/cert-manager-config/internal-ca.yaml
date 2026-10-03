@@ -1,0 +1,50 @@
+---
+# The cluster's internal CA: a self-signed root, an issuer that signs with it,
+# and a trust-manager Bundle that publishes the root certificate as a
+# ConfigMap for workloads to trust.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: internal-root-ca
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: internal-root-ca
+  duration: 8760h  # 1 year
+  renewBefore: 720h  # 30 days
+  secretName: internal-root-ca-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: internal-ca
+spec:
+  ca:
+    secretName: internal-root-ca-secret
+---
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: internal-trust
+spec:
+  sources:
+    - secret:
+        name: internal-root-ca-secret
+        key: ca.crt
+  target:
+    configMap:
+      key: ca-certificates.crt
