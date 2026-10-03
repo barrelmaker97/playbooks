@@ -66,7 +66,8 @@ spec:
       nodeDrainPolicy: allow-if-replica-is-stopped
       replicaAutoBalance: least-effort
       # Hard cap on snapshots per volume; new snapshots are blocked once reached.
-      # The snapshot alerts in the monitoring layer fire just below this value.
+      # The alerts in monitoring/prometheusrule-longhorn-snapshots.yaml fire
+      # just below it; keep them in step.
       snapshotMaxCount: "50"
       storageMinimalAvailablePercentage: "10"
     httproute:

@@ -5,8 +5,7 @@ argument_specs:
     description:
       - Installs the Flux Operator and the FluxInstance that syncs kubernetes/
         from Git, waits for the platform layers Flux owns, then deploys the
-        layers not yet moved to Flux - the monitoring stack and Gateway
-        routing.
+        layer not yet moved to Flux - Gateway routing.
       - >-
         Chart versions and this role's own tunables are supplied by the calling
         playbook. Identity and topology values shared with other roles come
@@ -25,14 +24,6 @@ argument_specs:
         description: Public domain served by the Gateway's HTTPS listeners.
         type: str
         required: true
-      node_ips:
-        description:
-          - Literal node IPs scraped for etcd metrics. Kubernetes Endpoints
-            reject hostnames, so these must track the nodes by hand.
-        type: list
-        elements: str
-        required: true
-
       gateway_name:
         description: Name of the Gateway object.
         type: str
@@ -76,35 +67,9 @@ argument_specs:
             type: str
             required: true
 
-      longhorn_snapshot_max_count:
-        description:
-          - Hard cap on snapshots per volume. The snapshot alert fires just
-            below this value.
-        type: int
-        required: true
 
       envoy_gateway_version:
         description: Version of the Envoy Gateway chart. OCI tags are v-prefixed.
-        type: str
-        required: true
-      loki_version:
-        description: Version of the Loki chart.
-        type: str
-        required: true
-      tempo_version:
-        description: Version of the Tempo chart.
-        type: str
-        required: true
-      otel_collector_version:
-        description: Version of the OpenTelemetry Collector chart.
-        type: str
-        required: true
-      kube_prometheus_stack_version:
-        description: Version of the kube-prometheus-stack chart.
-        type: str
-        required: true
-      metrics_server_version:
-        description: Version of the metrics-server chart.
         type: str
         required: true
       flux_operator_version:
