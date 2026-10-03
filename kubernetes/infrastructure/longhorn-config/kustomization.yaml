@@ -1,0 +1,9 @@
+---
+# Longhorn's storage classes and recurring jobs. Separate from the chart: the
+# RecurringJobs need its CRDs, which only exist once the longhorn Kustomization
+# is Ready.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - storageclasses.yaml
+  - recurringjobs.yaml
