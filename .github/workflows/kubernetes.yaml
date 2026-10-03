@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 # Flux applies whatever lands on main, so this is the last check before a
 # change reaches the cluster. Every directory holding a kustomization.yaml is
 # built and validated, custom resources against the datreeio CRD catalog.
@@ -34,3 +37,63 @@ jobs:
               -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
               -
           done
+
+  # Renders every Kustomization and HelmRelease offline, the way Flux will:
+  # charts are fetched and templated, post-renderers run, values are checked
+  # against chart schemas. Catches what kubeconform cannot see, such as a
+  # chart that only fails once rendered. flate is the maintained successor to
+  # flux-local.
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: home-operations/flate/action@v0.6.5
+      - name: Render and test the whole cluster
+        # The action exports FLATE_BASE, which would test only what the PR
+        # changed; the full tree takes seconds, so test all of it.
+        run: env -u FLATE_BASE flate test all --path ./kubernetes
+
+  # Comments the rendered diff against the base branch on the PR: the
+  # objects that will actually change in the cluster, not just the lines that
+  # changed in Git. Updated in place on each push.
+  diff:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: home-operations/flate/action@v0.6.5
+      - name: Diff rendered output
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: flate diff all --path ./kubernetes --base "origin/${BASE_REF}" -o github > diff.txt
+      - name: Comment on the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          marker="<!-- flate-diff -->"
+          {
+            echo "$marker"
+            echo "### Rendered cluster changes"
+            if [ -s diff.txt ]; then
+              echo '```diff'
+              head -c 60000 diff.txt
+              echo
+              echo '```'
+              if [ "$(wc -c < diff.txt)" -gt 60000 ]; then echo "_Truncated; run \`flate diff all --path ./kubernetes --base main\` locally for the rest._"; fi
+            else
+              echo "No rendered changes."
+            fi
+          } > comment.md
+          id=$(gh api "repos/${REPO}/issues/${PR}/comments" --paginate \
+            --jq ".[] | select(.body | startswith(\"${marker}\")) | .id" | head -n 1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/${REPO}/issues/comments/${id}" -F body=@comment.md > /dev/null
+          else
+            gh api -X POST "repos/${REPO}/issues/${PR}/comments" -F body=@comment.md > /dev/null
+          fi

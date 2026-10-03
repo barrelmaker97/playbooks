@@ -73,7 +73,11 @@ FluxInstance from those same files when they are missing.
 Differences from the Ansible roles:
 
 - Merging to `main` deploys. Flux polls every minute, so there is no playbook
-  run to trigger, and CI validates every kustomization before merge.
+  run to trigger. Before merge, CI validates every kustomization's schema
+  (kubeconform), renders the whole cluster offline the way Flux will, charts
+  and post-renderers included ([flate](https://github.com/home-operations/flate)),
+  and comments the rendered diff on the PR. To preview locally:
+  `flate diff all --path ./kubernetes --base main`.
 - There is no templating. Manifests hold literal values, so what is in Git is
   what is applied.
 - sops files under `kubernetes/` are encrypted to a second, cluster-only age
