@@ -21,13 +21,15 @@ jobs:
           pipx install --include-deps ansible
           pipx inject --include-apps ansible ansible-lint
       - name: Install collections
-        run: ansible-galaxy collection install -r requirements.yml
+        run: ansible-galaxy collection install -r ansible/requirements.yml
       - name: Lint
         run: ansible-lint
       - name: Syntax check
-        # inventory.yaml is the only top-level yaml that is not a playbook.
-        # Written as an if rather than "[ ... ] && continue", which would abort
-        # the whole loop under the default bash -e when the test is false.
+        # Run from ansible/ so its ansible.cfg, inventory and group_vars apply.
+        # inventory.yaml is the only yaml there that is not a playbook. Written
+        # as an if rather than "[ ... ] && continue", which would abort the
+        # whole loop under the default bash -e when the test is false.
+        working-directory: ansible
         run: |
           for playbook in *.yaml; do
             if [ "$playbook" = "inventory.yaml" ]; then continue; fi

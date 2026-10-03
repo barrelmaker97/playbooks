@@ -2,6 +2,6 @@
 ---
 exclude_paths:
   - "*.sops.yaml"
-  - inventory.yaml
+  - ansible/inventory.yaml
 warn_list:
   - experimental

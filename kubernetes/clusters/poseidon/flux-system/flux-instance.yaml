@@ -1,0 +1,26 @@
+---
+# Flux itself. The operator installs and upgrades the Flux controllers to
+# match this; bump distribution.version here to upgrade Flux. Ansible's flux
+# role applies this same file once, to bootstrap a cluster that has no Flux.
+#
+# The operator requires this name and namespace. The sync block creates the
+# flux-system GitRepository and Kustomization that apply this directory's
+# parent, including this file.
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+  annotations:
+    # The flux-system Kustomization prunes, and deleting this object makes
+    # the operator uninstall Flux. Removing the file must not do that.
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  distribution:
+    version: "2.9.x"
+    registry: ghcr.io/fluxcd
+  sync:
+    kind: GitRepository
+    url: https://github.com/barrelmaker97/playbooks.git
+    ref: refs/heads/main
+    path: kubernetes/clusters/poseidon

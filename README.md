@@ -4,9 +4,15 @@ Flux deploys everything on the cluster from `kubernetes/`; Ansible builds and
 bootstraps the cluster, issues the local kubeconfig, and manages the DNS and
 sensor hosts.
 
+# Repository Layout
+| Path          | Contents                                                              |
+|---------------|-----------------------------------------------------------------------|
+| `kubernetes/` | Everything on the cluster, deployed by Flux from `main` (see Flux below) |
+| `ansible/`    | Playbooks for what Flux cannot do: build and bootstrap the cluster, issue the local kubeconfig, and manage the DNS and sensor hosts |
+
 # Installing Ansible
 ```bash
-./install-ansible.sh
+./ansible/install-ansible.sh
 ```
 
 # Secrets Management
@@ -23,49 +29,42 @@ using [this guide](https://docs.siderolabs.com/talos/v1.14/getting-started/talos
 the version that matches the version of Talos to be used for the cluster.
 
 # Running Playbooks
-To run the playbooks that manage the running cluster, use site.yaml:
+Playbooks run from `ansible/`, where its `ansible.cfg`, inventory and
+`group_vars` apply:
 ```bash
-ansible-playbook site.yaml
-```
-
-`setup.yaml` is not part of `site.yaml`. It generates Talos machine
-configuration for a new cluster and mints a fresh admin client certificate each
-time it runs, so it is a bootstrap step to run deliberately rather than on every
-converge. `user.yaml` is left out for the same reason: it issues a new client
-certificate and rewrites `~/.kube/config`, so run it when the kubeconfig needs
-creating or renewing.
-
-Individual playbooks can be run in a similar manner:
-```bash
-ansible-playbook setup.yaml
-```
-
-| Playbook         | Targets       | In `site.yaml` | Purpose                                                        |
-|------------------|---------------|----------------|----------------------------------------------------------------|
-| `setup.yaml`     | localhost     | no             | Generate Talos machine configs for the control plane nodes      |
-| `user.yaml`      | localhost     | no             | Create the cluster user, sign its cert, write a kubeconfig      |
-| `core.yaml`      | localhost     | yes            | Install Flux, which deploys the platform and applications       |
-| `dns.yaml`       | `dns_servers` | no             | unbound, Pi-hole and keepalived on the DNS pair                 |
-| `dewpoint.yaml`  | `dns_servers` | no             | The dewpoint Govee sensor Prometheus exporter                   |
-
-`dns.yaml` and `dewpoint.yaml` run against the hosts in `inventory.yaml` rather
-than localhost, and are kept out of `site.yaml` so that a full cluster run never
-touches the DNS servers. Both support role tags:
-
-```bash
+cd ansible
+ansible-playbook user.yaml
 ansible-playbook dns.yaml --tags pihole
 ```
+
+| Playbook        | Targets       | Purpose                                                          |
+|-----------------|---------------|------------------------------------------------------------------|
+| `setup.yaml`    | localhost     | Generate Talos machine configs for the control plane nodes        |
+| `user.yaml`     | localhost     | Create the cluster user, sign its cert, write a kubeconfig        |
+| `flux.yaml`     | localhost     | Bootstrap Flux, which then manages itself and the whole cluster   |
+| `dns.yaml`      | `dns_servers` | unbound, Pi-hole and keepalived on the DNS pair                   |
+| `dewpoint.yaml` | `dns_servers` | The dewpoint Govee sensor Prometheus exporter                     |
+
+None of them is meant to run on a schedule. `setup.yaml` mints a fresh Talos
+admin certificate and `user.yaml` a fresh client certificate on every run, so
+run them when building the cluster or renewing the kubeconfig. `flux.yaml` only
+acts on a cluster missing Flux. `dns.yaml` and `dewpoint.yaml` run against the
+hosts in `inventory.yaml`, and both support role tags.
+
 # Flux
 Flux deploys the whole cluster: the platform layers in
 `kubernetes/infrastructure` and every application in `kubernetes/apps`.
-Ansible's core role only installs the Flux Operator, the cluster's sops key,
-and a FluxInstance that syncs `kubernetes/clusters/poseidon` from `main`. That
-directory holds one Flux Kustomization per platform layer
-(`infrastructure.yaml`) and per application (`apps.yaml`).
+Flux also manages itself: the Flux Operator's HelmRelease and the FluxInstance
+live in `kubernetes/clusters/poseidon/flux-system`, so upgrading the operator
+or Flux is a commit there. The FluxInstance syncs `kubernetes/clusters/poseidon`
+from `main`, which holds one Flux Kustomization per platform layer
+(`infrastructure.yaml`) and per application (`apps.yaml`). Ansible's `flux`
+role only bootstraps: it installs the cluster's sops key, and the operator and
+FluxInstance from those same files when they are missing.
 
 | Path                                          | Contents                                                     |
 |-----------------------------------------------|--------------------------------------------------------------|
-| `kubernetes/clusters/poseidon`                | Entry point: Helm repositories and one Kustomization per directory below |
+| `kubernetes/clusters/poseidon`                | Entry point: Flux itself (`flux-system/`), chart sources, and one Kustomization per directory below |
 | `kubernetes/infrastructure/flux-notifications`| Discord alerts for failed Flux reconciliations               |
 | `kubernetes/infrastructure/<layer>`           | Platform layers, ordered bottom up by `dependsOn` in `infrastructure.yaml` |
 | `kubernetes/apps/<app>`                       | The app's HelmRelease, plus its namespace, database and alerts where it owns them |
@@ -99,13 +98,17 @@ Differences from the Ansible roles:
   `kustomize.toolkit.fluxcd.io/prune: disabled`, so deleting their files never
   deletes their data.
 
-Install or update Flux itself:
+Upgrade Flux by editing `flux-system/flux-instance.yaml` (the Flux version)
+or `flux-system/flux-operator.yaml` (the operator chart) and merging. To
+bootstrap a cluster without Flux, or recover one that lost it:
 ```bash
-ansible-playbook core.yaml
-# Try a branch before merging it; any later run without the override points
-# Flux back at main
-ansible-playbook core.yaml -e flux_sync_ref=refs/heads/<branch>
+cd ansible && ansible-playbook flux.yaml
 ```
+
+Because Flux syncs its own FluxInstance from `main`, it cannot simply be
+pointed at a branch: it would sync the branch's FluxInstance and point itself
+back. Preview a change against the cluster with `flux diff kustomization` (below)
+instead.
 
 Day to day, with the [flux CLI](https://fluxcd.io/flux/installation/#install-the-flux-cli):
 ```bash
@@ -138,6 +141,7 @@ flux events -A                                    # Why something is not Ready
 # Cluster Bootstrap
 1. Generate the Talos machine configs and the ISO link:
    ```bash
+   cd ansible
    ansible-playbook setup.yaml
    ```
 2. Boot the nodes from the ISO, then apply the configs and bootstrap etcd:
@@ -156,11 +160,11 @@ flux events -A                                    # Why something is not Ready
    ```bash
    ansible-playbook user.yaml
    ```
-4. Install Flux. It then builds the platform layer by layer, in the
+4. Bootstrap Flux. It then builds the platform layer by layer, in the
    `dependsOn` order of `kubernetes/clusters/poseidon/infrastructure.yaml`, and
    the applications on top:
    ```bash
-   ansible-playbook core.yaml
+   ansible-playbook flux.yaml
    flux get kustomizations --watch
    ```
 

@@ -1,0 +1,16 @@
+---
+argument_specs:
+  main:
+    short_description: Bootstrap Flux on a cluster that does not have it
+    description:
+      - Installs the cluster's sops age key, and, where they are missing, the
+        Flux Operator and the FluxInstance. Both are read from the files Flux
+        itself syncs, which manage them from then on.
+    options:
+      flux_cluster_dir:
+        description:
+          - Path to the Flux cluster directory, the one the FluxInstance
+            syncs. Its flux-system/ subdirectory holds the operator chart
+            source and the FluxInstance.
+        type: path
+        required: true

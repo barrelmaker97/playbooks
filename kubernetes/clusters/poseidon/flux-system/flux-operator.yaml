@@ -1,0 +1,49 @@
+---
+# The Flux Operator, managed by the Flux it runs, as the operator docs
+# recommend: bump the tag here to upgrade it. Ansible's flux role reads the
+# tag from this file to install the operator once, on a cluster without it.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: flux-operator
+  namespace: flux-system
+spec:
+  url: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
+  ref:
+    tag: "0.60.0"
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  interval: 1h
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: flux-operator
+  namespace: flux-system
+  annotations:
+    # Uninstalling the operator would leave Flux without the controller that
+    # manages it. Removing the file must not do that.
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  releaseName: flux-operator
+  chartRef:
+    kind: OCIRepository
+    name: flux-operator
+    namespace: flux-system
+  interval: 30m
+  # Infrastructure guards; see infrastructure.yaml. The chart already marks
+  # its CRDs keep.
+  install:
+    crds: CreateReplace
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 15m
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 15m
+  driftDetection:
+    mode: warn

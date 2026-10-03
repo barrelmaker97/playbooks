@@ -1,7 +1,9 @@
 ---
 galaxy_info:
   author: Nolan Cooper
-  description: Install Helm and deploy chart releases via a diff-then-upgrade flow.
+  description: >-
+    Bootstrap Flux and its sops key; Flux then manages itself and deploys the
+    platform and every application from kubernetes/ in Git.
   license: GPL-3.0-or-later
   min_ansible_version: "2.15"
   platforms:
@@ -9,6 +11,6 @@ galaxy_info:
       versions: [all]
     - name: Ubuntu
       versions: [all]
-  galaxy_tags: [helm, kubernetes]
+  galaxy_tags: [kubernetes, flux]
 
 dependencies: []
