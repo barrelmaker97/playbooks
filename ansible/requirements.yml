@@ -1,13 +1,10 @@
 ---
-# Collections the playbooks import. Versions are floors, not pins: they record
-# what is known to work rather than freezing a resolved set. Install with
-#   ansible-galaxy collection install -r requirements.yml
+# Collections the playbooks import, pinned like everything in mise.toml.
+# Install with `mise run collections` from the repository root.
 collections:
   - name: kubernetes.core       # k8s, k8s_info, helm, helm_info
-    version: ">=6.4.0"
-  - name: community.sops        # sops lookup, install role
-    version: ">=2.3.0"
-  - name: community.general     # snap
-    version: ">=12.6.1"
+    version: "6.6.0"
+  - name: community.sops        # sops lookup
+    version: "2.4.0"
   - name: community.crypto      # openssl_privatekey, openssl_csr
-    version: ">=3.2.1"
+    version: "3.4.0"

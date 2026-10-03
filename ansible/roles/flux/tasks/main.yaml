@@ -4,15 +4,8 @@
 # live in kubernetes/clusters/poseidon/flux-system, and upgrades are commits
 # to those files. This role reads the same files, so the two can never
 # disagree, and only creates what is missing, so an old checkout can never
-# downgrade a running Flux.
-
-# kubernetes.core.helm drives the helm binary.
-- name: Install Helm
-  become: true
-  community.general.snap:
-    name: helm
-    classic: true
-    channel: latest/stable
+# downgrade a running Flux. kubernetes.core.helm drives the helm binary from
+# mise.toml.
 
 - name: Read the Flux manifests Flux syncs
   ansible.builtin.set_fact:

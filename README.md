@@ -10,23 +10,27 @@ sensor hosts.
 | `kubernetes/` | Everything on the cluster, deployed by Flux from `main` (see Flux below) |
 | `ansible/`    | Playbooks for what Flux cannot do: build and bootstrap the cluster, issue the local kubeconfig, and manage the DNS and sensor hosts |
 
-# Installing Ansible
-```bash
-./ansible/install-ansible.sh
-```
+# Tools
+Every tool the repository uses is pinned in `mise.toml`: kubectl, talosctl,
+flux, helm, the CloudNativePG kubectl plugin, sops, age, kubeconform, flate,
+and Ansible with ansible-lint. CI installs from the same file.
+
+1. [Install mise](https://mise.jdx.dev/installing-mise.html) and activate it
+   in your shell.
+2. From the repository root:
+   ```bash
+   mise install          # the pinned tools
+   mise run collections  # the Ansible collections in ansible/requirements.yml
+   ```
+
+talosctl is pinned to the cluster's Talos version (`talos_version` in
+`ansible/vars/setup.yaml`); bump both together.
 
 # Secrets Management
-Secrets are encrypted with age/sops, which the `setup.yaml` playbook installs
-if they are not present. The personal age key is expected at
+Secrets are encrypted with age/sops. The personal age key is expected at
 `~/.config/sops/age/keys.txt` and can decrypt every secret in the repository.
 Files under `kubernetes/` are also encrypted to a cluster-only key that Flux
 holds; see the Flux section below and `.sops.yaml`.
-
-# Prerequisites
-The `setup.yaml` playbook depends on `talosctl` to generate artifacts for cluster setup
-and will also be needed for bootstrapping after the playbook is complete. It can be installed
-using [this guide](https://docs.siderolabs.com/talos/v1.14/getting-started/talosctl). Be sure to install
-the version that matches the version of Talos to be used for the cluster.
 
 # Running Playbooks
 Playbooks run from `ansible/`, where its `ansible.cfg`, inventory and
@@ -189,11 +193,7 @@ talosctl -e node1-poseidon.lan -n node2-poseidon.lan upgrade --image factory.tal
 talosctl -e node1-poseidon.lan -n node3-poseidon.lan upgrade --image factory.talos.dev/installer/<Image ID>:<Talos Version>
 ```
 ## Upgrade Talosctl
-Download the talosctl binary from the Github release page for the correct architecture. Then move it to the correct location and make sure it is executable. For example:
-```bash
-sudo mv ./talosctl-linux-amd64 /usr/local/bin/talosctl
-sudo chmod +x /usr/local/bin/talosctl
-```
+Bump `talosctl` in `mise.toml` to the new Talos version, then `mise install`.
 
 ## Upgrade Kubernetes
 ```bash
