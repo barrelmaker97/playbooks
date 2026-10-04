@@ -98,7 +98,7 @@ metadata:
 spec:
   url: oci://docker.io/envoyproxy/gateway-helm
   ref:
-    tag: v1.8.1  # OCI chart tags are v-prefixed
+    tag: 1.9.2  # OCI chart tags are v-prefixed
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
