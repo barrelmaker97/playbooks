@@ -1,7 +1,6 @@
 ---
-# Single wildcard certificate for internal LAN routes, issued by the internal
-# self-signed CA. Let's Encrypt cannot issue certs for non-public domains so
-# we mint our own. Lives in the gateway namespace alongside the public cert.
+# The LAN routes' certificate, from the internal CA: Let's Encrypt cannot
+# issue for .lan names.
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -17,10 +16,8 @@ spec:
   dnsNames:
     - "*.poseidon.lan"
 ---
-# Single wildcard Certificate covering the apex and all subdomains of the
-# external domain. Issued via DNS-01 (Cloudflare) so it can be used for hosts
-# that are not publicly routable on port 80. Every public HTTPS listener on
-# the Gateway references the resulting secret.
+# The public certificate, issued by DNS-01 through Cloudflare, which needs no
+# host reachable on port 80.
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:

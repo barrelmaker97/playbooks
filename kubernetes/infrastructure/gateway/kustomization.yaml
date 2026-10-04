@@ -1,7 +1,4 @@
 ---
-# The shared Gateway: its class and proxy config, the two wildcard
-# certificates its HTTPS listeners terminate with, the policies attached to
-# it, and the HTTP-to-HTTPS redirect for every hostname.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:

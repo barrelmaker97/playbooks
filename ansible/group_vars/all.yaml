@@ -1,24 +1,18 @@
 ---
-# Site-level values: identity, topology, and anything more than one playbook
-# reads. Values a single playbook needs live in its own vars/ file, which
-# outranks this one, so a key duplicated here has no effect.
+# Values more than one playbook reads. Values a single playbook needs live in
+# its own vars/ file.
 ansible_user: barrelmaker
 
-# Cluster identity. cluster_host and local_domain are the building blocks for
-# the templated domain at the bottom of this file, so they belong here even
-# though only one role reads each of them directly.
+# Cluster identity
 cluster_host: poseidon
 cluster_port: 6443
 cluster_vip: 192.168.15.40
 local_domain: lan
 
-# Node topology. The node IPs are not listed here: the only reader was the
-# etcd scrape endpoints, now in
-# kubernetes/infrastructure/monitoring/kube-prometheus-stack.yaml.
+# Control plane nodes, one Talos machine config each
 node_names:
   - node1-poseidon
   - node2-poseidon
   - node3-poseidon
 
-# Templated variables
 cluster_domain: "{{ cluster_host }}.{{ local_domain }}"

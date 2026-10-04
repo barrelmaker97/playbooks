@@ -19,9 +19,7 @@ spec:
         namespace: flux-system
       interval: 1h
   interval: 30m
-  # Fail forward: a failed action is retried as written, never rolled back
-  # or uninstalled, so the cluster does not drift from Git. Fix forward with
-  # a commit; a rollback is a git revert.
+  # Infrastructure guards; see kubernetes/clusters/poseidon/infrastructure.yaml.
   install:
     crds: CreateReplace
     strategy:
@@ -35,8 +33,6 @@ spec:
       retryInterval: 15m
   driftDetection:
     mode: enabled
-  # Uninstalling a CRD deletes every object of its kind, cluster-wide. Helm
-  # skips anything marked keep, so no release removal can take the CRDs.
   postRenderers:
     - kustomize:
         patches:

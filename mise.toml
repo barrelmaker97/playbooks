@@ -1,6 +1,6 @@
 # Every tool this repository needs, pinned. Install with `mise install`, then
 # `mise run collections` for the Ansible collections. CI installs from this
-# same file. Versions that track something else are noted.
+# same file.
 
 [tools]
 # Cluster

@@ -1,7 +1,6 @@
 ---
-# Published only as an OCI artifact, so the chart comes from an
-# OCIRepository (kubernetes/clusters/poseidon/repositories.yaml) through
-# chartRef rather than a HelmRepository. The version is pinned there.
+# The chart and its version come from the envoy-gateway OCIRepository in
+# kubernetes/clusters/poseidon/repositories.yaml.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:

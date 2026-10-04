@@ -1,4 +1,3 @@
 ---
-# Read by dewpoint.yaml. dewpoint_bind_port and dewpoint_address stay in the
-# role's defaults/: the role runs without them, so they are real defaults.
+# Read by dewpoint.yaml.
 dewpoint_version: "0.1.2"

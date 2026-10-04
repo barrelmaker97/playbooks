@@ -6,10 +6,8 @@
 # coalescing routing requests to the wrong listener. Setting ALPN explicitly
 # acknowledges the overlap and restores h2 multiplexing.
 #
-# Also advertises the X25519MLKEM768 post-quantum hybrid key-exchange group
-# alongside the classic curves, so PQC-capable clients (current Chrome,
-# Firefox, etc.) negotiate quantum-resistant session keys while older clients
-# fall back to X25519/P-256 transparently.
+# X25519MLKEM768 is a post-quantum hybrid key exchange, preferred where the
+# client supports it; the classic curves after it are the fallback.
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: ClientTrafficPolicy
 metadata:

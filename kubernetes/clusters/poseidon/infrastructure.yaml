@@ -7,6 +7,15 @@
 # A chart and the custom resources it defines are separate Kustomizations
 # (metallb and metallb-config): Flux validates a Kustomization as a whole
 # before applying it, so the resources cannot ship with the CRDs they need.
+#
+# Infrastructure guards, on every HelmRelease in these layers:
+#   RetryOnFailure  a failed install or upgrade is retried as written every
+#                   15 minutes, never rolled back or uninstalled, so the
+#                   cluster does not drift from Git. Roll back with git revert.
+#   driftDetection  changes made by hand to chart objects are reverted.
+#   CRDs keep       a post-renderer marks every CRD helm.sh/resource-policy:
+#                   keep. Deleting a CRD deletes every object of its kind, so
+#                   no release removal may take one.
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
