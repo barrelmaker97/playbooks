@@ -1,6 +1,5 @@
 ---
-# Serves https://dotfiles.barrelmaker.dev as a redirect to the updot
-# script, replacing the retired ingress chart's rewrite-target hack.
+# Redirects https://dotfiles.barrelmaker.dev to the updot script.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:

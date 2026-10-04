@@ -1,10 +1,6 @@
 ---
-# Longhorn's own uninstall guard also stays in place: with its
-# deleting-confirmation-flag setting false (the default), the chart's
-# uninstall hook refuses to run.
-#
-# Longhorn does not support downgrades, which is one more reason this
-# release is never rolled back automatically.
+# Longhorn does not support downgrades. Its uninstall hook refuses to run
+# while the deleting-confirmation-flag setting is false, the default.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:

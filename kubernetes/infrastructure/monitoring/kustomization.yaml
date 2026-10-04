@@ -20,10 +20,8 @@ resources:
   - podmonitor-flux.yaml
   - prometheusrule-flux.yaml
 
-# Grafana dashboards, one JSON file each in dashboards/, which Grafana's
-# sidecar loads by the grafana_dashboard label. Export a dashboard from Grafana
-# and drop it in as a file. The name stays fixed: this layer is never pruned,
-# so a hashed name would leave every old copy behind for the sidecar to load.
+# The name is not hashed: this layer is never pruned, so hashed names would
+# leave every old copy behind for Grafana's sidecar to load.
 configMapGenerator:
   - name: dashboards
     namespace: monitoring

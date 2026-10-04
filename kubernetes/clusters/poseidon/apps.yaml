@@ -1,12 +1,16 @@
 # One Kustomization per app, so a failure is reported by app name and blocks
-# nothing else. Apps in the shared barrelmaker namespace wait for the
-# Kustomization that creates it, and apps that create ServiceMonitors,
-# PodMonitors or PrometheusRules wait for the CRDs in monitoring-prereq, and
-# apps with a PostgreSQL Cluster wait for the cloudnative-pg operator, and
-# apps with volumes wait for Longhorn's storage classes in longhorn-config,
-# and apps with routes wait for the Gateway.
-# wait: true makes each one Ready only once
-# everything it applied is healthy, including its HelmRelease.
+# nothing else. wait: true makes each one Ready only once everything it
+# applied is healthy, including its HelmRelease. An app depends on:
+#   barrelmaker        if it lives in the shared barrelmaker namespace
+#   monitoring-prereq  if it creates ServiceMonitors, PodMonitors or
+#                      PrometheusRules
+#   cloudnative-pg     if it has a PostgreSQL Cluster
+#   longhorn-config    if it has volumes
+#   gateway            if it has routes
+#
+# App HelmReleases fail forward: a failed install or upgrade is retried as
+# written every 15 minutes, never rolled back or uninstalled. Fix with a
+# commit; a StatefulSet stuck on a bad pod also needs that pod deleted by hand.
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

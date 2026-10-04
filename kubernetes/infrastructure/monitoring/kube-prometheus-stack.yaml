@@ -2,11 +2,9 @@
 # crds: Skip because the chart bundles its own copy of the Prometheus
 # CRDs, at an older operator version than prometheus-operator-crds in
 # monitoring-prereq, which owns them. CreateReplace here would downgrade them
-# on every upgrade. Helm never touched the bundled copy under Ansible either.
+# on every upgrade.
 #
 # The Grafana datasource values escape Grafana's own interpolation as $${...}.
-# This Kustomization has no postBuild substitution; if one is added, mark this
-# file kustomize.toolkit.fluxcd.io/substitute: disabled.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
