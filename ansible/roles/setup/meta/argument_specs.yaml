@@ -62,8 +62,6 @@ argument_specs:
         type: str
         required: true
       nut_password:
-        description:
-          - NUT password. Stored in plaintext, unlike every other credential in
-            this repository, which are sops-encrypted.
+        description: NUT password.
         type: str
         required: true

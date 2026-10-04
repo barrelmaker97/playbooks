@@ -9,9 +9,10 @@ install_disk: /dev/nvme0n1
 interface_name: enp86s0
 ntp_server: 192.168.15.1
 
-# NUT connection for the nut-client extension. nut_password is stored in
-# plaintext, unlike every other credential in this repository, which are
-# sops-encrypted.
+# NUT connection for the nut-client extension. The password is kept in
+# setup.sops.yaml beside this file.
 nut_host: ups@192.168.15.30
 nut_user: remoteuser
-nut_password: hunter2
+nut_password: >-
+  {{ (lookup('community.sops.sops', playbook_dir ~ '/vars/setup.sops.yaml')
+      | from_yaml).nut_password }}

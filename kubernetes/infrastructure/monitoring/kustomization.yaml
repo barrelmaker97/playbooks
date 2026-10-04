@@ -8,7 +8,6 @@ resources:
   - limitrange.yaml
   - secret-grafana-admin-credentials.sops.yaml
   - secret-additional-scrape-configs.yaml
-  - configmap-dashboards.yaml
   - kube-prometheus-stack.yaml
   - loki.yaml
   - tempo.yaml
@@ -20,3 +19,19 @@ resources:
   - prometheusrule-dewpoint.yaml
   - podmonitor-flux.yaml
   - prometheusrule-flux.yaml
+
+# Grafana dashboards, one JSON file each in dashboards/, which Grafana's
+# sidecar loads by the grafana_dashboard label. Export a dashboard from Grafana
+# and drop it in as a file. The name stays fixed: this layer is never pruned,
+# so a hashed name would leave every old copy behind for the sidecar to load.
+configMapGenerator:
+  - name: dashboards
+    namespace: monitoring
+    files:
+      - dashboards/homelab-nodes.json
+      - dashboards/openwrt.json
+      - dashboards/dewpoint.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"
