@@ -58,7 +58,9 @@ jobs:
 
   # Comments the rendered diff against the base branch on the PR: the
   # objects that will actually change in the cluster, not just the lines that
-  # changed in Git. Updated in place on each push.
+  # changed in Git. Updated in place on each push. A PR that renders no
+  # changes, such as a tool or CI update, gets no comment: every new comment
+  # is a notification, and an empty one says nothing.
   diff:
     runs-on: ubuntu-latest
     permissions:
@@ -85,6 +87,12 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           marker="<!-- flate-diff -->"
+          id=$(gh api "repos/${REPO}/issues/${PR}/comments" --paginate \
+            --jq ".[] | select(.body | startswith(\"${marker}\")) | .id" | head -n 1)
+          if [ ! -s diff.txt ] && [ -z "$id" ]; then
+            echo "No rendered changes; not commenting."
+            exit 0
+          fi
           {
             echo "$marker"
             echo "### Rendered cluster changes"
@@ -98,8 +106,6 @@ jobs:
               echo "No rendered changes."
             fi
           } > comment.md
-          id=$(gh api "repos/${REPO}/issues/${PR}/comments" --paginate \
-            --jq ".[] | select(.body | startswith(\"${marker}\")) | .id" | head -n 1)
           if [ -n "$id" ]; then
             gh api -X PATCH "repos/${REPO}/issues/comments/${id}" -F body=@comment.md > /dev/null
           else
