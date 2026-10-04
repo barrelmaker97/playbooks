@@ -1,9 +1,8 @@
 # The cluster platform, one Kustomization per layer, ordered by dependsOn
-# from the bottom up. These differ from the apps on purpose:
-#   prune: false  removing a file never removes the platform; deleting
-#                 infrastructure is a deliberate manual step.
-#   wait: true    a layer is Ready only once everything in it is healthy,
-#                 which is what the layers above wait for.
+# from the bottom up. Settings they share with the apps are set in
+# kustomization.yaml. Unlike the apps they set prune: false: removing a file
+# never removes the platform; deleting infrastructure is a deliberate manual
+# step.
 # A chart and the custom resources it defines are separate Kustomizations
 # (metallb and metallb-config): Flux validates a Kustomization as a whole
 # before applying it, so the resources cannot ship with the CRDs they need.
@@ -24,17 +23,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/flux-notifications
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
   prune: false
-  wait: true
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
 
 # Layer 0: everything else renders ServiceMonitors, PodMonitors or
 # PrometheusRules into these CRDs.
@@ -46,14 +35,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/monitoring-prereq
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
 
 # Layer 1: independent of each other; each needs the monitoring CRDs for
 # its ServiceMonitors or PodMonitors.
@@ -65,14 +47,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/metallb
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: monitoring-prereq
 ---
@@ -83,14 +58,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/metallb-config
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: metallb
 ---
@@ -101,14 +69,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/cert-manager
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: monitoring-prereq
 ---
@@ -119,20 +80,9 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/cert-manager-config
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: cert-manager
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -141,14 +91,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/cloudnative-pg
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: monitoring-prereq
 ---
@@ -159,14 +102,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/longhorn
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: monitoring-prereq
 ---
@@ -177,14 +113,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/longhorn-config
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: longhorn
 
@@ -198,21 +127,10 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/monitoring
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: monitoring-prereq
     - name: longhorn-config
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
 
 # Layer 3: the Gateway on top of everything below it, then the routes to the
 # platform UIs, which need the services they route to.
@@ -224,14 +142,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/envoy-gateway
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -240,14 +151,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/gateway
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: envoy-gateway
     - name: cert-manager-config
@@ -261,19 +165,8 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/routing
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: false
-  wait: true
   dependsOn:
     - name: gateway
     - name: monitoring
     - name: longhorn
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
