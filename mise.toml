@@ -29,3 +29,16 @@ uv = "0.12.23"
 [tasks.collections]
 description = "Install the Ansible collections in ansible/requirements.yml"
 run = "ansible-galaxy collection install -r ansible/requirements.yml"
+
+# The Image Factory returns the same schematic ID for the same customization,
+# so this is the image the nodes run, at talos_version.
+[tasks."talos:image"]
+description = "Print the Talos installer image for talos_version and the node extensions"
+run = '''
+set -eu
+version=$(sed -n 's/^talos_version: "\(.*\)"$/\1/p' ansible/vars/setup.yaml)
+id=$(curl -fsS -X POST --data-binary @ansible/roles/setup/files/customization.yaml \
+  https://factory.talos.dev/schematics | sed -n 's/.*"id":"\([0-9a-f]*\)".*/\1/p')
+test -n "$version" && test -n "$id"
+echo "factory.talos.dev/installer/${id}:v${version}"
+'''

@@ -1,4 +1,6 @@
 # vim: ft=yaml
 ---
+# Read by ansible-lint, which applies these rules to every YAML file in the
+# repository, kubernetes/ included.
 rules:
   line-length: disable
