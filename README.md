@@ -24,7 +24,7 @@ and Ansible with ansible-lint. CI installs from the same file.
    ```
 
 talosctl is pinned to the cluster's Talos version (`talos_version` in
-`ansible/vars/setup.yaml`); bump both together.
+`ansible/vars/setup.yaml`); Renovate bumps both in one PR.
 
 # Secrets Management
 Secrets are encrypted with age/sops. The personal age key is expected at
@@ -196,26 +196,35 @@ flux events -A                                    # Why something is not Ready
    ```
 
 # Cluster Upgrade
+Renovate opens one PR for a new Talos release, bumping `talos_version` and
+talosctl together. Merge it, `mise install`, then upgrade the nodes.
+
 ## Upgrade Talos
-Be sure to wait for upgrade to complete on each node before proceeding to the next one. This means waiting for all workloads to be in a good state.
+Print the installer image for the merged version:
 ```bash
-# Node 1
-talosctl -e node2-poseidon.lan -n node1-poseidon.lan upgrade --image factory.talos.dev/installer/<Image ID>:<Talos Version>
-
-# Node 2
-talosctl -e node1-poseidon.lan -n node2-poseidon.lan upgrade --image factory.talos.dev/installer/<Image ID>:<Talos Version>
-
-# Node 3
-talosctl -e node1-poseidon.lan -n node3-poseidon.lan upgrade --image factory.talos.dev/installer/<Image ID>:<Talos Version>
+mise run talos:image
 ```
-## Upgrade Talosctl
-Bump `talosctl` in `mise.toml` to the new Talos version, then `mise install`.
+Upgrade one node at a time, each through another node's endpoint, and wait for
+the node to rejoin and every workload to be healthy before the next:
+```bash
+IMAGE=$(mise run -q talos:image)
+talosctl -e node2-poseidon.lan -n node1-poseidon.lan upgrade --image "$IMAGE"
+talosctl -e node1-poseidon.lan -n node2-poseidon.lan upgrade --image "$IMAGE"
+talosctl -e node1-poseidon.lan -n node3-poseidon.lan upgrade --image "$IMAGE"
+```
 
 ## Upgrade Kubernetes
 ```bash
 talosctl -n node1-poseidon.lan upgrade-k8s --dry-run
 talosctl -n node1-poseidon.lan upgrade-k8s
 ```
+Then bump kubectl in `mise.toml` to the new version: Renovate only offers
+kubectl patches, since kubectl follows the cluster.
+
+## Global Tools
+mise's global config (outside this repository) pins the cluster tools by minor
+version so they work from any directory. After a minor upgrade of Talos or
+Kubernetes, move those prefixes too, e.g. `mise use -g talosctl@1.15`.
 
 # License
 
