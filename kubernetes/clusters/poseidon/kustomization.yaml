@@ -9,3 +9,31 @@ resources:
   - repositories.yaml
   - infrastructure.yaml
   - apps.yaml
+
+# Settings every Flux Kustomization in infrastructure.yaml and apps.yaml
+# shares, so each entry there holds only its path, prune and dependsOn. A
+# patch overrides the same field set on an entry, so to vary one of these for
+# a single Kustomization, narrow this patch's target rather than setting it
+# there. wait: true makes each Ready only once everything it applied is
+# healthy, which is what dependsOn waits for.
+patches:
+  - target:
+      group: kustomize.toolkit.fluxcd.io
+      kind: Kustomization
+    patch: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: any
+      spec:
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+        interval: 10m
+        retryInterval: 1m
+        timeout: 10m
+        wait: true
+        decryption:
+          provider: sops
+          secretRef:
+            name: sops-age

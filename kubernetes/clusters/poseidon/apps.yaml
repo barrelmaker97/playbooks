@@ -1,6 +1,6 @@
 # One Kustomization per app, so a failure is reported by app name and blocks
-# nothing else. wait: true makes each one Ready only once everything it
-# applied is healthy, including its HelmRelease. An app depends on:
+# nothing else. Settings they all share are set in kustomization.yaml. An
+# app depends on:
 #   barrelmaker        if it lives in the shared barrelmaker namespace
 #   monitoring-prereq  if it creates ServiceMonitors, PodMonitors or
 #                      PrometheusRules
@@ -19,14 +19,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/barrelmaker
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -35,14 +28,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/dotfiles
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
   dependsOn:
     - name: barrelmaker
     - name: gateway
@@ -54,14 +40,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/jellyfin
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
   dependsOn:
     - name: barrelmaker
     - name: longhorn-config
@@ -74,14 +53,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/niucraft
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
   dependsOn:
     - name: monitoring-prereq
     - name: barrelmaker
@@ -95,14 +67,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/pistachio
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
   dependsOn:
     - name: monitoring-prereq
     - name: barrelmaker
@@ -114,14 +79,7 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/website
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
   dependsOn:
     - name: barrelmaker
     - name: gateway
@@ -133,21 +91,10 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/loch
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
   dependsOn:
     - name: barrelmaker
     - name: longhorn-config
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -156,21 +103,10 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/valheim
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
   dependsOn:
     - name: barrelmaker
     - name: longhorn-config
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -179,23 +115,12 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/obscura
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
   dependsOn:
     - name: monitoring-prereq
     - name: cloudnative-pg
     - name: longhorn-config
     - name: gateway
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -204,20 +129,9 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/apps/devscura
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  interval: 10m
-  retryInterval: 1m
-  timeout: 10m
   prune: true
-  wait: true
   dependsOn:
     - name: monitoring-prereq
     - name: cloudnative-pg
     - name: longhorn-config
     - name: gateway
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
