@@ -1,6 +1,6 @@
 ---
-# Same Discord webhook Alertmanager posts to. The Secret's address key holds
-# the webhook URL.
+# Flux's own Discord webhook, separate from Alertmanager's. The Secret's
+# address key holds the webhook URL.
 apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Provider
 metadata:
