@@ -59,6 +59,11 @@ spec:
     defaultSettings:
       allowVolumeCreationWithDegradedAvailability: false
       backupTarget: "nfs://soteria.lan:/volume1/longhorn-backupstore"
+      # Upgrade volume engines to the new default after a Longhorn upgrade:
+      # live where possible, and offline for strict-local volumes (the CNPG
+      # ones), which cannot live-upgrade and so move on their next detach,
+      # such as a node reboot.
+      concurrentAutomaticEngineUpgradePerNodeLimit: "1"
       concurrentReplicaRebuildPerNodeLimit: "2"
       defaultDataLocality: best-effort
       defaultDataPath: /var/mnt/longhorn
