@@ -8,9 +8,8 @@
 #   longhorn-config    if it has volumes
 #   gateway            if it has routes
 #
-# App HelmReleases fail forward: a failed install or upgrade is retried as
-# written every 15 minutes, never rolled back or uninstalled. Fix with a
-# commit; a StatefulSet stuck on a bad pod also needs that pod deleted by hand.
+# An app with a HelmRelease lists kubernetes/components/helmrelease under
+# components in its kustomization.yaml, for the settings every release shares.
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

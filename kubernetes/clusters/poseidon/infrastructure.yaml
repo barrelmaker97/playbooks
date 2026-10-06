@@ -6,15 +6,8 @@
 # A chart and the custom resources it defines are separate Kustomizations
 # (metallb and metallb-config): Flux validates a Kustomization as a whole
 # before applying it, so the resources cannot ship with the CRDs they need.
-#
-# Infrastructure guards, on every HelmRelease in these layers:
-#   RetryOnFailure  a failed install or upgrade is retried as written every
-#                   15 minutes, never rolled back or uninstalled, so the
-#                   cluster does not drift from Git. Roll back with git revert.
-#   driftDetection  changes made by hand to chart objects are reverted.
-#   CRDs keep       a post-renderer marks every CRD helm.sh/resource-policy:
-#                   keep. Deleting a CRD deletes every object of its kind, so
-#                   no release removal may take one.
+# The settings every HelmRelease shares, and the CRD guards, are the
+# kubernetes/components/helmrelease component.
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -25,8 +18,9 @@ spec:
   path: ./kubernetes/infrastructure/flux-notifications
   prune: false
 
-# Layer 0: everything else renders ServiceMonitors, PodMonitors or
-# PrometheusRules into these CRDs.
+# Layer 0: no dependencies. Everything else renders ServiceMonitors,
+# PodMonitors or PrometheusRules into the monitoring CRDs. Envoy Gateway
+# defines the Gateway API and its own CRDs, which the gateway layer needs.
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -35,6 +29,15 @@ metadata:
   namespace: flux-system
 spec:
   path: ./kubernetes/infrastructure/monitoring-prereq
+  prune: false
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: envoy-gateway
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/envoy-gateway
   prune: false
 
 # Layer 1: independent of each other; each needs the monitoring CRDs for
@@ -116,6 +119,17 @@ spec:
   prune: false
   dependsOn:
     - name: longhorn
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: metrics-server
+  namespace: flux-system
+spec:
+  path: ./kubernetes/infrastructure/metrics-server
+  prune: false
+  dependsOn:
+    - name: monitoring-prereq
 
 # Layer 2: needs the monitoring CRDs, and Longhorn's storage classes for the
 # Prometheus, Alertmanager, Loki and Tempo volumes.
@@ -132,17 +146,9 @@ spec:
     - name: monitoring-prereq
     - name: longhorn-config
 
-# Layer 3: the Gateway on top of everything below it, then the routes to the
-# platform UIs, which need the services they route to.
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: envoy-gateway
-  namespace: flux-system
-spec:
-  path: ./kubernetes/infrastructure/envoy-gateway
-  prune: false
+# Layer 3: the Gateway, once its controller, certificates and load balancer
+# address exist, then the routes to the platform UIs, which need the services
+# they route to.
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

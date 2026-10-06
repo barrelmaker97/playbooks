@@ -9,6 +9,8 @@ resources:
   - postgres-podmonitor.yaml
   - postgres-prometheusrule.yaml
   - helmrelease.yaml
+components:
+  - ../../components/helmrelease
 
 # kustomize-controller decrypts values.sops.yaml before building, so the
 # generated Secret holds plaintext values while the file in Git stays

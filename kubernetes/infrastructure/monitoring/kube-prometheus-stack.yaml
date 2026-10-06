@@ -1,8 +1,8 @@
 ---
-# crds: Skip because the chart bundles its own copy of the Prometheus
-# CRDs, at an older operator version than prometheus-operator-crds in
-# monitoring-prereq, which owns them. CreateReplace here would downgrade them
-# on every upgrade.
+# crds.enabled: false because the chart bundles its own copy of the
+# Prometheus CRDs, at an older operator version than prometheus-operator-crds
+# in monitoring-prereq, which owns them. Rendering them here would downgrade
+# them on every upgrade.
 #
 # The Grafana datasource values escape Grafana's own interpolation as $${...}.
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -21,34 +21,9 @@ spec:
         name: prometheus-community
         namespace: flux-system
       interval: 1h
-  interval: 30m
-  # Infrastructure guards; see kubernetes/clusters/poseidon/infrastructure.yaml.
-  install:
-    crds: Skip
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  upgrade:
-    crds: Skip
-    cleanupOnFail: true
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  driftDetection:
-    mode: enabled
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              kind: CustomResourceDefinition
-            patch: |
-              apiVersion: apiextensions.k8s.io/v1
-              kind: CustomResourceDefinition
-              metadata:
-                name: any
-                annotations:
-                  helm.sh/resource-policy: keep
   values:
+    crds:
+      enabled: false
     kubeEtcd:
       enabled: true
       # Literal node IPs: Kubernetes Endpoints reject hostnames.

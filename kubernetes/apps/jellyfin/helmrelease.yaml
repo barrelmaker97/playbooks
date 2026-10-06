@@ -15,18 +15,6 @@ spec:
         name: barrelmaker
         namespace: flux-system
       interval: 1h
-  interval: 30m
-  install:
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  upgrade:
-    cleanupOnFail: true
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  driftDetection:
-    mode: enabled
   values:
     persistence:
       config:

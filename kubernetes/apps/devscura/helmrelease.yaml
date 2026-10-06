@@ -15,18 +15,6 @@ spec:
         name: barrelmaker
         namespace: flux-system
       interval: 1h
-  interval: 30m
-  install:
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  upgrade:
-    cleanupOnFail: true
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  driftDetection:
-    mode: enabled
   # The sops values only add keys that the values below do not set, so the
   # merge order (valuesFrom first, then values) does not change the result.
   valuesFrom:
