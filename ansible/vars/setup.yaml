@@ -8,11 +8,3 @@ talos_config_dir: /home/barrelmaker/.talos
 install_disk: /dev/nvme0n1
 interface_name: enp86s0
 ntp_server: 192.168.15.1
-
-# NUT connection for the nut-client extension. The password is kept in
-# setup.sops.yaml beside this file.
-nut_host: ups@192.168.15.30
-nut_user: remoteuser
-nut_password: >-
-  {{ (lookup('community.sops.sops', playbook_dir ~ '/vars/setup.sops.yaml')
-      | from_yaml).nut_password }}

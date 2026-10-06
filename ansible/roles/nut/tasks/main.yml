@@ -1,0 +1,73 @@
+---
+- name: Install NUT
+  ansible.builtin.apt:
+    name:
+      - nut-client
+      - nut-server
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Configure NUT mode
+  ansible.builtin.template:
+    src: nut.conf.j2
+    dest: /etc/nut/nut.conf
+    owner: root
+    group: nut
+    mode: '0640'
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+- name: Configure UPS driver
+  ansible.builtin.template:
+    src: ups.conf.j2
+    dest: /etc/nut/ups.conf
+    owner: root
+    group: nut
+    mode: '0640'
+  notify: Restart nut-driver
+
+- name: Configure upsd
+  ansible.builtin.template:
+    src: upsd.conf.j2
+    dest: /etc/nut/upsd.conf
+    owner: root
+    group: nut
+    mode: '0640'
+  notify: Restart nut-server
+
+# Holds passwords, so no diff
+- name: Configure upsd users
+  ansible.builtin.template:
+    src: upsd.users.j2
+    dest: /etc/nut/upsd.users
+    owner: root
+    group: nut
+    mode: '0640'
+  diff: false
+  notify: Restart nut-server
+
+# Holds the primary's password, so no diff
+- name: Configure upsmon
+  ansible.builtin.template:
+    src: upsmon.conf.j2
+    dest: /etc/nut/upsmon.conf
+    owner: root
+    group: nut
+    mode: '0640'
+  diff: false
+  notify: Restart nut-monitor
+
+- name: Flush handlers to restart NUT before checking services
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure NUT services are enabled and started
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - nut-driver.target
+    - nut-server
+    - nut-monitor

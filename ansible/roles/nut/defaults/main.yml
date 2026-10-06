@@ -1,0 +1,21 @@
+---
+# Driver settings for the UPS the server is USB-connected to.
+nut_ups_driver: usbhid-ups
+nut_ups_port: auto
+nut_ups_desc: Main UPS
+
+# With ignorelb the driver raises low battery itself from these thresholds,
+# whichever is crossed first, instead of trusting the UPS's own flag. The
+# runtime must cover the slowest secondary's shutdown with margin.
+nut_ups_runtime_low: 600
+nut_ups_charge_low: 15
+
+# Seconds the UPS keeps its output on after the primary commands killpower, and
+# then waits once mains returns before restoring it. offdelay is the window the
+# secondaries get to finish shutting down; ondelay must exceed it.
+nut_ups_offdelay: 180
+nut_ups_ondelay: 240
+
+# Address and port upsd listens on for secondaries.
+nut_listen_address: 0.0.0.0
+nut_listen_port: 3493

@@ -53,12 +53,13 @@ ansible-playbook dns.yaml --tags pihole
 | `flux.yaml`     | localhost     | Bootstrap Flux on a cluster that has none                  |
 | `dns.yaml`      | `dns_servers` | unbound, Pi-hole and keepalived on the DNS pair            |
 | `dewpoint.yaml` | `dns_servers` | The dewpoint Govee sensor Prometheus exporter              |
+| `nut.yaml`      | `ups_servers` | The NUT server, on the host the UPS is USB-connected to    |
 
 None of them is meant to run on a schedule. `setup.yaml` mints a fresh Talos
 admin certificate and `user.yaml` a fresh client certificate on every run, so
 run them when building the cluster or renewing the kubeconfig. `flux.yaml` only
-acts on a cluster missing Flux, or one that lost it. `dns.yaml` and
-`dewpoint.yaml` support role tags. Run `dns.yaml` one host at a time
+acts on a cluster missing Flux, or one that lost it. `dns.yaml`,
+`dewpoint.yaml` and `nut.yaml` support role tags. Run `dns.yaml` one host at a time
 (`--limit castor`, then `--limit pollux`): a config change restarts unbound,
 and the VIP needs one healthy resolver to stay on.
 
@@ -128,6 +129,33 @@ flux events -A                                    # Why something is not Ready
 - The CloudNativePG databases (`longhorn-cnpg-local`) are not backed up:
   replication protects against losing a node, not against losing data.
 - The Jellyfin media library lives on the NAS itself.
+
+# Power
+The nodes, pollux, Soteria and the router run off one UPS (CyberPower
+CP1500PFCLCDa), USB-connected to pollux; the modem does not. Pollux is the NUT primary, configured by `nut.yaml`; the Talos nodes are
+secondaries through the nut-client extension, configured by `setup.yaml`, and
+Soteria is one through DSM.
+
+On battery, a power loss plays out as:
+1. The driver raises low battery at 600s of runtime or 15% charge, whichever
+   comes first, rather than trusting the UPS's own flag.
+2. Pollux sets FSD and every secondary starts shutting down.
+3. Pollux waits up to 15s for them, shuts itself down and commands killpower.
+4. The UPS holds its output for 180s, then cuts it.
+5. Once mains returns, it waits 240s and restores output.
+
+A graceful Talos shutdown takes about 70s, so the nodes get roughly 2.5x what
+they need. If one ever comes close to 3 minutes, raise `nut_ups_offdelay` and
+`nut_ups_runtime_low` together. Pollux boots when power returns; the nodes stay
+off and have to be powered on.
+
+DSM cannot set the UPS name or credentials: it always connects to `ups` as
+`monuser`, which is why the server keeps both. Point it at pollux under
+**Control Panel > Hardware and Power > UPS** as a Synology UPS server.
+
+Check the server and its clients with `upsc ups@pollux.lan` and
+`upsc -c ups@pollux.lan`. `sudo upsmon -c fsd` on pollux tests the whole chain
+and shuts everything down for real.
 
 # IP Plan
 ### Cluster

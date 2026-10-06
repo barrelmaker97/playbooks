@@ -16,3 +16,13 @@ node_names:
   - node3-poseidon
 
 cluster_domain: "{{ cluster_host }}.{{ local_domain }}"
+
+# NUT: the UPS pollux serves, and the account the Talos nodes monitor it with.
+# nut.yaml configures the server side, setup.yaml the nut-client extension.
+nut_server: 192.168.15.30
+nut_ups_name: ups
+nut_host: "{{ nut_ups_name }}@{{ nut_server }}"
+nut_user: remoteuser
+nut_password: >-
+  {{ (lookup('community.sops.sops', playbook_dir ~ '/vars/nut.sops.yaml')
+      | from_yaml).remoteuser_password }}
