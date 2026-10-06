@@ -130,6 +130,33 @@ flux events -A                                    # Why something is not Ready
   replication protects against losing a node, not against losing data.
 - The Jellyfin media library lives on the NAS itself.
 
+# Power
+The nodes, pollux, Soteria and the router run off one UPS (CyberPower
+CP1500PFCLCDa), USB-connected to pollux; the modem does not. Pollux is the NUT primary, configured by `nut.yaml`; the Talos nodes are
+secondaries through the nut-client extension, configured by `setup.yaml`, and
+Soteria is one through DSM.
+
+On battery, a power loss plays out as:
+1. The driver raises low battery at 600s of runtime or 15% charge, whichever
+   comes first, rather than trusting the UPS's own flag.
+2. Pollux sets FSD and every secondary starts shutting down.
+3. Pollux waits up to 15s for them, shuts itself down and commands killpower.
+4. The UPS holds its output for 180s, then cuts it.
+5. Once mains returns, it waits 240s and restores output.
+
+A graceful Talos shutdown takes about 70s, so the nodes get roughly 2.5x what
+they need. If one ever comes close to 3 minutes, raise `nut_ups_offdelay` and
+`nut_ups_runtime_low` together. Pollux boots when power returns; the nodes stay
+off and have to be powered on.
+
+DSM cannot set the UPS name or credentials: it always connects to `ups` as
+`monuser`, which is why the server keeps both. Point it at pollux under
+**Control Panel > Hardware and Power > UPS** as a Synology UPS server.
+
+Check the server and its clients with `upsc ups@pollux.lan` and
+`upsc -c ups@pollux.lan`. `sudo upsmon -c fsd` on pollux tests the whole chain
+and shuts everything down for real.
+
 # IP Plan
 ### Cluster
 | Name         | Address                     | Hostname           |
