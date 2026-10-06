@@ -12,6 +12,7 @@ permissions:
 # Flux applies whatever lands on main, so this is the last check before a
 # change reaches the cluster. Every directory holding a kustomization.yaml is
 # built and validated, custom resources against the datreeio CRD catalog.
+# Components are skipped: they build only as part of a kustomization.
 # Secrets are skipped: sops-encrypted ones carry a top-level sops block that
 # strict validation rejects, and Flux decrypts them before applying.
 jobs:
@@ -30,7 +31,7 @@ jobs:
         # empty input and pass.
         shell: bash
         run: |
-          find kubernetes -name kustomization.yaml -printf '%h\n' | sort | while read -r dir; do
+          find kubernetes -name kustomization.yaml -not -path 'kubernetes/components/*' -printf '%h\n' | sort | while read -r dir; do
             echo "== $dir"
             kubectl kustomize "$dir" | kubeconform -strict -summary -skip Secret \
               -schema-location default \

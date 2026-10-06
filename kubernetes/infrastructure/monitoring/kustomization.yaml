@@ -12,13 +12,14 @@ resources:
   - loki.yaml
   - tempo.yaml
   - otel-collector.yaml
-  - metrics-server.yaml
   - secret-discord-webhook-url.sops.yaml
   - alertmanagerconfig.yaml
   - prometheusrule-longhorn-snapshots.yaml
   - prometheusrule-dewpoint.yaml
   - podmonitor-flux.yaml
   - prometheusrule-flux.yaml
+components:
+  - ../../components/helmrelease
 
 # The name is not hashed: this layer is never pruned, so hashed names would
 # leave every old copy behind for Grafana's sidecar to load.

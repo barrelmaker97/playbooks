@@ -74,6 +74,7 @@ Flux manages itself: upgrade Flux or its operator by editing
 | `kubernetes/infrastructure/<layer>` | Platform layers, ordered bottom up by `dependsOn` in `infrastructure.yaml` |
 | `kubernetes/apps/<app>`             | The app's HelmRelease, plus its namespace, database and alerts where it owns them |
 | `kubernetes/apps/barrelmaker`       | The namespace most apps share, with its quota and limit range |
+| `kubernetes/components/helmrelease` | The settings every HelmRelease shares, listed under `components` beside each one |
 
 ## How deploys work
 - Merging to `main` deploys. Before merge, CI validates every kustomization's
@@ -83,15 +84,18 @@ Flux manages itself: upgrade Flux or its operator by editing
   rendered diff on the PR. Preview locally with
   `flate diff all --path ./kubernetes --base main`.
 - Manifests hold literal values, apart from a few kustomize patches and
-  generators; the rendered diff shows what will actually be applied.
+  generators; the rendered diff shows what will actually be applied. The
+  settings every HelmRelease shares are one kustomize component,
+  `kubernetes/components/helmrelease`, so a HelmRelease file holds only its
+  chart, values and `dependsOn`.
 - HelmReleases fail forward: a failed install or upgrade is retried as written
   every 15 minutes and never rolled back, so the cluster does not drift from
   Git. Fix forward with a commit, or `git revert`. A StatefulSet stuck on a bad
   pod also needs that pod deleted by hand once the spec is fixed.
 - Every HelmRelease reverts changes made by hand to the objects its chart
   manages.
-- Infrastructure is never pruned: removing a file does not uninstall it, and
-  its CRDs are marked `helm.sh/resource-policy: keep`. Namespaces and database
+- Infrastructure is never pruned: removing a file does not uninstall it. Every
+  chart's CRDs are marked `helm.sh/resource-policy: keep`. Namespaces and database
   Clusters carry `kustomize.toolkit.fluxcd.io/prune: disabled`, so deleting
   their files never deletes their data.
 - Failed reconciliations post to Discord. Alertmanager also alerts when a Flux
@@ -103,8 +107,9 @@ Flux manages itself: upgrade Flux or its operator by editing
 
 ## Adding an app
 1. Create `kubernetes/apps/<app>/` with a `kustomization.yaml` and the app's
-   HelmRelease. Put it in the shared `barrelmaker` namespace, or give it its own
-   `namespace.yaml` with `kustomize.toolkit.fluxcd.io/prune: disabled`.
+   HelmRelease, and `../../components/helmrelease` under `components` in that
+   `kustomization.yaml`. Put it in the shared `barrelmaker` namespace, or give
+   it its own `namespace.yaml` with `kustomize.toolkit.fluxcd.io/prune: disabled`.
 2. Add a Flux Kustomization for it to `kubernetes/clusters/poseidon/apps.yaml`,
    with `prune: true` and the `dependsOn` its resources need (listed at the top
    of that file).

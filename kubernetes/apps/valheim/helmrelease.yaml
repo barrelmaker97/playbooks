@@ -15,18 +15,34 @@ spec:
         name: barrelmaker
         namespace: flux-system
       interval: 1h
-  interval: 30m
-  install:
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  upgrade:
-    cleanupOnFail: true
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  driftDetection:
-    mode: enabled
   valuesFrom:
     - kind: Secret
       name: valheim-values
+  values:
+    serverName: Barrelmaker
+    worldName: Asgard
+    public: false
+    metrics: true
+
+    persistence:
+      storageClassName: longhorn-protected
+      size: 10Gi
+
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      runAsNonRoot: true
+      runAsUser: 111
+      runAsGroup: 1000
+      fsGroup: 1000
+
+    service:
+      type: LoadBalancer
+      port: 2456
+
+    resources:
+      requests:
+        cpu: 700m
+        memory: 3000Mi
+      limits:
+        memory: 4000Mi

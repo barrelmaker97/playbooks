@@ -9,6 +9,8 @@ resources:
   - postgres-podmonitor.yaml
   - postgres-prometheusrule.yaml
   - helmrelease.yaml
+components:
+  - ../../components/helmrelease
 
 # kustomize-controller decrypts values.sops.yaml before building; see
 # kubernetes/apps/devscura/kustomization.yaml.

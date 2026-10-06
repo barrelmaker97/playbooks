@@ -16,35 +16,8 @@ spec:
         name: jetstack
         namespace: flux-system
       interval: 1h
-  interval: 30m
   dependsOn:
     - name: cert-manager
-  # Infrastructure guards; see kubernetes/clusters/poseidon/infrastructure.yaml.
-  install:
-    crds: CreateReplace
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  upgrade:
-    crds: CreateReplace
-    cleanupOnFail: true
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 15m
-  driftDetection:
-    mode: enabled
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              kind: CustomResourceDefinition
-            patch: |
-              apiVersion: apiextensions.k8s.io/v1
-              kind: CustomResourceDefinition
-              metadata:
-                name: any
-                annotations:
-                  helm.sh/resource-policy: keep
   values:
     app:
       trust:

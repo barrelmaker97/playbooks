@@ -32,8 +32,8 @@ spec:
     name: flux-operator
     namespace: flux-system
   interval: 30m
-  # Infrastructure guards; see infrastructure.yaml. The chart already marks
-  # its CRDs keep.
+  # The settings every HelmRelease shares, as kubernetes/components/helmrelease
+  # sets them for the rest. The chart already marks its CRDs keep.
   install:
     crds: CreateReplace
     strategy:
