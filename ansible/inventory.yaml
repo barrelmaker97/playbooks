@@ -14,3 +14,6 @@ all:
         keepalived_vip: 192.168.15.80
         keepalived_interface: eth0
         keepalived_router_id: 51
+    ups_servers:
+      hosts:
+        pollux:

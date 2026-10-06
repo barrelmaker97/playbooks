@@ -1,0 +1,72 @@
+---
+argument_specs:
+  main:
+    short_description: Configure the NUT server for the UPS
+    description:
+      - Installs NUT in netserver mode with the host as the UPS's primary, and
+        writes the driver, upsd, user and upsmon configuration.
+      - >-
+        On low battery the primary sets FSD, shuts itself down and commands
+        killpower; the UPS then cuts its output nut_ups_offdelay seconds later.
+        That delay, not the primary's own HOSTSYNC wait, is what gives the
+        secondaries time to shut down cleanly.
+    options:
+      nut_ups_name:
+        description: Name the UPS is served under, as secondaries address it.
+        type: str
+        required: true
+      nut_user:
+        description: upsd account the Talos nodes monitor the UPS with.
+        type: str
+        required: true
+      nut_password:
+        description: Password for nut_user.
+        type: str
+        required: true
+      nut_admin_password:
+        description: Password for the admin upsd account.
+        type: str
+        required: true
+      nut_localuser_password:
+        description: Password for localuser, the primary upsmon on this host.
+        type: str
+        required: true
+      nut_monuser_password:
+        description: Password for monuser, the account Synology DSM connects as.
+        type: str
+        required: true
+      nut_ups_driver:
+        description: NUT driver for the UPS. Defaults to usbhid-ups.
+        type: str
+      nut_ups_port:
+        description: Driver port. Defaults to auto.
+        type: str
+      nut_ups_desc:
+        description: Description of the UPS. Defaults to "Main UPS".
+        type: str
+      nut_ups_runtime_low:
+        description:
+          - Remaining runtime in seconds at which NUT raises low battery.
+            Must cover the slowest secondary's shutdown. Defaults to 600.
+        type: int
+      nut_ups_charge_low:
+        description:
+          - Remaining charge in percent at which NUT raises low battery.
+            Defaults to 15.
+        type: int
+      nut_ups_offdelay:
+        description:
+          - Seconds the UPS keeps its output on after killpower. Must exceed
+            the slowest secondary's shutdown. Defaults to 180.
+        type: int
+      nut_ups_ondelay:
+        description:
+          - Seconds the UPS waits after mains returns before restoring output.
+            Must exceed nut_ups_offdelay. Defaults to 240.
+        type: int
+      nut_listen_address:
+        description: Address upsd listens on. Defaults to 0.0.0.0.
+        type: str
+      nut_listen_port:
+        description: Port upsd listens on. Defaults to 3493.
+        type: int

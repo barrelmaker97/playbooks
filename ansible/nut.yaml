@@ -1,0 +1,10 @@
+---
+- name: Deploy NUT server
+  hosts: ups_servers
+  become: true
+  gather_facts: false
+  vars_files:
+    - vars/nut.yaml
+  roles:
+    - role: nut
+      tags: [nut]

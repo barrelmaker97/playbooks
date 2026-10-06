@@ -1,0 +1,19 @@
+[admin]
+  password = {{ nut_admin_password }}
+  actions = set
+  actions = fsd
+  instcmds = ALL
+
+[localuser]
+  password = {{ nut_localuser_password }}
+  upsmon primary
+
+# The Talos nodes, through the nut-client extension
+[{{ nut_user }}]
+  password = {{ nut_password }}
+  upsmon secondary
+
+# Synology DSM only connects as monuser
+[monuser]
+  password = {{ nut_monuser_password }}
+  upsmon secondary

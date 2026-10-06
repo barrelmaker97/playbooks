@@ -1,0 +1,15 @@
+---
+- name: Restart nut-driver
+  ansible.builtin.systemd:
+    name: "nut-driver@{{ nut_ups_name }}"
+    state: restarted
+
+- name: Restart nut-server
+  ansible.builtin.systemd:
+    name: nut-server
+    state: restarted
+
+- name: Restart nut-monitor
+  ansible.builtin.systemd:
+    name: nut-monitor
+    state: restarted
