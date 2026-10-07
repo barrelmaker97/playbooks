@@ -81,6 +81,9 @@ spec:
 
     service:
       type: LoadBalancer
+      # The router forwards the game port to this address.
+      annotations:
+        metallb.io/loadBalancerIPs: 192.168.15.62
       port: 25565
 
     resources:

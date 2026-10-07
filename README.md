@@ -174,6 +174,9 @@ and shuts everything down for real.
 | Node 3       | 192.168.15.43               | node3-poseidon.lan |
 | MetalLB pool | 192.168.15.60-192.168.15.69 |                    |
 | Gateway      | 192.168.15.60               | poseidon.lan       |
+| Valheim      | 192.168.15.61               |                    |
+| Niucraft     | 192.168.15.62               |                    |
+| Loch         | 192.168.15.63               |                    |
 
 ### DNS
 | Name       | Address       | Hostname   | Role   |
