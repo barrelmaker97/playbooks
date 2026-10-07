@@ -109,7 +109,9 @@ Flux manages itself: upgrade Flux or its operator by editing
 1. Create `kubernetes/apps/<app>/` with a `kustomization.yaml` and the app's
    HelmRelease, and `../../components/helmrelease` under `components` in that
    `kustomization.yaml`. Put it in the shared `barrelmaker` namespace, or give
-   it its own `namespace.yaml` with `kustomize.toolkit.fluxcd.io/prune: disabled`.
+   it its own `namespace.yaml` with `kustomize.toolkit.fluxcd.io/prune: disabled`
+   that enforces the `restricted` Pod Security Standard, as the app namespaces
+   do. Charts from `charts.barrelmaker.dev` meet it with their default values.
 2. Add a Flux Kustomization for it to `kubernetes/clusters/poseidon/apps.yaml`,
    with `prune: true` and the `dependsOn` its resources need (listed at the top
    of that file).

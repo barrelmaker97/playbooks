@@ -38,20 +38,6 @@ spec:
         matchLabelKeys:
           - pod-template-hash
 
-    podSecurityContext:
-      seccompProfile:
-        type: RuntimeDefault
-      runAsNonRoot: true
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
-
-    securityContext:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-          - ALL
-
     resources:
       requests:
         cpu: 10m

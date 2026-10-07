@@ -28,13 +28,9 @@ spec:
       storageClassName: longhorn-protected
       size: 10Gi
 
+    # The files on its volume belong to 111, not the image's steam user (1000).
     podSecurityContext:
-      seccompProfile:
-        type: RuntimeDefault
-      runAsNonRoot: true
       runAsUser: 111
-      runAsGroup: 1000
-      fsGroup: 1000
 
     service:
       type: LoadBalancer

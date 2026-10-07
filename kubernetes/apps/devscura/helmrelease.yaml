@@ -68,29 +68,6 @@ spec:
           memory: 256Mi
         limits:
           memory: 512Mi
-      podSecurityContext:
-        fsGroup: 10001
-        runAsGroup: 10001
-        runAsUser: 10001
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
-
-    bucketSetup:
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        capabilities:
-          drop:
-            - ALL
-
-    podSecurityContext:
-      fsGroup: 10001
-      runAsGroup: 10001
-      runAsUser: 10001
-      runAsNonRoot: true
-      seccompProfile:
-        type: RuntimeDefault
 
     resources:
       requests:
@@ -98,12 +75,6 @@ spec:
         memory: 128Mi
       limits:
         memory: 256Mi
-
-    securityContext:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-          - ALL
 
     httpRoute:
       enabled: true
