@@ -32,11 +32,6 @@ spec:
             memory: 10Mi
           limits:
             memory: 30Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
       httpRoute:
         enabled: true
         parentRefs:
@@ -83,20 +78,6 @@ spec:
         ThePrimeus,
         Celery_Trainer,
         ninjahomie7
-
-    podSecurityContext:
-      seccompProfile:
-        type: RuntimeDefault
-      runAsNonRoot: true
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
-
-    securityContext:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-          - ALL
 
     service:
       type: LoadBalancer

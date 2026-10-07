@@ -21,11 +21,6 @@ spec:
       ref: main
       contentDirectory: website
       periodSeconds: 300
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-            - ALL
       resources:
         requests:
           cpu: 20m
@@ -50,20 +45,6 @@ spec:
             app.kubernetes.io/instance: website
         matchLabelKeys:
           - pod-template-hash
-
-    podSecurityContext:
-      seccompProfile:
-        type: RuntimeDefault
-      runAsNonRoot: true
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
-
-    securityContext:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-          - ALL
 
     httpRoute:
       enabled: true
