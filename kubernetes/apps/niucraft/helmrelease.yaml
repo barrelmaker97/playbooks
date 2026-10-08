@@ -51,7 +51,7 @@ spec:
     properties:
       aikarFlags: true
       enforceWhitelist: true
-      memory: "6G"
+      memory: "4G"
       motd: "NIUCraft Server"
       ops: "Barrelmaker97"
       existingWhitelist: "SYNCHRONIZE"
@@ -89,6 +89,6 @@ spec:
     resources:
       requests:
         cpu: 1000m
-        memory: 7500Mi
+        memory: 4608Mi
       limits:
-        memory: 8000Mi
+        memory: 5632Mi
