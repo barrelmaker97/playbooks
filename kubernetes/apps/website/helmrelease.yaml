@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: website
-      version: "0.7.1"
+      version: "0.8.0"
       sourceRef:
         kind: HelmRepository
         name: barrelmaker
@@ -58,6 +58,6 @@ spec:
     resources:
       requests:
         cpu: 20m
-        memory: 600Mi
+        memory: 32Mi
       limits:
-        memory: 700Mi
+        memory: 128Mi
