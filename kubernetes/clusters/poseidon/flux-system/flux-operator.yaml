@@ -47,3 +47,8 @@ spec:
       retryInterval: 15m
   driftDetection:
     mode: enabled
+  values:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 192Mi

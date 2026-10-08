@@ -24,3 +24,12 @@ spec:
     url: https://github.com/barrelmaker97/homelab.git
     ref: refs/heads/main
     path: kubernetes/clusters/poseidon
+  kustomize:
+    patches:
+      - target:
+          kind: Deployment
+          name: "(helm|kustomize|source)-controller"
+        patch: |
+          - op: replace
+            path: /spec/template/spec/containers/0/resources/requests/memory
+            value: 192Mi
