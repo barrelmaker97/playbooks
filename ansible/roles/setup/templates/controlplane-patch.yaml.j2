@@ -12,6 +12,16 @@ cluster:
   scheduler:
     extraArgs:
       bind-address: 0.0.0.0
+    resources:
+      requests:
+        cpu: 10m
+        memory: 128Mi
+  # Sized from the 7-day p95; Talos's default 512Mi is a third of real use.
+  apiServer:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 1536Mi
 
 machine:
   certSANs:
