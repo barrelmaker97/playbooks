@@ -96,7 +96,7 @@
       enabled: false,
     },
     {
-      description: 'Obscura dev is the staging environment: its chart updates arrive first, in a PR of their own',
+      description: 'Obscura dev is the staging environment: its updates get a PR of their own',
       matchFileNames: ['kubernetes/apps/obscura/dev/**'],
       additionalBranchPrefix: 'obscura-dev-',
       commitMessageSuffix: '(dev)',

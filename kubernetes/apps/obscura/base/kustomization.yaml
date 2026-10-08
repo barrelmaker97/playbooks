@@ -1,7 +1,4 @@
 ---
-# Obscura, as prod (../prod) and dev (../dev) run it. The overlays set the
-# namespace, the chart version, the hostname, the values secret and the
-# alerts; everything else is here.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:

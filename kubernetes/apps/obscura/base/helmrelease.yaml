@@ -6,8 +6,7 @@ metadata:
   namespace: obscura
 spec:
   releaseName: obscura
-  # The chart and its version are set by each overlay, so dev can run a
-  # version before prod does.
+  # Each overlay sets the chart, so dev can run a version before prod.
   # The sops values only add keys that the values below do not set, so the
   # merge order (valuesFrom first, then values) does not change the result.
   valuesFrom:

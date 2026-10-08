@@ -1,6 +1,4 @@
 ---
-# One instance and no synchronous replication: dev does not need prod's
-# availability, and a single instance leaves room in the quota.
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
