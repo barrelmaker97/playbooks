@@ -1,0 +1,21 @@
+---
+# Renovate opens prod's chart updates three days after dev's; see
+# renovate.json5.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: obscura
+spec:
+  chart:
+    spec:
+      chart: obscura
+      version: "0.14.2"
+      sourceRef:
+        kind: HelmRepository
+        name: barrelmaker
+        namespace: flux-system
+      interval: 1h
+  values:
+    httpRoute:
+      hostnames:
+        - "obscura.barrelmaker.dev"

@@ -2,18 +2,18 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: devscura-postgres
+  name: obscura-postgres
   namespace: obscura-dev
 spec:
   groups:
-    - name: devscura-postgres.availability
+    - name: obscura-postgres.availability
       rules:
         - alert: CloudNativePGInstancesNotReady
           expr: >-
             (
               count(
                 up{
-                  job="obscura-dev/devscura-postgres"
+                  job="obscura-dev/obscura-postgres"
                 } == 1
               )
               or vector(0)
@@ -21,12 +21,12 @@ spec:
           for: 2m
           labels:
             severity: warning
-            cnpg_cluster: devscura-postgres
-            job: obscura-dev/devscura-postgres
+            cnpg_cluster: obscura-postgres
+            job: obscura-dev/obscura-postgres
             namespace: obscura-dev
           annotations:
             summary: >-
-              CloudNativePG cluster obscura-dev/devscura-postgres
+              CloudNativePG cluster obscura-dev/obscura-postgres
               has unavailable instances
             description: >-
               Fewer than 1 PostgreSQL
@@ -35,13 +35,13 @@ spec:
         - alert: CloudNativePGPostgresDown
           expr: >-
             cnpg_collector_up{
-              job="obscura-dev/devscura-postgres"
+              job="obscura-dev/obscura-postgres"
             } == 0
           for: 1m
           labels:
             severity: warning
-            cnpg_cluster: devscura-postgres
-            job: obscura-dev/devscura-postgres
+            cnpg_cluster: obscura-postgres
+            job: obscura-dev/obscura-postgres
             namespace: obscura-dev
           annotations:
             summary: >-
@@ -50,18 +50,18 @@ spec:
               The CloudNativePG collector cannot connect to PostgreSQL on
               {{ $labels.pod }}.
 
-    - name: devscura-postgres.operations
+    - name: obscura-postgres.operations
       rules:
         - alert: CloudNativePGLongRunningTransaction
           expr: >-
             cnpg_backends_max_tx_duration_seconds{
-              job="obscura-dev/devscura-postgres"
+              job="obscura-dev/obscura-postgres"
             } > 300
           for: 1m
           labels:
             severity: warning
-            cnpg_cluster: devscura-postgres
-            job: obscura-dev/devscura-postgres
+            cnpg_cluster: obscura-postgres
+            job: obscura-dev/obscura-postgres
             namespace: obscura-dev
           annotations:
             summary: >-
@@ -73,14 +73,14 @@ spec:
           expr: >-
             max by (namespace, job, datname) (
               cnpg_pg_database_xid_age{
-                job="obscura-dev/devscura-postgres"
+                job="obscura-dev/obscura-postgres"
               }
             ) > 300000000
           for: 5m
           labels:
             severity: warning
-            cnpg_cluster: devscura-postgres
-            job: obscura-dev/devscura-postgres
+            cnpg_cluster: obscura-postgres
+            job: obscura-dev/obscura-postgres
             namespace: obscura-dev
           annotations:
             summary: >-
@@ -94,15 +94,15 @@ spec:
             sum by (namespace, job, datname) (
               increase(
                 cnpg_pg_stat_database_deadlocks{
-                  job="obscura-dev/devscura-postgres",
+                  job="obscura-dev/obscura-postgres",
                   datname!=""
                 }[10m]
               )
             ) > 0
           labels:
             severity: warning
-            cnpg_cluster: devscura-postgres
-            job: obscura-dev/devscura-postgres
+            cnpg_cluster: obscura-postgres
+            job: obscura-dev/obscura-postgres
             namespace: obscura-dev
           annotations:
             summary: >-
@@ -113,13 +113,13 @@ spec:
         - alert: CloudNativePGMetricsCollectionError
           expr: >-
             cnpg_collector_last_collection_error{
-              job="obscura-dev/devscura-postgres"
+              job="obscura-dev/obscura-postgres"
             } == 1
           for: 2m
           labels:
             severity: warning
-            cnpg_cluster: devscura-postgres
-            job: obscura-dev/devscura-postgres
+            cnpg_cluster: obscura-postgres
+            job: obscura-dev/obscura-postgres
             namespace: obscura-dev
           annotations:
             summary: >-

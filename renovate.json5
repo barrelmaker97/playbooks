@@ -95,5 +95,19 @@
       matchUpdateTypes: ['major'],
       enabled: false,
     },
+    {
+      description: 'Obscura dev is the staging environment: its chart updates arrive first, in a PR of their own',
+      matchFileNames: ['kubernetes/apps/obscura/dev/**'],
+      additionalBranchPrefix: 'obscura-dev-',
+      commitMessageSuffix: '(dev)',
+    },
+    {
+      description: 'Obscura prod gets a chart update three days after dev, so it runs in dev first',
+      matchFileNames: ['kubernetes/apps/obscura/prod/**'],
+      additionalBranchPrefix: 'obscura-prod-',
+      commitMessageSuffix: '(prod)',
+      minimumReleaseAge: '3 days',
+      prBodyNotes: ['Promote only once this version has run in obscura-dev (devscura.barrelmaker.dev) without problems.'],
+    },
   ],
 }
