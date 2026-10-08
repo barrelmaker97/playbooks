@@ -2,24 +2,16 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: devscura
-  namespace: obscura-dev
+  name: obscura
+  namespace: obscura
 spec:
-  releaseName: devscura
-  chart:
-    spec:
-      chart: obscura
-      version: 0.14.2
-      sourceRef:
-        kind: HelmRepository
-        name: barrelmaker
-        namespace: flux-system
-      interval: 1h
+  releaseName: obscura
+  # Each overlay sets the chart, so dev can run a version before prod.
   # The sops values only add keys that the values below do not set, so the
   # merge order (valuesFrom first, then values) does not change the result.
   valuesFrom:
     - kind: Secret
-      name: devscura-values
+      name: obscura-values
   values:
     replicaCount: 3
 
@@ -35,14 +27,14 @@ spec:
         labelSelector:
           matchLabels:
             app.kubernetes.io/name: obscura
-            app.kubernetes.io/instance: devscura
+            app.kubernetes.io/instance: obscura
         matchLabelKeys:
           - pod-template-hash
 
     obscura:
       database:
         existingSecret:
-          name: devscura-postgres-app
+          name: obscura-postgres-app
           key: uri
       telemetry:
         otlpEndpoint: http://otel.monitoring.svc.cluster.local:4317
@@ -79,11 +71,9 @@ spec:
     httpRoute:
       enabled: true
       parentRefs:
-        - name: poseidon
-          namespace: envoy-gateway-system
-          sectionName: https-wildcard
-      hostnames:
-        - devscura.barrelmaker.dev
+        - name: "poseidon"
+          namespace: "envoy-gateway-system"
+          sectionName: "https-wildcard"
 
     securityPolicy:
       cors:

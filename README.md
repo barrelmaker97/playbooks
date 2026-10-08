@@ -36,6 +36,9 @@ rendered diff, and merging deploys it; nothing automerges.
 - Major updates wait on the Dependency Dashboard issue until ticked.
 - kubectl gets patches only; it follows the cluster (see Cluster Upgrade).
 - PostgreSQL major versions are disabled: they are data migrations.
+- Obscura's dev overlay is its staging environment: a chart update arrives
+  for dev first, and for prod in a separate PR three days later. Merge prod's
+  only once the version has run in dev.
 
 # Running Playbooks
 Playbooks run from `ansible/`, where its `ansible.cfg`, inventory and
@@ -74,6 +77,7 @@ Flux manages itself: upgrade Flux or its operator by editing
 | `kubernetes/infrastructure/<layer>` | Platform layers, ordered bottom up by `dependsOn` in `infrastructure.yaml` |
 | `kubernetes/apps/<app>`             | The app's HelmRelease, plus its namespace, database and alerts where it owns them |
 | `kubernetes/apps/barrelmaker`       | The namespace most apps share, with its quota and limit range |
+| `kubernetes/apps/obscura`           | Obscura as a `base` with `prod` and `dev` overlays; dev is its staging environment (see Updates) |
 | `kubernetes/components/helmrelease` | The settings every HelmRelease shares, listed under `components` beside each one |
 
 ## How deploys work
@@ -121,10 +125,10 @@ Flux manages itself: upgrade Flux or its operator by editing
 ## Day to day
 ```bash
 flux get all -A                                   # Status of every Flux object
-flux reconcile kustomization devscura --with-source  # Apply now instead of waiting
-flux diff kustomization devscura --path kubernetes/apps/devscura  # Preview local changes
-flux suspend helmrelease devscura -n obscura-dev   # Pause while fixing by hand
-flux resume helmrelease devscura -n obscura-dev
+flux reconcile kustomization obscura-dev --with-source  # Apply now instead of waiting
+flux diff kustomization obscura-dev --path kubernetes/apps/obscura/dev  # Preview local changes
+flux suspend helmrelease obscura -n obscura-dev   # Pause while fixing by hand
+flux resume helmrelease obscura -n obscura-dev
 flux events -A                                    # Why something is not Ready
 ```
 
