@@ -33,3 +33,11 @@ spec:
           - op: replace
             path: /spec/template/spec/containers/0/resources/requests/memory
             value: 192Mi
+      # CPU limits throttled the controllers (helm-controller in up to 34% of
+      # scheduling periods) while they averaged ~30m.
+      - target:
+          kind: Deployment
+          name: "(helm|kustomize|source|notification)-controller"
+        patch: |
+          - op: remove
+            path: /spec/template/spec/containers/0/resources/limits/cpu
