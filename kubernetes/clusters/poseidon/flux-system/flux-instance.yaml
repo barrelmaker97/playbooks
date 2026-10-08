@@ -24,20 +24,42 @@ spec:
     url: https://github.com/barrelmaker97/homelab.git
     ref: refs/heads/main
     path: kubernetes/clusters/poseidon
+  # Strategic-merge patches, so they apply whether or not a Flux release sets
+  # the field: a JSON patch remove fails on a missing key and would block the
+  # upgrade.
   kustomize:
     patches:
       - target:
           kind: Deployment
           name: "(helm|kustomize|source)-controller"
         patch: |
-          - op: replace
-            path: /spec/template/spec/containers/0/resources/requests/memory
-            value: 192Mi
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: all
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: manager
+                    resources:
+                      requests:
+                        memory: 192Mi
       # CPU limits throttled the controllers (helm-controller in up to 34% of
       # scheduling periods) while they averaged ~30m.
       - target:
           kind: Deployment
           name: "(helm|kustomize|source|notification)-controller"
         patch: |
-          - op: remove
-            path: /spec/template/spec/containers/0/resources/limits/cpu
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: all
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: manager
+                    resources:
+                      limits:
+                        cpu: null
