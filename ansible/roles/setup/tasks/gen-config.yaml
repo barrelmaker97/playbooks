@@ -7,16 +7,11 @@
   vars:
     node_hostname: "{{ item }}"
 
-# --talos-version v1.13 keeps the single-document config format the nodes
-# run: from 1.14, gen config emits separate documents (KubeAPIServerConfig,
-# KubeletConfig, ...) that conflict with this patch's cluster and machine
-# settings, and KubeletConfig has no field for the Longhorn mount.
 - name: Generate machine config for {{ item }}
   changed_when: true
   ansible.builtin.command: >
     sops exec-file "{{ role_path }}/files/secrets.sops.yaml"
     'talosctl gen config --force
-    --talos-version v1.13
     --with-docs=false
     --with-examples=false
     --with-secrets {}

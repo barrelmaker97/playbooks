@@ -1,35 +1,11 @@
 cluster:
-  allowSchedulingOnControlPlanes: true
   etcd:
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
-  controllerManager:
-    extraArgs:
-      bind-address: 0.0.0.0
-  proxy:
-    extraArgs:
-      metrics-bind-address: 0.0.0.0:10249
-  scheduler:
-    extraArgs:
-      bind-address: 0.0.0.0
-    resources:
-      requests:
-        cpu: 10m
-        memory: 128Mi
-  # Sized from the 7-day p95; Talos's default 512Mi is a third of real use.
-  apiServer:
-    resources:
-      requests:
-        cpu: 200m
-        memory: 1536Mi
 
 machine:
   certSANs:
     - "{{ node_hostname }}.{{ local_domain }}"
-  install:
-    image: factory.talos.dev/installer/{{ setup_factory_response.json.id }}:v{{ talos_version }}
-    disk: "{{ install_disk }}"
-    wipe: false
   network:
     interfaces:
       - interface: "{{ interface_name }}"
@@ -45,16 +21,52 @@ machine:
       bootTimeout: 2m0s
       servers:
           - "{{ ntp_server }}"
-  kubelet:
-    extraMounts:
-      - destination: /var/mnt/longhorn
-        type: bind
-        source: /var/mnt/longhorn
-        options:
-          - bind
-          - rshared
-          - rw
 ---
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+installer:
+  image: factory.talos.dev/installer/{{ setup_factory_response.json.id }}:v{{ talos_version }}
+provisioning:
+  diskSelector:
+    match: disk.dev_path == "{{ install_disk }}"
+  wipe: false
+---
+# Run workloads on the control plane nodes, which are the only nodes.
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+taints:
+  node-role.kubernetes.io/control-plane:
+    $patch: delete
+---
+apiVersion: v1alpha1
+kind: KubeAPIServerConfig
+# Sized from the 7-day p95; the default 512Mi is a third of real use.
+resources:
+  requests:
+    cpu: 200m
+    memory: 1536Mi
+---
+apiVersion: v1alpha1
+kind: KubeControllerManagerConfig
+extraArgs:
+  bind-address: 0.0.0.0
+---
+apiVersion: v1alpha1
+kind: KubeSchedulerConfig
+extraArgs:
+  bind-address: 0.0.0.0
+resources:
+  requests:
+    cpu: 10m
+    memory: 128Mi
+---
+apiVersion: v1alpha1
+kind: KubeProxyConfig
+config:
+  metricsBindAddress: 0.0.0.0:10249
+---
+# Longhorn's disk. Talos mounts it at /var/mnt/longhorn and propagates it into
+# the kubelet, so it needs no kubelet mount.
 apiVersion: v1alpha1
 kind: UserVolumeConfig
 name: longhorn
