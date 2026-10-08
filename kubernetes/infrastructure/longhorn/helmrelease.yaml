@@ -18,6 +18,18 @@ spec:
         namespace: flux-system
       interval: 1h
   values:
+    # The chart can set resources only for these two; Longhorn creates its
+    # CSI and instance-manager pods itself.
+    longhornManager:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 384Mi
+    longhornGlobalManager:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
     persistence:
       defaultClass: false
       defaultDataLocality: best-effort
