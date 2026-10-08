@@ -22,7 +22,7 @@ kubeconform = "0.8.0"
 # ansible/requirements.yml. kubernetes.core needs the kubernetes library in
 # ansible's own environment.
 python = "3.14.8"
-uv = "0.12.23"
+uv = "0.12.24"
 "pypi:ansible-core" = { version = "2.21.5", with = ["kubernetes"] }
 "pypi:ansible-lint" = { version = "26.9.0", with = ["ansible-core==2.21.5"] }
 
