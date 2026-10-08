@@ -67,7 +67,7 @@ spec:
         minecraft-sqlite-jdbc
       type: "FABRIC"
       version: "1.21.11"
-      viewDistance: "32"
+      viewDistance: "16"
       whitelist: >-
         BakerGang2022,
         Barrelmaker97,
