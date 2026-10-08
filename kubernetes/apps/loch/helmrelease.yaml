@@ -43,7 +43,7 @@ spec:
       port: 34197
     resources:
       requests:
-        cpu: 800m
+        cpu: 200m
         memory: 3000Mi
       limits:
         memory: 3100Mi

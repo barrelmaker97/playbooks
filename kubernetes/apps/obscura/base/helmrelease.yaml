@@ -63,10 +63,18 @@ spec:
 
     resources:
       requests:
-        cpu: 100m
-        memory: 128Mi
+        cpu: 25m
+        memory: 64Mi
       limits:
         memory: 256Mi
+
+    valkey:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 128Mi
 
     httpRoute:
       enabled: true
