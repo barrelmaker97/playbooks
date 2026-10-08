@@ -10,6 +10,10 @@ patches:
     target:
       kind: HelmRelease
       name: obscura
+  - path: postgres-cluster.yaml
+    target:
+      kind: Cluster
+      name: obscura-postgres
 
 # kustomize-controller decrypts values.sops.yaml before building; see
 # kubernetes/apps/loch/kustomization.yaml.

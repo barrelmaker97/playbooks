@@ -17,7 +17,7 @@ spec:
                 } == 1
               )
               or vector(0)
-            ) < 1
+            ) < 3
           for: 2m
           labels:
             severity: warning
@@ -29,7 +29,7 @@ spec:
               CloudNativePG cluster obscura-dev/obscura-postgres
               has unavailable instances
             description: >-
-              Fewer than 1 PostgreSQL
+              Fewer than 3 PostgreSQL
               instances have healthy Prometheus scrape targets.
 
         - alert: CloudNativePGPostgresDown
@@ -49,6 +49,68 @@ spec:
             description: >-
               The CloudNativePG collector cannot connect to PostgreSQL on
               {{ $labels.pod }}.
+
+        - alert: CloudNativePGReplicaNotStreaming
+          expr: >-
+            cnpg_pg_replication_in_recovery{
+              job="obscura-dev/obscura-postgres"
+            }
+            >
+            cnpg_pg_replication_is_wal_receiver_up{
+              job="obscura-dev/obscura-postgres"
+            }
+          for: 2m
+          labels:
+            severity: warning
+            cnpg_cluster: obscura-postgres
+            job: obscura-dev/obscura-postgres
+            namespace: obscura-dev
+          annotations:
+            summary: >-
+              PostgreSQL replica {{ $labels.pod }} is not streaming
+            description: >-
+              The replica is in recovery but its WAL receiver is not running.
+
+        - alert: CloudNativePGReplicationLagHigh
+          expr: >-
+            cnpg_pg_replication_lag{
+              job="obscura-dev/obscura-postgres"
+            } > 300
+          for: 2m
+          labels:
+            severity: warning
+            cnpg_cluster: obscura-postgres
+            job: obscura-dev/obscura-postgres
+            namespace: obscura-dev
+          annotations:
+            summary: >-
+              PostgreSQL replica {{ $labels.pod }} is over five minutes behind
+            description: >-
+              Replication lag has remained above 300 seconds for two minutes.
+
+        - alert: CloudNativePGSynchronousReplicasUnavailable
+          expr: >-
+            cnpg_collector_sync_replicas{
+              job="obscura-dev/obscura-postgres",
+              value="observed"
+            }
+            < ignoring(value)
+            cnpg_collector_sync_replicas{
+              job="obscura-dev/obscura-postgres",
+              value="expected"
+            }
+          for: 1m
+          labels:
+            severity: warning
+            cnpg_cluster: obscura-postgres
+            job: obscura-dev/obscura-postgres
+            namespace: obscura-dev
+          annotations:
+            summary: >-
+              CloudNativePG cluster obscura-postgres lacks synchronous replicas
+            description: >-
+              Fewer synchronous replicas are available than required; commits
+              may block to preserve data durability.
 
     - name: obscura-postgres.operations
       rules:
